@@ -3,9 +3,6 @@ node_modules
 /dist
 /lib
 /fonts
-/docs/demo
-/docs/dist
-/docs/index.html
 *-lock.json
 
 # local env files
