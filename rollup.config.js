@@ -37,11 +37,7 @@ const config = {
     format: 'umd', // 输出 ＵＭＤ格式，各种模块规范通用
     name: 'showdowns', // 打包后的全局变量，如浏览器端 window.ReactRedux;
     sourcemap: true,
-    banner: banner,
-    globals: {
-      showdown: 'showdown',
-      showdowns: 'showdowns'
-    }
+    banner: banner
   },
   onwarn: (msg, warn) => {
     if (!/Circular/.test(msg)) {

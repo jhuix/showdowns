@@ -1,7 +1,6 @@
 'use strict';
 
 import './less/preview.less';
-//import "../node_modules/katex/dist/fonts/KaTeX_AMS-Regular.woff2";
 import '../node_modules/katex/dist/katex.min.css';
 
 import showdown from 'showdown';
@@ -13,7 +12,7 @@ import showdownPlantuml from './extensions/showdown-plantuml.js';
 import showdownFootnotes from './extensions/showdown-footnotes.js';
 import * as zlibcodec from './utils/zlib-codec.js';
 
-const getOptions = options => {
+const getOptions = (options = {}) => {
   return {
     flavor: 'github',
     strikethrough: true,
@@ -27,7 +26,7 @@ const getOptions = options => {
   };
 };
 
-const getExtensions = extensions => {
+const getExtensions = (extensions = []) => {
   return [
     showdownToc,
     showdownAlign,
@@ -41,37 +40,36 @@ const getExtensions = extensions => {
 const showdowns = {
   showdown: showdown,
   converter: null,
-  options: {},
-  extensions: [],
-  setOptions: options => {
-    if (showdowns.converter) {
+  defaultOptions: getExtensions(),
+  defaultExtensions: getOptions(),
+  addOptions: function(options) {
+    if (this.converter) {
       for (const key in options) {
         if (key === 'flavor') {
-          showdowns.converter.setFlavor(options[key]);
+          this.converter.setFlavor(options[key]);
         } else {
-          showdowns.converter.setOption(key, options[key]);
+          this.converter.setOption(key, options[key]);
         }
       }
     }
   },
-  setExtensions: extensions => {
-    if (showdowns.converter) {
-      showdowns.converter.addExtension(extensions);
+  addExtensions: function(extensions) {
+    if (this.converter) {
+      this.converter.addExtension(extensions);
     }
   },
-  init: () => {
-    if (!showdowns.converter) {
+  init: function() {
+    if (!this.converter) {
       // converter instance of showdown
-      showdowns.converter = new showdown.Converter({
-        extensions: getExtensions(showdowns.extensions)
+      this.converter = new showdown.Converter({
+        extensions: this.defaultOptions
       });
 
       // set options of this instance (include flavor)
-      const options = getOptions(showdowns.options);
-      showdowns.setOptions(options);
+      this.addOptions(this.defaultOptions);
     }
   },
-  makeHtml: doc => {
+  makeHtml: function(doc) {
     let content = '';
     if (typeof doc === 'object') {
       if (doc.content !== 'string') {
@@ -86,8 +84,8 @@ const showdowns = {
     } else {
       content = doc;
     }
-    const html = showdowns.converter
-      ? showdowns.converter.makeHtml(content)
+    const html = this.converter
+      ? this.converter.makeHtml(content)
       : '';
     return `<div class='markdown-preview'>${html}</div>`;
   }
