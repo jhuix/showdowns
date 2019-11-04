@@ -68,6 +68,7 @@ const showdowns = {
       // set options of this instance (include flavor)
       this.addOptions(this.defaultOptions);
     }
+    return this;
   },
   makeHtml: function(doc) {
     let content = '';
