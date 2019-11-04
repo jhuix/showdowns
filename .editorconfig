@@ -1,0 +1,26 @@
+root = true
+
+[*]
+charset = utf-8
+indent_style = space
+indent_size = 2
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+[*.{js,jsx,ts,tsx,vue}]
+continuation_indent_size = 2
+quote_type = single
+space_after_anonymous_functions = true
+space_after_control_statements = true
+spaces_around_operators = true
+spaces_in_brackets = false
+curly_bracket_next_line = true
+indent_brace_style = 1TBS
+
+[*.md]
+trim_trailing_whitespace = false
+
+[**.min.js]
+indent_style = ignore
+insert_final_newline = ignore

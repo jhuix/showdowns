@@ -1,0 +1,71 @@
+{
+  "name": "@jhuix/showdowns",
+  "version": "0.1.0",
+  "description": "A lib that make markdown to html with some extensions of showdown.js.",
+  "main": "dist/showdowns.js",
+  "browser": "dist/showdowns.js",
+  "jsnext:main": "src/showdowns.js",
+  "moduleMain": "lib/showdowns.js",
+  "unpkg": "lib/showdowns.js",
+  "scripts": {
+    "build": "npm run build:umd && npm run build:umd:min && npm run build:cjs && npm run build:cjs:min",
+    "build:umd": "rollup -c && rimraf fonts",
+    "build:umd:min": "rollup -c --environment MIN && rimraf fonts",
+    "build:cjs": "rollup -c --environment TARGET:cjs",
+    "build:cjs:min": "rollup -c --environment TARGET:cjs --environment MIN",
+    "clean": "rimraf lib && rimraf dist && rimraf fonts",
+    "prepublishOnly": "npm run clean && npm run build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jhuix/showdowns.git"
+  },
+  "keywords": [
+    "showdown",
+    "markdown",
+    "html",
+    "mermaid",
+    "plantuml",
+    "katex",
+    "toc"
+  ],
+  "files": [
+    "dist",
+    "lib",
+    "src"
+  ],
+  "author": "jhuix",
+  "license": "MIT",
+  "homepage": "https://github.com/jhuix/showdowns#readme",
+  "devDependencies": {
+    "@babel/core": "^7.6.4",
+    "@babel/plugin-external-helpers": "^7.2.0",
+    "@babel/preset-env": "^7.6.3",
+    "autoprefixer": "^9.7.0",
+    "cssnano": "^4.1.10",
+    "less": "^3.10.3",
+    "postcss-nested": "^4.1.2",
+    "postcss-simple-vars": "^5.0.2",
+    "postcss-url": "^8.0.0",
+    "rimraf": "^3.0.0",
+    "rollup": "^1.12.5",
+    "rollup-plugin-babel": "^4.3.3",
+    "rollup-plugin-commonjs": "^10.1.0",
+    "rollup-plugin-copy": "^3.1.0",
+    "rollup-plugin-inject": "^3.0.1",
+    "rollup-plugin-json": "^4.0.0",
+    "rollup-plugin-node-builtins": "^2.1.2",
+    "rollup-plugin-node-globals": "^1.4.0",
+    "rollup-plugin-node-resolve": "^5.2.0",
+    "rollup-plugin-postcss": "^2.0.3",
+    "rollup-plugin-replace": "^2.2.0",
+    "rollup-plugin-terser": "^5.1.2",
+    "rollup-plugin-url": "^3.0.0"
+  },
+  "peerDependencies": {},
+  "dependencies": {
+    "mermaid": "^8.4.0",
+    "showdown": "^1.9.0",
+    "showdown-katex": "^0.6.0"
+  }
+}
