@@ -2,17 +2,18 @@
   "name": "@jhuix/showdowns",
   "version": "0.1.0",
   "description": "A lib that make markdown to html with some extensions of showdown.js.",
-  "main": "dist/showdowns.js",
-  "browser": "dist/showdowns.js",
-  "jsnext:main": "src/showdowns.js",
-  "moduleMain": "lib/showdowns.js",
-  "unpkg": "lib/showdowns.js",
+  "main": "dist/showdowns.min.js",
+  "browser": "dist/showdowns.min.js",
+  "module": "lib/showdowns.min.js",
+  "unpkg": "dist/showdowns.min.js",
   "scripts": {
     "build": "npm run build:umd && npm run build:umd:min && npm run build:cjs && npm run build:cjs:min",
     "build:umd": "rollup -c && rimraf fonts",
     "build:umd:min": "rollup -c --environment MIN && rimraf fonts",
     "build:cjs": "rollup -c --environment TARGET:cjs",
     "build:cjs:min": "rollup -c --environment TARGET:cjs --environment MIN",
+    "build:demo": "rimraf docs/demo && rimraf docs/dist && rollup -c --environment DEMO --environment MIN && rimraf fonts",
+    "publish": "npm run clean && npm run build:umd:min && npm run build:cjs:min",
     "clean": "rimraf lib && rimraf dist && rimraf fonts",
     "prepublishOnly": "npm run clean && npm run build"
   },
@@ -34,9 +35,10 @@
     "lib",
     "src"
   ],
-  "author": "jhuix",
+  "author": "Jhuix (Hui Jin) <jhuix0117@gmail.com>",
   "license": "MIT",
   "homepage": "https://github.com/jhuix/showdowns#readme",
+  "private": false,
   "devDependencies": {
     "@babel/core": "^7.6.4",
     "@babel/plugin-external-helpers": "^7.2.0",
@@ -62,7 +64,6 @@
     "rollup-plugin-terser": "^5.1.2",
     "rollup-plugin-url": "^3.0.0"
   },
-  "peerDependencies": {},
   "dependencies": {
     "mermaid": "^8.4.0",
     "showdown": "^1.9.0",

@@ -5,9 +5,9 @@ import babel from 'rollup-plugin-babel'; // rollup 的 babel 插件，ES6转ES5
 import commonjs from 'rollup-plugin-commonjs'; // 将非ES6语法的包转为ES6可用
 import { terser } from 'rollup-plugin-terser'; // 压缩包
 import json from 'rollup-plugin-json'; // json
-//import url from 'rollup-plugin-url'; // url
 import builtins from 'rollup-plugin-node-builtins'; //集成zlib crypto等库
 import globals from 'rollup-plugin-node-globals';
+import copy from 'rollup-plugin-copy';
 //import replace from "rollup-plugin-replace"; // 替换待打包文件里的一些变量，如 process在浏览器端是不存在的，需要被替换
 
 // 新增 postcss plugins
@@ -16,24 +16,24 @@ import autoprefixer from 'autoprefixer';
 import simplevars from 'postcss-simple-vars';
 import nested from 'postcss-nested';
 import url from 'postcss-url'; // url
-import copy from 'rollup-plugin-copy';
 
 import pkg from './package.json';
 
 const isMinBuild = process.env.MIN === 'true';
 const isFormatCJS = process.env.TARGET === 'cjs';
+const isDemoBuild = process.env.DEMO === 'true';
 const version = process.env.VERSION || pkg.version;
 const banner =
   '/*!\n' +
   ` * showdowns.js v${version}\n` +
-  ` * Copyright (c) 2019-present, Jhuix (jhuix0117@gmail.com)\n` +
+  ` * Copyright (c) 2019-present, Jhuix (Hui Jin) <jhuix0117@gmail.com>\n` +
   ' * Released under the MIT License.\n' +
   ' */';
 
 const config = {
   input: 'src/showdowns.js',
   output: {
-    file: pkg.main,
+    file: pkg.main.replace('.min.js', '.js'),
     format: 'umd', // 输出 ＵＭＤ格式，各种模块规范通用
     name: 'showdowns', // 打包后的全局变量，如浏览器端 window.ReactRedux;
     sourcemap: true,
@@ -85,7 +85,7 @@ const config = {
 
 if (isFormatCJS) {
   // node environment
-  config.output.file = pkg.moduleMain;
+  config.output.file = pkg.module.replace('.min.js', '.js');
   config.output.format = 'cjs';
   config.external.push('mermaid', 'showdown', 'showdown-katex', 'zlib');
 } else {
@@ -113,7 +113,13 @@ if (isFormatCJS) {
     globals(),
     builtins(),
     copy({
-      targets: [{ src: 'fonts', dest: 'dist' }]
+      targets: [
+        { src: 'fonts', dest: 'dist' },
+        isDemoBuild && { src: 'public/*', dest: 'docs' },
+        isDemoBuild && { src: 'demo', dest: 'docs' },
+        isDemoBuild && { src: 'dist/showdowns.min.*', dest: 'docs/dist' },
+        isDemoBuild && { src: 'dist/fonts', dest: 'docs/dist' }
+      ]
     })
   );
 }

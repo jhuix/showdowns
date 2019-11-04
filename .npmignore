@@ -1,12 +1,13 @@
 .DS_Store
 node_modules
-/dist
-/lib
-/fonts
-/docs/demo
-/docs/dist
-/docs/index.html
+/src
+/docs
 *-lock.json
+demo.md
+.babelrc
+.editorconfig
+.gitignore
+.npmignore
 
 # local env files
 .env.local
