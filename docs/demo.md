@@ -1,4 +1,4 @@
-# showdowns
+# Showdowns Demos
 
 A lib that make markdown to html with some extensions of showdown.js.
 

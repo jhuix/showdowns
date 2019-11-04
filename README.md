@@ -11,148 +11,140 @@ It can converte markdown content to html that using the [Showdown](https://githu
 - [Showdown's Markdown syntax](https://github.com/showdownjs/showdown/wiki/Showdown's-Markdown-syntax)
 - [Showdown Options](https://github.com/showdownjs/showdown/wiki/Showdown-options)
 
-## Supporting some markdown extension features
+### Supporting some markdown extension features
 
-[TOC]
+[LaTeX math and AsciiMath](https://github.com/jhuix/showdowns/blob/master/docs/demo.md#latex-math-and-asciimath)
 
-### LaTeX math and AsciiMath
+[Table of Contents](https://github.com/jhuix/showdowns/blob/master/docs/demo.md#table-of-contents)
 
-It's supported by [showdown-katex](https://github.com/obedm503/showdown-katex.git), that render [LaTeX](https://www.latex-project.org/) math and [AsciiMath](http://asciimath.org/) using [KaTeX](https://github.com/Khan/KaTeX), You can check [KaTeX supported functions/symbols](https://khan.github.io/KaTeX/function-support.html).
+[Mermaid](https://github.com/jhuix/showdowns/blob/master/docs/demo.md#mermaid)
 
-#### Math examples
+[Plantuml](https://github.com/jhuix/showdowns/blob/master/docs/demo.md#plantuml)
 
-```asciimath
-x = (-b +- sqrt(b^2-4ac)) / (2a)
-```
+[Footnotes](https://github.com/jhuix/showdowns/blob/master/docs/demo.md#footnotes)
 
-```latex
-x=\frac{ -b\pm\sqrt{ b^2-4ac } } {2a}
-```
+See more information, refer to the following document:
 
-### Table of Contents
+[Extensions Examples](https://github.com/jhuix/showdowns/blob/master/docs/demo.md)
 
-It's implemented sub-TOC in showdown-toc.js.
+### Demo
 
-[TOC]
+See [showdowns Demo](https://jhuix.github.io/showdown/)
 
-#### TOC examples
+## Usage
 
-```
-  [TOC]
-```
+### Installation
 
-### Mermaid
-
-It's implemented in showdown-mermaid.js, render diagrams of Flowchart or Sequence or Gantt using [mermaid](https://github.com/knsv/mermaid), check [mermaid doc](https://mermaidjs.github.io) for more information.
-
-#### Mermaid examples:
-
-##### Flowchart
-
-```mermaid
-graph TD;
-           A-->B;
-           A-->C;
-           B-->D;
-           C-->D;
-```
-
-##### Sequence diagram
-
-```mermaid
-sequenceDiagram
-           participant Alice
-           participant Bob
-           Alice->>John: Hello John, how are you?
-           loop Healthcheck
-               John->>John: Fight against hypochondria
-           end
-           Note right of John: Rational thoughts <br/>prevail!
-           John-->>Alice: Great!
-           John->>Bob: How about you?
-           Bob-->>John: Jolly good!
-```
-
-##### Gantt diagram
-
-```mermaid
-       gantt
-       dateFormat  YYYY-MM-DD
-       title Adding GANTT diagram to mermaid
-       excludes weekdays 2014-01-10
-
-       section A section
-       Completed task            :done,    des1, 2014-01-06,2014-01-08
-       Active task               :active,  des2, 2014-01-09, 3d
-       Future task               :         des3, after des2, 5d
-       Future task2               :         des4, after des3, 5d
-```
-
-### Plantuml
-
-It's implemented in showdown-plantuml.js. render diagrams of uml using [plantuml](http://plantuml.com). To know more about PlantUML, please visit [plantuml website](http://plantuml.com/).
-
-#### Plantuml examples
-
-```plantuml
-      @startuml
-      participant User
-
-      User -> A: DoWork
-      activate A
-
-      A -> B: << createRequest >>
-      activate B
-
-      B -> C: DoWork
-      activate C
-      C --> B: WorkDone
-      destroy C
-
-      B --> A: RequestCreated
-      deactivate B
-
-      A -> User: Done
-      deactivate A
-
-      @enduml
-```
-
-### Footnotes
-
-It's implemented in showdown-footnotes.js, use for reference the [showdown-footnotes](https://github.com/Kriegslustig/showdown-footnotes).
-
-#### Footnotes examples
-
-[^1]: The explanation.
-
-## Using
-
-### Install
+Using npm:
 
     npm install @jhuix/showdowns
 
-### Using
+Note: add --save if you are using npm < 5.0.0
 
-    import showdowns from ''@jhuix/showdowns';
+In a browser:
 
-    showdowns.init();
-    showdowns.makeHtml('# markdown content');
+    <link rel="stylesheet" href="dist/showdowns.min.css">
+    <script src="dist/showdowns.min.js"></script>
 
-#### Options
+In Node.js:
 
-    showdown
+    var showdowns = require('showdowns');
 
-    convertor
+    var showdowns = require('showdowns.core.js');
 
-    defaultOptions
+### Quick Example
 
-    defaultExtensions
+Node
 
-    addOptions
+    var showdowns  = require('showdowns'),
+    showdowns.init()
+    text      = '# hello, markdown!',
+    html      = showdowns.makeHtml(text);
 
-    addExtensions
+Browser
 
-    init
+    showdowns.init()
+    text      = '# hello, markdown!',
+    html      = showdowns.makeHtml(text);
 
-    makeHtml(doc)
+### Options
+
+For more showdown options and extensions, refer to the following document:
+
+[Showdown Options](https://github.com/showdownjs/showdown/blob/master/README.md#options)
+
+[Showdown Extensions](https://github.com/showdownjs/showdown/blob/master/README.md#extensions)
+
+#### defaultOptions
+     
+    defaultOptions = {
+      flavor: 'github',
+      strikethrough: true,
+      tables: true,
+      tasklists: true,
+      underline: true,
+      emoji: true,
+      ghCompatibleHeaderId: false,
+      rawHeaderId: true
+    };
+
+#### defaultExtensions
+
+    defaultExtensions = [
+      showdownToc,
+      showdownAlign,
+      showdownFootnotes,
+      showdownMermaid,
+      showdownKatex(),
+      showdownPlantuml({ imageFormat: 'svg' })
+    ];
+
+### Properties
+
+#### showdown
+
+Type: showdown
+
+Default: showdown
+
+Output showdown.js native object for global.
+
+#### convertor
+
+Type: showdown.convertor | null
+
+Default: null
+
+Output showdown.convertor native object in current showdowns Instance.
+
+### Methods
+
+#### addOptions
+
+Type: {options} => void
+
+A function to add or update options of showdown.convertor.
+
+#### addExtensions
+
+Type: \[extensions] => void
+
+A function to add or update extensions of showdown.convertor.
+
+#### init
+
+Type: void => showdonws
+
+A function to init that be created showdown.convertor instance for showdowns.
+
+#### makeHtml(doc)
+
+Type: {type:'zip', content: string} | string => string
+
+A function to make markdown to html that showdown.convertor converte it in current showdowns instance.
+
+## License
+
+[MIT](http://opensource.org/licenses/MIT)
+
+Copyright (c) 2019-present, [Jhuix](mailto:jhuix0117@gmail.com) (Hui Jin)
