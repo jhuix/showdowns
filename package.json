@@ -32,7 +32,9 @@
   ],
   "files": [
     "dist",
-    "src"
+    "src",
+    "public",
+    "demo"
   ],
   "author": "Jhuix (Hui Jin) <jhuix0117@gmail.com>",
   "license": "MIT",

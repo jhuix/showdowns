@@ -29,7 +29,7 @@ See more information, refer to the following document:
 
 ### Demo
 
-See [showdowns Demo](https://jhuix.github.io/showdown/)
+See [showdowns Demo](https://jhuix.github.io/showdowns/)
 
 ## Usage
 
