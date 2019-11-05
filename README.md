@@ -4,7 +4,7 @@ A lib that make markdown to html with some extensions of showdown.js.
 
 ## Markdown To Html
 
-It can converte markdown content to html that using the [Showdown](https://github.com/showdownjs/showdown).
+It can converte markdown content to html that using the [showdown.js](https://github.com/showdownjs/showdown).
 
 [Showdown](https://github.com/showdownjs/showdown) is a Javascript Markdown to HTML converter, based on the original works by John Gruber. Showdown can be used client side (in the browser) or server side (with NodeJs). For more information, refer to the following document:
 
@@ -48,9 +48,26 @@ In a browser:
 
 In Node.js:
 
+For commonjs
+
     var showdowns = require('showdowns');
 
-    var showdowns = require('showdowns.core.js');
+or
+
+    import 'showdowns/dist/showdowns.core.min.css'
+    import 'katex/dist/katex.min.css'
+
+    import showdowns from 'showdowns';
+
+For umd
+
+    var showdowns = require('showdowns/dist/showdowns.min.js');
+
+or
+
+    import 'showdowns/dist/showdowns.min.css'
+
+    import showdowns from 'showdowns/dist/showdowns.min.js';
 
 ### Quick Example
 
@@ -76,7 +93,11 @@ For more showdown options and extensions, refer to the following document:
 [Showdown Extensions](https://github.com/showdownjs/showdown/blob/master/README.md#extensions)
 
 #### defaultOptions
-     
+
+Type: Object
+
+Default options is described below:
+
     defaultOptions = {
       flavor: 'github',
       strikethrough: true,
@@ -89,6 +110,10 @@ For more showdown options and extensions, refer to the following document:
     };
 
 #### defaultExtensions
+
+Type: Array
+
+Default extensions is described below:
 
     defaultExtensions = [
       showdownToc,
@@ -137,7 +162,7 @@ Type: void => showdonws
 
 A function to init that be created showdown.convertor instance for showdowns.
 
-#### makeHtml(doc)
+#### makeHtml
 
 Type: {type:'zip', content: string} | string => string
 

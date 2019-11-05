@@ -2,20 +2,20 @@
   "name": "@jhuix/showdowns",
   "version": "0.1.0",
   "description": "A lib that make markdown to html with some extensions of showdown.js.",
-  "main": "dist/showdowns.min.js",
+  "main": "dist/showdowns.core.min.js",
   "browser": "dist/showdowns.min.js",
-  "module": "lib/showdowns.min.js",
+  "module": "dist/showdowns.core.min.js",
   "unpkg": "dist/showdowns.min.js",
   "scripts": {
-    "build": "npm run build:umd && npm run build:umd:min && npm run build:cjs && npm run build:cjs:min",
+    "build": "npm run publish && npm run build:demo",
     "build:umd": "rollup -c && rimraf fonts",
     "build:umd:min": "rollup -c --environment MIN && rimraf fonts",
     "build:cjs": "rollup -c --environment TARGET:cjs",
-    "build:cjs:min": "rollup -c --environment TARGET:cjs --environment MIN",
-    "build:demo": "rimraf docs/demo && rimraf docs/dist && rollup -c --environment DEMO --environment MIN && rimraf fonts",
+    "build:cjs:min": "rollup -c --environment MIN,TARGET:cjs",
+    "build:demo": "rimraf docs/demo && rimraf docs/dist && rollup -c --environment DEMO,MIN && rimraf fonts",
+    "build:dev": "npm run build:umd && npm run build:cjs",
     "publish": "npm run clean && npm run build:umd:min && npm run build:cjs:min",
-    "clean": "rimraf lib && rimraf dist && rimraf fonts",
-    "prepublishOnly": "npm run clean && npm run build"
+    "clean": "rimraf dist && rimraf fonts"
   },
   "repository": {
     "type": "git",
@@ -32,7 +32,6 @@
   ],
   "files": [
     "dist",
-    "lib",
     "src"
   ],
   "author": "Jhuix (Hui Jin) <jhuix0117@gmail.com>",

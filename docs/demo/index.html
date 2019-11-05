@@ -82,7 +82,7 @@
     (function (element) {
       showdowns.init();
       axios
-        .get("https://raw.githubusercontent.com/jhuix/showdown-markdown-editor/master/docs/demo.md")
+        .get("https://jhuix.github.io/showdowns/demo.md")
         .then(function (res) {
           element.innerHTML = showdowns.makeHtml(res.data);
         })
