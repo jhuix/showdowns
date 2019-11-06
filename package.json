@@ -7,14 +7,15 @@
   "module": "dist/showdowns.core.min.js",
   "unpkg": "dist/showdowns.min.js",
   "scripts": {
-    "build": "npm run publish && npm run build:demo",
+    "build": "npm run build:release && npm run build:demo",
     "build:umd": "rollup -c && rimraf fonts",
     "build:umd:min": "rollup -c --environment MIN && rimraf fonts",
     "build:cjs": "rollup -c --environment TARGET:cjs",
     "build:cjs:min": "rollup -c --environment MIN,TARGET:cjs",
+    "build:release": "npm run clean && npm run build:umd:min && npm run build:cjs:min",
     "build:demo": "rimraf docs/demo && rimraf docs/dist && rollup -c --environment DEMO,MIN && rimraf fonts",
     "build:dev": "npm run build:umd && npm run build:cjs",
-    "publish": "npm run clean && npm run build:umd:min && npm run build:cjs:min",
+    "prepublishOnly": "npm run build:release",
     "clean": "rimraf dist && rimraf fonts"
   },
   "repository": {
@@ -32,12 +33,11 @@
     "toc"
   ],
   "files": [
+    "demo",
     "dist",
-    "src",
-    "public",
-    "demo"
+    "src"
   ],
-  "author": "Jhuix (Hui Jin) <jhuix0117@gmail.com>",
+  "author": "Jhuix [Hui  Jin] <jhuix0117@gmail.com>",
   "license": "MIT",
   "homepage": "https://github.com/jhuix/showdowns#readme",
   "private": false,
@@ -70,5 +70,8 @@
     "mermaid": "^8.4.0",
     "showdown": "^1.9.0",
     "showdown-katex": "^0.6.0"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }
