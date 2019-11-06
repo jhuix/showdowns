@@ -40,8 +40,8 @@ const getExtensions = (extensions = []) => {
 const showdowns = {
   showdown: showdown,
   converter: null,
-  defaultOptions: getExtensions(),
-  defaultExtensions: getOptions(),
+  defaultOptions: getOptions(),
+  defaultExtensions: getExtensions(),
   addOptions: function(options) {
     if (this.converter) {
       for (const key in options) {
@@ -62,7 +62,7 @@ const showdowns = {
     if (!this.converter) {
       // converter instance of showdown
       this.converter = new showdown.Converter({
-        extensions: this.defaultOptions
+        extensions: this.defaultExtensions
       });
 
       // set options of this instance (include flavor)
@@ -73,22 +73,24 @@ const showdowns = {
   makeHtml: function(doc) {
     let content = '';
     if (typeof doc === 'object') {
-      if (doc.content !== 'string') {
-        return;
-      }
-
-      if (typeof doc.type === 'string' && doc.type === 'zip') {
-        content = zlibcodec.decode(doc.content);
-      } else {
-        content = doc.content;
+      if (typeof doc.content === 'string') {
+        if (typeof doc.type === 'string' && doc.type === 'zip') {
+          content = this.zDecode(doc.content);
+        } else {
+          content = doc.content;
+        }
       }
     } else {
       content = doc;
     }
-    const html = this.converter
-      ? this.converter.makeHtml(content)
-      : '';
+    const html = this.converter && content ? this.converter.makeHtml(content) : '';
     return `<div class='markdown-preview'>${html}</div>`;
+  },
+  zDecode: function(zContent) {
+    return zlibcodec.decode(zContent);
+  },
+  zEncode: function(content) {
+    return zlibcodec.encode(content);
   }
 };
 
