@@ -30,7 +30,7 @@
     }
 
     body {
-      background: #fff;
+      background: #f9f9f9;
       font-size: 14px;
       line-height: 19px;
       min-height: 100%;
@@ -38,6 +38,21 @@
       font-family: Helvetica Neue, NotoSansHans-Regular, AvenirNext-Regular, arial, Hiragino Sans GB, Microsoft Yahei, WenQuanYi Micro Hei, Arial, Helvetica, sans-serif;
       -webkit-font-smoothing: antialiased;
       height: 100%;
+    }
+
+    a {
+      color: rgb(0, 122, 204);
+    }
+
+    a:hover,
+    a:focus {
+      color: rgb(0, 137, 255);
+    }
+
+    code {
+      background-color: #f8f8f8;
+      border-color: #dfdfdf;
+      color: #333;
     }
 
     .workspace-container {
@@ -81,13 +96,22 @@
   <script>
     (function (element) {
       showdowns.init();
+      let md = '';
       axios
         .get("https://jhuix.github.io/showdowns/demo.md")
         .then(function (res) {
-          element.innerHTML = showdowns.makeHtml(res.data);
+          md = res.data;
+          return axios.get("https://jhuix.github.io/showdowns/Showdown's-Markdown-syntax.md");
+        })
+        .then(function (res) {
+          md = md + `\n\n## Showdown's Markdown syntax\n\n` + res.data;
+          element.innerHTML = showdowns.makeHtml(md);
         })
         .catch(function (error) {
           console.log(error);
+          if (md) {
+            element.innerHTML = showdowns.makeHtml(md);
+          }
         });
     })(document.getElementById("main"));
 
