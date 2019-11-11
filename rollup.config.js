@@ -1,5 +1,3 @@
-import path from 'path';
-
 import resolve from 'rollup-plugin-node-resolve'; // 帮助寻找node_modules里的包
 import babel from 'rollup-plugin-babel'; // rollup 的 babel 插件，ES6转ES5
 import commonjs from 'rollup-plugin-commonjs'; // 将非ES6语法的包转为ES6可用
@@ -14,7 +12,6 @@ import postcss from 'rollup-plugin-postcss'; // css
 import autoprefixer from 'autoprefixer';
 import simplevars from 'postcss-simple-vars';
 import nested from 'postcss-nested';
-import url from 'postcss-url'; // url
 
 import pkg from './package.json';
 
@@ -52,13 +49,6 @@ const config = {
       minimize: isMinBuild,
       extensions: ['.css', '.less'],
       plugins: [
-        url({
-          limit: 0,
-          url: 'copy',
-          basePath: path.join(__dirname, 'node_modules/katex/dist'),
-          assetsPath: './',
-          useHash: false
-        }),
         autoprefixer(),
         simplevars(),
         nested()
@@ -122,7 +112,8 @@ if (!isFormatCJS) {
     config.plugins.push(
       copy({
         targets: [
-          { src: 'fonts', dest: 'docs/dist' },
+          { src: 'node_modules/katex/dist/fonts', dest: 'docs/dist' },
+          { src: 'node_modules/katex/dist/katex.min.css', dest: 'docs/dist' },
           { src: 'public/*', dest: 'docs' },
           { src: 'demo', dest: 'docs' }
         ]
@@ -131,7 +122,10 @@ if (!isFormatCJS) {
   } else {
     config.plugins.push(
       copy({
-        targets: [{ src: 'fonts', dest: 'dist' }]
+        targets: [
+          { src: 'node_modules/katex/dist/fonts', dest: 'dist' },
+          { src: 'node_modules/katex/dist/katex.min.css', dest: 'dist' }
+        ]
       })
     );
   }

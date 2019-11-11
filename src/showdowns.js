@@ -1,7 +1,7 @@
 'use strict';
 
 import './less/preview.less';
-import '../node_modules/katex/dist/katex.min.css';
+//import katexStyle from '../node_modules/katex/dist/katex.min.css';
 
 import showdown from 'showdown';
 import showdownKatex from 'showdown-katex';
@@ -10,6 +10,7 @@ import showdownAlign from './extensions/showdown-align.js';
 import showdownMermaid from './extensions/showdown-mermaid.js';
 import showdownPlantuml from './extensions/showdown-plantuml.js';
 import showdownFootnotes from './extensions/showdown-footnotes.js';
+import showdownCheckType from './extensions/showdown-checktype.js';
 import * as zlibcodec from './utils/zlib-codec.js';
 
 const getOptions = (options = {}) => {
@@ -83,8 +84,27 @@ const showdowns = {
     } else {
       content = doc;
     }
-    const html = this.converter && content ? this.converter.makeHtml(content) : '';
-    return `<div class='markdown-preview'>${html}</div>`;
+    let types_data = {};
+    if (this.converter) {
+      this.converter.addExtension(
+        showdownCheckType(data => {
+          types_data = data;
+        }),
+        'showdown-checktype'
+      );
+      content = content ? this.converter.makeHtml(content) : '';
+      //this.converter.removeExtension(showdownCheckType);
+    } else {
+      content = '';
+    }
+
+    // if (types_data.hasKatex) {
+    //   console.log(katexStyle);
+    // }
+    return {
+      html: `<div class='markdown-preview'>${content}</div>`,
+      types: types_data
+    };
   },
   zDecode: function(zContent) {
     return zlibcodec.decode(zContent);

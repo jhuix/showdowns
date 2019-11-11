@@ -8,15 +8,15 @@
   "unpkg": "dist/showdowns.min.js",
   "scripts": {
     "build": "npm run build:release && npm run build:demo",
-    "build:umd": "rollup -c && rimraf fonts",
-    "build:umd:min": "rollup -c --environment MIN && rimraf fonts",
+    "build:umd": "rollup -c",
+    "build:umd:min": "rollup -c --environment MIN",
     "build:cjs": "rollup -c --environment TARGET:cjs",
     "build:cjs:min": "rollup -c --environment MIN,TARGET:cjs",
     "build:release": "npm run clean && npm run build:umd:min && npm run build:cjs:min",
-    "build:demo": "rimraf docs/demo && rimraf docs/dist && rollup -c --environment DEMO,MIN && rimraf fonts",
+    "build:demo": "rimraf docs/demo && rimraf docs/dist && rollup -c --environment DEMO,MIN",
     "build:dev": "npm run build:umd && npm run build:cjs",
     "prepublishOnly": "npm run build:release",
-    "clean": "rimraf dist && rimraf fonts"
+    "clean": "rimraf dist"
   },
   "repository": {
     "type": "git",
@@ -50,7 +50,6 @@
     "less": "^3.10.3",
     "postcss-nested": "^4.1.2",
     "postcss-simple-vars": "^5.0.2",
-    "postcss-url": "^8.0.0",
     "rimraf": "^3.0.0",
     "rollup": "^1.12.5",
     "rollup-plugin-babel": "^4.3.3",
@@ -63,8 +62,7 @@
     "rollup-plugin-node-resolve": "^5.2.0",
     "rollup-plugin-postcss": "^2.0.3",
     "rollup-plugin-replace": "^2.2.0",
-    "rollup-plugin-terser": "^5.1.2",
-    "rollup-plugin-url": "^3.0.0"
+    "rollup-plugin-terser": "^5.1.2"
   },
   "dependencies": {
     "mermaid": "^8.4.0",

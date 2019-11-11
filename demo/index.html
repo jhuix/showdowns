@@ -95,6 +95,18 @@
   <script src="../dist/showdowns.min.js"></script>
   <script>
     (function (element) {
+      function injectStyleSheet(css) {
+        if (!css || typeof document === 'undefined') {
+          return;
+        }
+
+        var head = document.head || document.getElementsByTagName('head')[0];
+        var link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = css;
+        head.appendChild(link);
+      }
+
       showdowns.init();
       let md = '';
       axios
@@ -105,12 +117,20 @@
         })
         .then(function (res) {
           md = md + `\n\n## Showdown's Markdown syntax\n\n` + res.data;
-          element.innerHTML = showdowns.makeHtml(md);
+          const html = showdowns.makeHtml(md);
+          element.innerHTML = html.html;
+          if (html.types.hasKatex) {
+            injectStyleSheet('../dist/katex.min.css');
+          }
         })
         .catch(function (error) {
           console.log(error);
           if (md) {
-            element.innerHTML = showdowns.makeHtml(md);
+            const html = showdowns.makeHtml(md);
+            element.innerHTML = html.html;
+            if (html.types.hasKatex) {
+              injectStyleSheet('../dist/katex.min.css');
+            }
           }
         });
     })(document.getElementById("main"));
