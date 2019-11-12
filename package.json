@@ -33,8 +33,9 @@
     "toc"
   ],
   "files": [
-    "demo",
+    "public",
     "dist",
+    "demo",
     "src"
   ],
   "author": "Jhuix [Hui  Jin] <jhuix0117@gmail.com>",

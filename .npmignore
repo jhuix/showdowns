@@ -1,9 +1,7 @@
 .DS_Store
 node_modules
-/src
 /docs
 *-lock.json
-demo.md
 .babelrc
 .editorconfig
 .gitignore
