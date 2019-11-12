@@ -1,7 +1,6 @@
 'use strict';
 
 import './less/preview.less';
-//import katexStyle from '../node_modules/katex/dist/katex.min.css';
 
 import showdown from 'showdown';
 import showdownKatex from 'showdown-katex';
@@ -71,7 +70,7 @@ const showdowns = {
     }
     return this;
   },
-  makeHtml: function(doc) {
+  makeHtml: function(doc, callback) {
     let content = '';
     if (typeof doc === 'object') {
       if (typeof doc.content === 'string') {
@@ -84,27 +83,20 @@ const showdowns = {
     } else {
       content = doc;
     }
-    let types_data = {};
     if (this.converter) {
       this.converter.addExtension(
         showdownCheckType(data => {
-          types_data = data;
+          if (typeof callback === 'function') {
+            callback(data);
+          }
         }),
         'showdown-checktype'
       );
       content = content ? this.converter.makeHtml(content) : '';
-      //this.converter.removeExtension(showdownCheckType);
     } else {
       content = '';
     }
-
-    // if (types_data.hasKatex) {
-    //   console.log(katexStyle);
-    // }
-    return {
-      html: `<div class='markdown-preview'>${content}</div>`,
-      types: types_data
-    };
+    return `<div class='markdown-preview'>${content}</div>`;
   },
   zDecode: function(zContent) {
     return zlibcodec.decode(zContent);

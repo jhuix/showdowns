@@ -117,20 +117,20 @@
         })
         .then(function (res) {
           md = md + `\n\n## Showdown's Markdown syntax\n\n` + res.data;
-          const html = showdowns.makeHtml(md);
-          element.innerHTML = html.html;
-          if (html.types.hasKatex) {
-            injectStyleSheet('../dist/katex.min.css');
-          }
+          element.innerHTML = showdowns.makeHtml(md, (types) => {
+            if (types.hasKatex) {
+              injectStyleSheet('../dist/katex.min.css');
+            }
+          });
         })
         .catch(function (error) {
           console.log(error);
           if (md) {
-            const html = showdowns.makeHtml(md);
-            element.innerHTML = html.html;
-            if (html.types.hasKatex) {
-              injectStyleSheet('../dist/katex.min.css');
-            }
+            element.innerHTML = showdowns.makeHtml(md, (types) => {
+              if (types.hasKatex) {
+                injectStyleSheet('../dist/katex.min.css');
+              }
+            });
           }
         });
     })(document.getElementById("main"));

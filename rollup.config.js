@@ -115,7 +115,8 @@ if (!isFormatCJS) {
           { src: 'node_modules/katex/dist/fonts', dest: 'docs/dist' },
           { src: 'node_modules/katex/dist/katex.min.css', dest: 'docs/dist' },
           { src: 'public/*', dest: 'docs' },
-          { src: 'demo', dest: 'docs' }
+          { src: 'demo', dest: 'docs' },
+          { src: 'favicon.ico', dest: 'docs' }
         ]
       })
     );

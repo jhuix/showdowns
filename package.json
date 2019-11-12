@@ -13,7 +13,7 @@
     "build:cjs": "rollup -c --environment TARGET:cjs",
     "build:cjs:min": "rollup -c --environment MIN,TARGET:cjs",
     "build:release": "npm run clean && npm run build:umd:min && npm run build:cjs:min",
-    "build:demo": "rimraf docs/demo && rimraf docs/dist && rollup -c --environment DEMO,MIN",
+    "build:demo": "rimraf docs && rollup -c --environment DEMO,MIN",
     "build:dev": "npm run build:umd && npm run build:cjs",
     "prepublishOnly": "npm run build:release",
     "clean": "rimraf dist"

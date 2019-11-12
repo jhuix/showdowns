@@ -45,7 +45,7 @@ It's implemented sub-TOC in showdown-toc.js.
 
 It's implemented in showdown-mermaid.js, render diagrams of Flowchart or Sequence or Gantt using [mermaid](https://github.com/knsv/mermaid), check [mermaid doc](https://mermaidjs.github.io) for more information.
 
-#### Mermaid examples:
+#### Mermaid examples
 
 ##### Flowchart
 
