@@ -1,4 +1,6 @@
-# showdowns
+<p align="center"><a href="https://jhuix.github.io/showdowns" target="_blank" rel="noopener noreferrer"><img width="128" src="https://jhuix.github.io/showdowns/logo.png" alt="showdowns logo"></a></p>
+
+<h1 align="center">Showdowns</h1>
 
 A lib that make markdown to html with some extensions of showdown.js.
 
@@ -44,6 +46,7 @@ Note: add --save if you are using npm < 5.0.0
 In a browser:
 
     <link rel="stylesheet" href="dist/showdowns.min.css">
+    <link rel="stylesheet" href="dist/katex.min.css">
     <script src="dist/showdowns.min.js"></script>
 
 In Node.js:
@@ -55,8 +58,7 @@ For commonjs
 or
 
     import 'showdowns/dist/showdowns.core.min.css'
-    import 'katex/dist/katex.min.css'
-
+    import 'showdowns/dist/katex.min.css'
     import showdowns from 'showdowns';
 
 For umd
@@ -66,7 +68,7 @@ For umd
 or
 
     import 'showdowns/dist/showdowns.min.css'
-
+    import 'showdowns/dist/katex.min.css'
     import showdowns from 'showdowns/dist/showdowns.min.js';
 
 ### Quick Example
@@ -80,9 +82,25 @@ Node
 
 Browser
 
+    function injectStyleSheet(css) {
+      if (!css || typeof document === 'undefined') {
+        return;
+      }
+
+      var head = document.head || document.getElementsByTagName('head')[0];
+      var link = document.createElement('link');
+      link.rel = 'stylesheet';
+      link.href = css;
+      head.appendChild(link);
+    }
+
     showdowns.init()
     text      = '# hello, markdown!',
-    html      = showdowns.makeHtml(text);
+    html      = showdowns.makeHtml(text, (types) => {
+      if (types.hasKatex) {
+        injectStyleSheet('showdowns/dist/katex.min.css');
+      }
+    });
 
 ### Options
 
@@ -164,7 +182,7 @@ A function to init that be created showdown.convertor instance for showdowns.
 
 #### makeHtml
 
-Type: {type:'zip', content: string} | string => string
+Type: ({type:'zip', content: string} | string, (types) => void) => string
 
 A function to make markdown to html that showdown.convertor converte it in current showdowns instance.
 
