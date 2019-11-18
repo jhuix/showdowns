@@ -1,3 +1,5 @@
+![Showdowns](https://jhuix.github.io/showdowns/logo.png)
+
 # Showdowns Demos
 
 A lib that make markdown to html with some extensions of showdown.js.
@@ -10,6 +12,22 @@ It can converte markdown content to html that using the [Showdown](https://githu
 
 - [Showdown's Markdown syntax](https://github.com/showdownjs/showdown/wiki/Showdown's-Markdown-syntax)
 - [Showdown Options](https://github.com/showdownjs/showdown/wiki/Showdown-options)
+
+
+## Table
+
+| 返回码                        | 类型 | 值  | 描述                                          |
+| ----------------------------- | ---- | --- | --------------------------------------------- |
+| FGAMESDK_OK                   | int  | 1   | 调用函数调用返回成功或注册/检测等逻辑结果为真 |
+| FGAMESDK_ERROR                | int  | 0   | 注册/检测等逻辑结果为假                       |
+| FGAMESDK_ERROR_NOTCONNECT     | int  | -1  | 不能连接 First Game 平台                      |
+| FGAMESDK_ERROR_CONNECTTIMEOUT | int  | -2  | 连接 First Game 平台时被超时                  |
+| FGAMESDK_ERROR_AUTODISCONNECT | int  | -3  | 连接 First Game 平台时被自动断开              |
+| FGAMESDK_ERROR_NOTREQUEST     | int  | -4  | 不能发送请求                                  |
+| FGAMESDK_ERROR_REQUESTTIMEOUT | int  | -5  | 请求时被超时                                  |
+| FGAMESDK_ERROR_NOREGIESTED    | int  | -6  | 未注册                                        |
+| FGAMESDK_ERROR_INVAILDPARAMS  | int  | -7  | 无效参数                                      |
+| FGAMESDK_ERROR_OUTOFMEMROY    | int  | -8  | 内存分配失败或内存不足                        |
 
 ## Supporting some markdown extension features
 
@@ -125,3 +143,4 @@ It's implemented in showdown-footnotes.js, use for reference the [showdown-footn
 #### Footnotes examples
 
 [^1]: The explanation.
+

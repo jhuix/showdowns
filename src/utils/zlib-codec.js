@@ -8,12 +8,12 @@
  * http://plantuml.sourceforge.net/codejavascript2.html
  */
 
-"use strict";
+'use strict';
 
-import * as zlib from "zlib";
+import zlib from 'zlib';
 
 function encode64(data) {
-  var r = "";
+  var r = '';
   for (var i = 0; i < data.length; i += 3) {
     if (i + 2 == data.length) {
       r += append3bytes(data.charCodeAt(i), data.charCodeAt(i + 1), 0);
@@ -35,7 +35,7 @@ function append3bytes(b1, b2, b3) {
   var c2 = ((b1 & 0x3) << 4) | (b2 >> 4);
   var c3 = ((b2 & 0xf) << 2) | (b3 >> 6);
   var c4 = b3 & 0x3f;
-  var r = "";
+  var r = '';
   r += encode6bit(c1 & 0x3f);
   r += encode6bit(c2 & 0x3f);
   r += encode6bit(c3 & 0x3f);
@@ -57,22 +57,22 @@ function encode6bit(b) {
   }
   b -= 26;
   if (b == 0) {
-    return "-";
+    return '-';
   }
   if (b == 1) {
-    return "_";
+    return '_';
   }
-  return "?";
+  return '?';
 }
 
 function decode6bit(cc) {
   var c = cc.charCodeAt(0);
-  if (cc === "_") return 63;
-  if (cc === "-") return 62;
+  if (cc === '_') return 63;
+  if (cc === '-') return 62;
   if (c >= 97) return c - 61; // - 97 + 26 + 10
   if (c >= 65) return c - 55; // - 65 + 10
   if (c >= 48) return c - 48;
-  return "?";
+  return '?';
 }
 
 function extract3bytes(data) {
@@ -87,7 +87,7 @@ function extract3bytes(data) {
 }
 
 function decode64(data) {
-  var r = "";
+  var r = '';
   var i = 0;
   for (i = 0; i < data.length; i += 4) {
     var t = extract3bytes(data.substring(i, i + 4));
@@ -104,13 +104,37 @@ function encode(data) {
       .deflateRawSync(data, {
         level: 9
       })
-      .toString("binary")
+      .toString('binary')
   );
 }
 
 function decode(data) {
-  return zlib.inflateRawSync(Buffer.from(decode64(data), "binary")).toString();
+  return zlib.inflateRawSync(Buffer.from(decode64(data), 'binary')).toString();
 }
 
-const zlibcodec = { encode, decode };
-export { zlibcodec as default, encode, decode };
+const brEncode =
+  typeof zlib.brotliCompressSync === 'undefined'
+    ? undefined
+    : function(data) {
+        return zlib
+          .brotliCompressSync(Buffer.from(data), {
+            params: {
+              [zlib.constants.BROTLI_PARAM_MODE]:
+                zlib.constants.BROTLI_MODE_TEXT,
+              [zlib.constants.BROTLI_PARAM_QUALITY]: 11
+            }
+          })
+          .toString('base64');
+      };
+
+const brDecode =
+  typeof zlib.brotliDecompressSync === 'undefined'
+    ? undefined
+    : function(data) {
+        return zlib
+          .brotliDecompressSync(Buffer.from(data, 'base64'))
+          .toString();
+      };
+
+const zlibcodec = { encode, decode, brEncode, brDecode };
+export { zlibcodec as default, encode, decode, brEncode, brDecode };

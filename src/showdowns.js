@@ -42,6 +42,9 @@ const showdowns = {
   converter: null,
   defaultOptions: getOptions(),
   defaultExtensions: getExtensions(),
+  markdownDecodeFilter: function(doc) {
+    return null;
+  },
   addOptions: function(options) {
     if (this.converter) {
       for (const key in options) {
@@ -74,8 +77,15 @@ const showdowns = {
     let content = '';
     if (typeof doc === 'object') {
       if (typeof doc.content === 'string') {
-        if (typeof doc.type === 'string' && doc.type === 'zip') {
-          content = this.zDecode(doc.content);
+        if (typeof doc.type === 'string') {
+          switch (doc.type) {
+            case 'zip':
+              content = this.zDecode(doc.content);
+              break;
+            default:
+              content = this.markdownDecodeFilter(doc) || doc.content;
+              break;
+          }
         } else {
           content = doc.content;
         }
