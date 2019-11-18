@@ -37,21 +37,38 @@ declare namespace showdowns {
    * @param doc
    * @return
    */
-  function makeHtml(doc: { type: string; content: string } | string): string;
+  function makeHtml(
+    doc: { type: string; content: string } | string,
+    callback: (type: object) => void | undefined
+  ): string;
 
   /**
    *
-   * @param zContent
+   * @param data
    * @return string
    */
-  function zDecode(zContent: string): string;
+  function zDecode(data: string): string;
 
   /**
    *
-   * @param content
+   * @param data
    * @return string
    */
-  function zEncode(content: string): string;
+  function zEncode(data: string): string;
+
+  /**
+   *
+   * @param data
+   * @return string
+   */
+  function brDecode(data: string): string;
+
+  /**
+   *
+   * @param data
+   * @return string
+   */
+  function brEncode(data: string): string;
 }
 
 export default showdowns;

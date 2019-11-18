@@ -92,7 +92,7 @@
 <body style="display:none;" onload="document.body.style.display = 'block'">
   <div id="main" class="workspace-container"></div>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.15.3/axios.min.js"></script>
-  <script src="../dist/showdowns.min.js"></script>
+  <script src="../dist/showdowns.js"></script>
   <script>
     (function (element) {
       function injectStyleSheet(css) {
@@ -106,7 +106,6 @@
         link.href = css;
         head.appendChild(link);
       }
-
       showdowns.init();
       let md = '';
       axios
