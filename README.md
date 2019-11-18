@@ -71,6 +71,11 @@ or
     import 'showdowns/dist/katex.min.css'
     import showdowns from 'showdowns/dist/showdowns.min.js';
 
+Support compress markdown content with [wasm-brotli](https://github.com/dfrankland/wasm-brotli) for [google brotli](https://github.com/google/brotli), use the following file:
+
+    showdowns/dist/showdowns.br.min.js
+
+
 ### Quick Example
 
 Node
