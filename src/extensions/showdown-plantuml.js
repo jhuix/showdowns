@@ -30,7 +30,35 @@ function renderPlantumlElements(elements, config) {
       imageFormat !== defaultImageFormat ? `.${imageFormat}` : '';
     const uml = plantumlcodec.encodeuml(code);
     let src = `${website}/${imageFormat}/${uml}${imageExtension}`;
-    element.parentNode.outerHTML = `<div class="${name}"><img src='${src}' alt=''></img></div>`;
+    if (
+      imageFormat === 'svg' &&
+      typeof window !== 'undefined' &&
+      window.fetch &&
+      window.dispatchEvent
+    ) {
+      element.id = 'plantuml-' + Date.now();
+      window
+        .fetch(src)
+        .then(response => {
+          if (response.ok) {
+            return response.text();
+          }
+        })
+        .then(data => {
+          //element.parentNode.outerHTML = `<div class="${name}">${data}</div>`;
+          window.dispatchEvent(
+            new CustomEvent('plantuml', {
+              detail: {
+                id: element.id,
+                className: element.className,
+                imgData: data
+              }
+            })
+          );
+        });
+    } else {
+      element.parentNode.outerHTML = `<div class="${name}"><img src='${src}' alt=''></img></div>`;
+    }
   });
   return true;
 }
@@ -45,6 +73,22 @@ const getConfig = (config = {}) => ({
 function showdownPlantuml(userConfig) {
   const parser = new DOMParser();
   const config = getConfig(userConfig);
+
+  if (
+    config.imageFormat === 'svg' &&
+    typeof window !== 'undefined' &&
+    window.fetch &&
+    window.dispatchEvent
+  ) {
+    window.addEventListener('plantuml', event => {
+      if (event.detail) {
+        const el = window.document.getElementById(event.detail.id);
+        if (el) {
+          el.parentNode.outerHTML = `<div id="${event.detail.id}" class="${event.detail.className}">${event.detail.imgData}</div>`;
+        }
+      }
+    });
+  }
 
   return [
     {
