@@ -129,6 +129,75 @@ It's implemented in showdown-plantuml.js. render diagrams of uml using [plantuml
       @enduml
 ```
 
+### Flowchart
+
+```flow
+st=>start: Start:>http://www.google.com[blank]
+e=>end:>http://www.google.com
+op1=>operation: My Operation
+sub1=>subroutine: My Subroutine
+cond=>condition: Yes
+or No?:>http://www.google.com
+io=>inputoutput: catch something...
+para=>parallel: parallel tasks
+ 
+st->op1->cond
+cond(yes)->io->e
+cond(no)->para
+para(path1, bottom)->sub1(right)->op1
+para(path2, top)->op1
+```
+
+``` flowchart
+st=>start: Start
+e=>end
+op1=>operation: My Operation
+sub1=>subroutine: My Subroutine
+cond=>condition: Yes
+or No?:>http://www.google.com
+io=>inputoutput: catch something
+st->op1->cond
+cond(yes)->io->e
+cond(no)->sub1(right)->op1
+```
+
+### Network Sequence
+
+```sequence
+Alice->Bob: Hello Bob, how are you?
+Note right of Bob: Bob thinks
+Bob-->Alice: I am good thanks!
+```
+
+### Graphviz's dot
+
+```dot
+digraph G {
+    main -> parse -> execute;
+    main -> init;
+    main -> cleanup;
+    execute -> make_string;
+    execute -> printf
+    init -> make_string;
+    main -> printf;
+    execute -> compare;
+}
+```
+
+### Railroad diagrams
+
+```railroad
+Diagram(
+  Optional('+', 'skip'),
+    Choice(0,
+      NonTerminal('name-start char'),
+      NonTerminal('escape')),
+      ZeroOrMore(
+        Choice(0,
+          NonTerminal('name char'),
+          NonTerminal('escape'))))
+```
+
 ### Footnotes
 
 It's implemented in showdown-footnotes.js, use for reference the [showdown-footnotes](https://github.com/Kriegslustig/showdown-footnotes).
@@ -136,4 +205,3 @@ It's implemented in showdown-footnotes.js, use for reference the [showdown-footn
 #### Footnotes examples
 
 [^1]: The explanation.
-
