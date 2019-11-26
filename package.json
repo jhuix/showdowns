@@ -1,6 +1,6 @@
 {
   "name": "@jhuix/showdowns",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "A lib that make markdown to html with some extensions of showdown.js.",
   "main": "dist/showdowns.core.min.js",
   "browser": "dist/showdowns.min.js",
@@ -69,9 +69,17 @@
     "rollup-plugin-terser": "^5.1.2"
   },
   "dependencies": {
+    "@rokt33r/js-sequence-diagrams": "^2.0.6-2",
+    "flowchart.js": "^1.12.3",
     "mermaid": "^8.4.0",
+    "railroad-diagrams": "^1.0.0",
     "showdown": "^1.9.0",
-    "showdown-katex": "^0.6.0"
+    "showdown-katex": "^0.6.0",
+    "snapsvg": "^0.5.1",
+    "underscore": "^1.9.1",
+    "viz.js": "^2.1.2",
+    "wasm-brotli": "^2.0.2",
+    "webfontloader": "^1.6.28"
   },
   "publishConfig": {
     "access": "public"
