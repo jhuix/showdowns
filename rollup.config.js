@@ -168,6 +168,7 @@ if (!isFormatCJS) {
           // @rokt33r/js-sequence-diagrams https://github.com/bramp/js-sequence-diagrams
           { src: 'node_modules/@rokt33r/js-sequence-diagrams/dist/sequence-diagram-min.*', dest: 'docs/dist/diagrams/sequence/dist' },
           { src: 'node_modules/@rokt33r/js-sequence-diagrams/dist/sequence-diagram.*', dest: 'docs/dist/diagrams/sequence/dist' },
+          { src: 'node_modules/@rokt33r/js-sequence-diagrams/dist/danielbd.*', dest: 'docs/dist/diagrams/sequence/dist' },
           { src: 'node_modules/@rokt33r/js-sequence-diagrams/package.json', dest: 'docs/dist/diagrams/sequence' },
           { src: 'node_modules/@rokt33r/js-sequence-diagrams/README.md', dest: 'docs/dist/diagrams/sequence' },
           { src: 'node_modules/@rokt33r/js-sequence-diagrams/LICENCE', dest: 'docs/dist/diagrams/sequence' },
