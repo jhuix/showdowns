@@ -65,14 +65,28 @@ const config = {
     format: 'cjs', // 输出CJS格式，NODE.js模块规范通用
     name: 'showdowns', // 打包后的全局变量，如浏览器端 window.ReactRedux;
     sourcemap: true,
-    banner: banner
+    banner: banner,
+    globals: {
+      raphael: 'Raphael',
+      'flowchart.js': 'flowchart',
+      'viz.js': 'viz',
+      mermaid: 'mermaid',
+      katex: 'katex'
+    }
   },
   onwarn: (msg, warn) => {
     if (!/Circular/.test(msg)) {
       warn(msg);
     }
   },
-  external: [], // 作用：指出应将哪些模块视为外部模块，否则会被打包进最终的代码里
+  external: [
+    'mermaid',
+    'katex',
+    'raphael',
+    'flowchart.js',
+    'viz.js',
+    'showdown-katex'
+  ], // 作用：指出应将哪些模块视为外部模块，否则会被打包进最终的代码里
   plugins: [
     json(),
     postcss({
@@ -99,7 +113,7 @@ const config = {
 };
 
 if (isFormatCJS) {
-  config.external.push('mermaid', 'showdown', 'showdown-katex', 'zlib');
+  config.external.push('showdown', 'zlib');
 } else {
   config.output.file = pkg.browser.replace(
     '.min.js',
@@ -146,20 +160,40 @@ if (!isFormatCJS) {
     config.plugins.push(
       copy({
         targets: [
-          { src: 'node_modules/katex/dist/fonts', dest: 'docs/dist' },
-          { src: 'node_modules/katex/dist/katex.min.css', dest: 'docs/dist' },
+          // railroad-diagrams https://github.com/tabatkins/railroad-diagrams
+          { src: 'node_modules/railroad-diagrams/railroad-diagrams.js', dest: 'docs/dist/diagrams/railroad' },
+          { src: 'node_modules/railroad-diagrams/railroad-diagrams.css', dest: 'docs/dist/diagrams/railroad' },
+          { src: 'node_modules/railroad-diagrams/package.json', dest: 'docs/dist/diagrams/railroad' },
+          { src: 'node_modules/railroad-diagrams/README.md', dest: 'docs/dist/diagrams/railroad' },
+          // @rokt33r/js-sequence-diagrams https://github.com/bramp/js-sequence-diagrams
+          { src: 'node_modules/@rokt33r/js-sequence-diagrams/dist/sequence-diagram-min.*', dest: 'docs/dist/diagrams/sequence/dist' },
+          { src: 'node_modules/@rokt33r/js-sequence-diagrams/dist/sequence-diagram.*', dest: 'docs/dist/diagrams/sequence/dist' },
+          { src: 'node_modules/@rokt33r/js-sequence-diagrams/package.json', dest: 'docs/dist/diagrams/sequence' },
+          { src: 'node_modules/@rokt33r/js-sequence-diagrams/README.md', dest: 'docs/dist/diagrams/sequence' },
+          { src: 'node_modules/@rokt33r/js-sequence-diagrams/LICENCE', dest: 'docs/dist/diagrams/sequence' },
           { src: 'public/*', dest: 'docs' },
           { src: 'demo', dest: 'docs' },
           { src: 'favicon.ico', dest: 'docs' }
         ]
       })
     );
-  } else {
+  }
+  else {
     config.plugins.push(
       copy({
         targets: [
-          { src: 'node_modules/katex/dist/fonts', dest: 'dist' },
-          { src: 'node_modules/katex/dist/katex.min.css', dest: 'dist' }
+          // railroad-diagrams https://github.com/tabatkins/railroad-diagrams
+          { src: 'node_modules/railroad-diagrams/railroad-diagrams.js', dest: 'dist/diagrams/railroad' },
+          { src: 'node_modules/railroad-diagrams/railroad-diagrams.css', dest: 'dist/diagrams/railroad' },
+          { src: 'node_modules/railroad-diagrams/package.json', dest: 'dist/diagrams/railroad' },
+          { src: 'node_modules/railroad-diagrams/README.md', dest: 'dist/diagrams/railroad' },
+          // @rokt33r/js-sequence-diagrams https://github.com/bramp/js-sequence-diagrams
+          { src: 'node_modules/@rokt33r/js-sequence-diagrams/dist/sequence-diagram-min.*', dest: 'dist/diagrams/sequence/dist' },
+          { src: 'node_modules/@rokt33r/js-sequence-diagrams/dist/sequence-diagram.*', dest: 'dist/diagrams/sequence/dist' },
+          { src: 'node_modules/@rokt33r/js-sequence-diagrams/dist/danielbd.*', dest: 'dist/diagrams/sequence/dist' },
+          { src: 'node_modules/@rokt33r/js-sequence-diagrams/package.json', dest: 'dist/diagrams/sequence' },
+          { src: 'node_modules/@rokt33r/js-sequence-diagrams/README.md', dest: 'dist/diagrams/sequence' },
+          { src: 'node_modules/@rokt33r/js-sequence-diagrams/LICENCE', dest: 'dist/diagrams/sequence' }
         ]
       })
     );

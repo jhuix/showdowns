@@ -14,7 +14,10 @@ function showdownCheckType(checktype_callback) {
     {
       type: 'output',
       filter: function(html) {
-        if (typeof checktype_callback === 'function') {
+        if (
+          typeof checktype_callback === 'function' &&
+          (typeof window === 'undefined' || !window.dispatchEvent)
+        ) {
           // parse html
           const doc = parser.parseFromString(html, 'text/html');
           const wrapper = typeof doc.body !== 'undefined' ? doc.body : doc;

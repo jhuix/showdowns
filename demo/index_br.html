@@ -94,7 +94,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.15.3/axios.min.js"></script>
   <script src="../dist/showdowns.br.min.js"></script>
   <script>
-    window.addEventListener("wasm", function (e) {
+    window.addEventListener("showdownsLoaded", function (e) {
       (function (element) {
         function injectStyleSheet(css) {
           if (!css || typeof document === 'undefined') {

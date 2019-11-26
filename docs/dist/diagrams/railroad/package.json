@@ -1,0 +1,51 @@
+{
+  "_from": "railroad-diagrams",
+  "_id": "railroad-diagrams@1.0.0",
+  "_inBundle": false,
+  "_integrity": "sha1-635iZ1SN3t+4mcG5Dlc3RVnN234=",
+  "_location": "/railroad-diagrams",
+  "_phantomChildren": {},
+  "_requested": {
+    "type": "tag",
+    "registry": true,
+    "raw": "railroad-diagrams",
+    "name": "railroad-diagrams",
+    "escapedName": "railroad-diagrams",
+    "rawSpec": "",
+    "saveSpec": null,
+    "fetchSpec": "latest"
+  },
+  "_requiredBy": [
+    "#USER",
+    "/"
+  ],
+  "_resolved": "https://registry.npm.taobao.org/railroad-diagrams/download/railroad-diagrams-1.0.0.tgz",
+  "_shasum": "eb7e6267548ddedfb899c1b90e57374559cddb7e",
+  "_spec": "railroad-diagrams",
+  "_where": "H:\\works\\works\\showdowns",
+  "author": {
+    "name": "Tab Atkins Jr."
+  },
+  "bugs": {
+    "url": "https://github.com/tabatkins/railroad-diagrams/issues"
+  },
+  "bundleDependencies": false,
+  "deprecated": false,
+  "description": "A small JS+SVG library for drawing railroad syntax diagrams.",
+  "homepage": "https://github.com/tabatkins/railroad-diagrams",
+  "keywords": [
+    "railroad",
+    "syntax",
+    "diagrams",
+    "grammar",
+    "svg"
+  ],
+  "license": "CC0-1.0",
+  "main": "railroad-diagrams.js",
+  "name": "railroad-diagrams",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tabatkins/railroad-diagrams.git"
+  },
+  "version": "1.0.0"
+}

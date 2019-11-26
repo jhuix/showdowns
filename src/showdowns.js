@@ -3,13 +3,18 @@
 import './less/preview.less';
 
 import showdown from 'showdown';
-import showdownKatex from 'showdown-katex';
 import showdownToc from './extensions/showdown-toc.js';
+import showdownViz from './extensions/showdown-viz.js';
 import showdownAlign from './extensions/showdown-align.js';
+import showdownKatex from './extensions/showdown-katex.js';
 import showdownMermaid from './extensions/showdown-mermaid.js';
 import showdownPlantuml from './extensions/showdown-plantuml.js';
+import showdownRailroad from './extensions/showdown-railroad.js';
+import showdownSequence from './extensions/showdown-sequence.js';
 import showdownFootnotes from './extensions/showdown-footnotes.js';
+import showdownFlowchart from './extensions/showdown-flowchart.js';
 import showdownCheckType from './extensions/showdown-checktype.js';
+
 import * as zlibcodec from './utils/zlib-codec.js';
 
 const getOptions = (options = {}) => {
@@ -32,7 +37,11 @@ const getExtensions = (extensions = []) => {
     showdownAlign,
     showdownFootnotes,
     showdownMermaid,
-    showdownKatex(),
+    showdownFlowchart,
+    showdownRailroad,
+    showdownViz,
+    showdownSequence,
+    showdownKatex,
     showdownPlantuml({ imageFormat: 'svg' })
   ].concat(extensions ? extensions : []);
 };
@@ -43,7 +52,7 @@ const showdowns = {
   defaultOptions: getOptions(),
   defaultExtensions: getExtensions(),
   markdownDecodeFilter: function(doc) {
-    return null;
+    return '';
   },
   addOptions: function(options) {
     if (this.converter) {

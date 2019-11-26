@@ -19,7 +19,7 @@ function renderPlantumlElements(elements, config) {
     return false;
   }
   elements.forEach(element => {
-    const code = element.textContent;
+    const code = element.textContent.trim();
     const name = element.className;
     const imageFormat = config.imageFormat;
     const protocol = window && window.location.protocol;
@@ -29,14 +29,15 @@ function renderPlantumlElements(elements, config) {
     const imageExtension =
       imageFormat !== defaultImageFormat ? `.${imageFormat}` : '';
     const uml = plantumlcodec.encodeuml(code);
-    let src = `${website}/${imageFormat}/${uml}${imageExtension}`;
+    const src = `${website}/${imageFormat}/${uml}${imageExtension}`;
     if (
       imageFormat === 'svg' &&
       typeof window !== 'undefined' &&
       window.fetch &&
       window.dispatchEvent
     ) {
-      element.id = 'plantuml-' + Date.now();
+      const elid = 'plantuml-' + Date.now() + '-' + Math.floor(Math.random() * 10000);
+      element.id = elid;
       window
         .fetch(src)
         .then(response => {
@@ -44,14 +45,14 @@ function renderPlantumlElements(elements, config) {
             return response.text();
           }
         })
-        .then(data => {
-          //element.parentNode.outerHTML = `<div class="${name}">${data}</div>`;
+        .then(svgData => {
+          // dispatch plantuml custom event
           window.dispatchEvent(
             new CustomEvent('plantuml', {
               detail: {
-                id: element.id,
-                className: element.className,
-                imgData: data
+                id: elid,
+                className: name,
+                data: svgData
               }
             })
           );
@@ -80,11 +81,15 @@ function showdownPlantuml(userConfig) {
     window.fetch &&
     window.dispatchEvent
   ) {
+    // Listen plantuml custom event
     window.addEventListener('plantuml', event => {
       if (event.detail) {
-        const el = window.document.getElementById(event.detail.id);
+        const id = event.detail.id;
+        const name = event.detail.className;
+        const data = event.detail.data;
+        const el = window.document.getElementById(id);
         if (el) {
-          el.parentNode.outerHTML = `<div id="${event.detail.id}" class="${event.detail.className}">${event.detail.imgData}</div>`;
+          el.parentNode.outerHTML = `<div id="${id}" class="${name}">${data}</div>`;
         }
       }
     });

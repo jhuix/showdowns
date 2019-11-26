@@ -1,6 +1,6 @@
 import showdowns from './showdowns';
 import * as zlibcodec from './utils/zlib-codec.js';
-import * as wasmBrotli from './utils/wasm_brotli_browser.js';
+import * as wasmBrotli from './utils/wasm-brotli/wasm_brotli_browser.js';
 
 showdowns.brEncode = function(data) {
   if (zlibcodec.brEncode) {
@@ -28,4 +28,13 @@ showdowns.markdownDecodeFilter = function(doc) {
   return null;
 };
 
+if (typeof window !== 'undefined' && window.dispatchEvent) {
+  window.addEventListener("wasm", function (e) {
+    window.dispatchEvent(
+      new CustomEvent('showdownsLoaded', {
+        detail: e.detail
+      })
+    );
+  });
+}
 export default showdowns;

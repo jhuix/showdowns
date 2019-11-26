@@ -6,51 +6,81 @@
  * @LastEditTime: 2019-10-27 19:02:07
  */
 
-"use strict";
+'use strict';
 
-import mermaid from "mermaid";
+import mermaid from 'mermaid';
+import cdnjs from './cdn';
+
+if (typeof Mermaid === 'undefined') {
+  var Mermaid = mermaid;
+}
+
+function hasMermaid() {
+  return typeof Mermaid !== 'undefined' && Mermaid ? true : false;
+}
 
 /**
  * render mermaid graphs
  */
-function renderMermaid(element) {
+function renderMermaid(element, sync) {
   const code = element.textContent.trim();
   const name = element.className;
-  return new Promise((resolve, reject) => {
-    try {
-      const svgId = "mermaid-" + Date.now();
-      mermaid.render(svgId, code, svgCode => {
-        element.parentNode.outerHTML = `<div class="${name}">${svgCode}</div>`;
-      });
-    } catch (error) {
-      element.parentNode.outerHTML = `<div class="${name}"><pre class="language-text">${error.str.toString()}</pre></div>`;
-    }
-    return resolve();
-  });
+  const id = 'mermaid-' + Date.now() + '-' + Math.floor(Math.random() * 10000);
+  if (!sync && typeof window !== 'undefined' && window.dispatchEvent) {
+    element.id = id;
+    Promise.resolve(id).then(elementid => {
+      // dispatch mermaid custom event
+      window.dispatchEvent(
+        new CustomEvent('mermaid', {
+          detail: {
+            id: elementid,
+            className: name,
+            data: code
+          }
+        })
+      );
+    });
+  } else {
+    Mermaid.render(id, code, svgCode => {
+      element.parentNode.outerHTML = `<div class="${name}">${svgCode}</div>`;
+    });
+  }
 }
 
 // <div class="mermaid"></div>
-function renderMermaidElements(elements) {
+function renderMermaidElements(elements, config) {
   if (!elements.length) {
     return false;
   }
+
+  const sync = hasMermaid();
+  if (!sync && typeof window !== 'undefined') {
+    cdnjs.loadScript('mermaid').then(name => {
+      Mermaid =
+        window[name] && window[name].hasOwnProperty('default')
+          ? window[name]['default']
+          : window[name];
+      Mermaid.initialize(config);
+    });
+  }
+
   elements.forEach(element => {
-    renderMermaid(element);
+    renderMermaid(element, sync);
   });
   return true;
 }
 
 // mermaid default config
 const getConfig = (config = {}) => ({
-  theme: "forest",
+  theme: 'forest',
   logLevel: 3,
   startOnLoad: false,
   arrowMarkerAbsolute: false,
   flowchart: {
-    curve: "basis"
+    curve: 'basis'
   },
   gantt: {
-    axisFormat: "%m/%d/%Y"
+    axisFormat: '%m/%d/%Y'
   },
   sequence: {
     actorMargin: 50
@@ -58,25 +88,56 @@ const getConfig = (config = {}) => ({
   ...config
 });
 
+function onRenderMermaid(element) {
+  Promise.resolve({ canRender: hasMermaid(), element: element }).then(res => {
+    if (res.canRender) {
+      const id = res.element.id;
+      const name = res.element.className;
+      const data = res.element.data;
+      let el = window.document.getElementById(id);
+      if (el) {
+        const svgId =
+          'mermaid-' + Date.now() + '-' + Math.floor(Math.random() * 10000);
+        Mermaid.render(svgId, data, svgCode => {
+          el.parentNode.outerHTML = `<div class="${name}">${svgCode}</div>`;
+        });
+      }
+    } else {
+      setTimeout(() => {
+        onRenderMermaid(res.element);
+      }, 100);
+    }
+  });
+}
+
 function showdownMermaid(userConfig) {
   const parser = new DOMParser();
   const config = getConfig(userConfig);
-  mermaid.initialize(config);
+  if (!hasMermaid() && typeof window !== 'undefined' && window.dispatchEvent) {
+    // Listen mermaid custom event
+    window.addEventListener('mermaid', event => {
+      if (event.detail) {
+        onRenderMermaid(event.detail);
+      }
+    });
+  } else {
+    Mermaid.initialize(config);
+  }
 
   return [
     {
-      type: "output",
+      type: 'output',
       filter: function(html) {
         // parse html
-        const doc = parser.parseFromString(html, "text/html");
-        const wrapper = typeof doc.body !== "undefined" ? doc.body : doc;
+        const doc = parser.parseFromString(html, 'text/html');
+        const wrapper = typeof doc.body !== 'undefined' ? doc.body : doc;
 
         // find the mermaid in code blocks
         const elements = wrapper.querySelectorAll(
-          "code.mermaid.language-mermaid"
+          'code.mermaid.language-mermaid'
         );
 
-        if (!renderMermaidElements(elements)) {
+        if (!renderMermaidElements(elements, config)) {
           return html;
         }
         // return html text content
