@@ -71,7 +71,7 @@ function renderVizElements(elements) {
     return false;
   }
 
-  const sync = hasViz();
+  let sync = hasViz();
   if (typeof window !== 'undefined') {
     if (!sync) {
       cdnjs.loadScript('Viz').then(name => {

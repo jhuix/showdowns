@@ -78,7 +78,7 @@ function renderBlockElements(latex, asciimath, config) {
   }
 
   katexElementCount = latex.length + asciimath.length;
-  const sync = hasKatex();
+  let sync = hasKatex();
   if (typeof window !== 'undefined') {
     if (!sync) {
       cdnjs.loadStyleSheet('katexCSS');

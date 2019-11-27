@@ -58,7 +58,7 @@ function renderWavedromElements(elements, skin) {
     return false;
   }
 
-  const sync = hasWavedrom();
+  let sync = hasWavedrom();
   if (typeof window !== 'undefined') {
     if (!sync) {
       cdnjs

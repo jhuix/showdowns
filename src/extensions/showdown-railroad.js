@@ -50,7 +50,7 @@ function renderRailroadElements(elements) {
     return false;
   }
 
-  const sync = hasRailroad();
+  let sync = hasRailroad();
   if (typeof window !== 'undefined') {
     if (!sync) {
       cdnjs.loadStyleSheet('railroadCSS');

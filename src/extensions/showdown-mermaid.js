@@ -53,7 +53,10 @@ function renderMermaidElements(elements, config) {
     return false;
   }
 
-  const sync = hasMermaid();
+  // When window object exists,
+  // it means browser environment, otherwise node.js environment.
+  // In browser environment, html need to be rendered asynchronously.
+  let sync = hasMermaid();
   if (typeof window !== 'undefined') {
     if (!sync) {
       cdnjs.loadScript('mermaid').then(name => {

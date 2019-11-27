@@ -66,7 +66,7 @@ function renderFlowchartElements(flowchartElements, flowElements, options) {
     return false;
   }
 
-  const sync = hasFlowchart();
+  let sync = hasFlowchart();
   if (typeof window !== 'undefined') {
     if (!sync) {
       cdnjs

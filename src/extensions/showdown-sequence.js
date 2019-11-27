@@ -71,7 +71,7 @@ function renderSequenceElements(elements) {
     return false;
   }
 
-  const sync = hasSequence();
+  let sync = hasSequence();
   if (typeof window !== 'undefined') {
     if (!sync) {
       cdnjs.loadStyleSheet('sequenceCSS');
