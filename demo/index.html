@@ -1,121 +1,130 @@
 <!DOCTYPE html>
 <html>
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <link rel="icon" href="../favicon.ico" />
+    <title>showdowns demo</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        border: none;
+      }
 
-<head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-  <meta name="viewport" content="width=device-width,initial-scale=1.0">
-  <link rel="icon" href="../favicon.ico">
-  <title>showdowns demo</title>
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      border: none;
-    }
+      html {
+        box-sizing: border-box;
+        text-size-adjust: 100%;
+        font-size: 14px;
+        line-height: 1.15;
+        height: 100%;
+      }
 
-    html {
-      box-sizing: border-box;
-      text-size-adjust: 100%;
-      font-size: 14px;
-      line-height: 1.15;
-      height: 100%;
-    }
+      *,
+      :after,
+      :before {
+        box-sizing: inherit;
+      }
 
-    *,
-    :after,
-    :before {
-      box-sizing: inherit;
-    }
+      body {
+        background: #f9f9f9;
+        font-size: 14px;
+        line-height: 19px;
+        min-height: 100%;
+        position: relative;
+        font-family: Helvetica Neue, NotoSansHans-Regular, AvenirNext-Regular,
+          arial, Hiragino Sans GB, Microsoft Yahei, WenQuanYi Micro Hei, Arial,
+          Helvetica, sans-serif;
+        -webkit-font-smoothing: antialiased;
+        height: 100%;
+      }
 
-    body {
-      background: #f9f9f9;
-      font-size: 14px;
-      line-height: 19px;
-      min-height: 100%;
-      position: relative;
-      font-family: Helvetica Neue, NotoSansHans-Regular, AvenirNext-Regular, arial, Hiragino Sans GB, Microsoft Yahei, WenQuanYi Micro Hei, Arial, Helvetica, sans-serif;
-      -webkit-font-smoothing: antialiased;
-      height: 100%;
-    }
+      a {
+        color: rgb(0, 122, 204);
+      }
 
-    a {
-      color: rgb(0, 122, 204);
-    }
+      a:hover,
+      a:focus {
+        color: rgb(0, 137, 255);
+      }
 
-    a:hover,
-    a:focus {
-      color: rgb(0, 137, 255);
-    }
+      code {
+        background-color: #f8f8f8;
+        border-color: #dfdfdf;
+        color: #333;
+      }
 
-    code {
-      background-color: #f8f8f8;
-      border-color: #dfdfdf;
-      color: #333;
-    }
+      .workspace-container {
+        overflow: hidden;
+        margin: 8px 15px 8px 15px;
+      }
 
-    .workspace-container {
-      overflow: hidden;
-      margin: 8px 15px 8px 15px;
-    }
+      ::-webkit-scrollbar {
+        -webkit-appearance: none;
+        width: 10px;
+        height: 10px;
+      }
 
-    ::-webkit-scrollbar {
-      -webkit-appearance: none;
-      width: 10px;
-      height: 10px;
-    }
+      ::-webkit-scrollbar-track {
+        background: rgb(241, 241, 241);
+        border-radius: 0;
+      }
 
-    ::-webkit-scrollbar-track {
-      background: rgb(241, 241, 241);
-      border-radius: 0;
-    }
+      ::-webkit-scrollbar-thumb {
+        cursor: pointer;
+        border-radius: 5px;
+        background: rgba(0, 0, 0, 0.25);
+        transition: color 0.2s ease;
+      }
 
-    ::-webkit-scrollbar-thumb {
-      cursor: pointer;
-      border-radius: 5px;
-      background: rgba(0, 0, 0, 0.25);
-      transition: color 0.2s ease;
-    }
+      ::-webkit-scrollbar-thumb:window-inactive {
+        background: rgba(0, 0, 0, 0.15);
+      }
 
-    ::-webkit-scrollbar-thumb:window-inactive {
-      background: rgba(0, 0, 0, 0.15);
-    }
+      ::-webkit-scrollbar-thumb:hover {
+        background: rgba(128, 135, 139, 0.8);
+      }
+    </style>
+    <link rel="stylesheet" href="../dist/showdowns.min.css" />
+  </head>
 
-    ::-webkit-scrollbar-thumb:hover {
-      background: rgba(128, 135, 139, 0.8);
-    }
-
-  </style>
-  <link rel="stylesheet" href="../dist/showdowns.min.css">
-</head>
-
-<body style="display:none;" onload="document.body.style.display = 'block'">
-  <div id="main" class="workspace-container"></div>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.15.3/axios.min.js"></script>
-  <script src="../dist/showdowns.min.js"></script>
-  <script>
-    (function (element) {
-      showdowns.init();
-      let md = '';
-      axios
-        .get("https://jhuix.github.io/showdowns/demo.md")
-        .then(function (res) {
-          md = res.data;
-          return axios.get("https://jhuix.github.io/showdowns/Showdown's-Markdown-syntax.md");
-        })
-        .then(function (res) {
-          md = md + `\n\n## Showdown's Markdown syntax\n\n` + res.data;
-          element.innerHTML = showdowns.makeHtml(md);
-        })
-        .catch(function (error) {
-          console.log(error);
-          if (md) {
+  <body style="display:none;" onload="document.body.style.display = 'block'">
+    <div id="main" class="workspace-container"></div>
+    <script src="../dist/showdowns.min.js"></script>
+    <script>
+      (function(element) {
+        showdowns.init();
+        let md = "";
+        window
+          .fetch("https://jhuix.github.io/showdowns/demo.md")
+          .then(function(response) {
+            if (response.ok) {
+              return response.text();
+            }
+          })
+          .then(function(text) {
+            md = text;
+            return window.fetch(
+              "https://jhuix.github.io/showdowns/Showdown's-Markdown-syntax.md"
+            );
+          })
+          .then(function(response) {
+            if (response.ok) {
+              return response.text();
+            }
+          })
+          .then(function(text) {
+            md = md + `\n\n## Showdown's Markdown syntax\n\n` + text;
             element.innerHTML = showdowns.makeHtml(md);
-          }
-        });
-    })(document.getElementById("main"));
-
-  </script>
-</body>
-
+          })
+          .catch(function(error) {
+            console.log(error);
+            if (md) {
+              element.innerHTML = showdowns.makeHtml(md);
+            }
+          });
+      })(document.getElementById("main"));
+    </script>
+  </body>
 </html>

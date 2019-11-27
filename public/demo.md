@@ -1,8 +1,9 @@
 ![Showdowns](https://jhuix.github.io/showdowns/logo.png)
 
-# Showdowns Demos
+# [Showdowns Demos](https://jhuix.github.io/showdowns)
 
-A lib that make markdown to html with some extensions of showdown.js.
+[Showdowns](https://github.com/jhuix/showdowns) is a lib that make markdown to html with some extensions of showdown.js.
+Click the link to preview the [Showdowns Demos](https://jhuix.github.io/showdowns).
 
 ## Markdown To Html
 
@@ -103,8 +104,6 @@ sequenceDiagram
 
 It's implemented in showdown-plantuml.js. render diagrams of uml using [plantuml](http://plantuml.com). To know more about PlantUML, please visit [plantuml website](http://plantuml.com/).
 
-#### Plantuml examples
-
 ```plantuml
       @startuml
       participant User
@@ -130,6 +129,8 @@ It's implemented in showdown-plantuml.js. render diagrams of uml using [plantuml
 ```
 
 ### Flowchart
+
+It's implemented in showdown-flowchart.js, render diagrams of flowchart using [flowchart.js](https://github.com/adrai/flowchart.js), check [flowchart website](http://flowchart.js.org/) for more information.
 
 ```flow
 st=>start: Start:>http://www.google.com[blank]
@@ -163,6 +164,8 @@ cond(no)->sub1(right)->op1
 
 ### Network Sequence
 
+It's implemented in showdown-sequence.js, render diagrams of sequence using [js-sequence-diagrams](https://github.com/bramp/js-sequence-diagrams).
+
 ```sequence {"theme":"hand"}
 Alice->Bob: Hello Bob, how are you?
 Note right of Bob: Bob thinks
@@ -176,6 +179,8 @@ Bob-->Alice: I am good thanks!
 ```
 
 ### Graphviz's dot
+
+It's implemented in showdown-viz.js, render diagrams of graphviz's dot using [viz.js](https://github.com/mdaines/viz.js).
 
 ```dot {"engine":"dot"}
 digraph G {
@@ -205,6 +210,8 @@ digraph G {
 
 ### Railroad diagrams
 
+It's implemented in showdown-viz.js, render diagrams of railroad using [railroad-diagrams](https://github.com/tabatkins/railroad-diagrams).
+
 ```railroad
 Diagram(
   Optional('+', 'skip'),
@@ -219,6 +226,8 @@ Diagram(
 
 ### WaveDrom
 
+It's implemented in showdown-viz.js, render diagrams of wavedrom using [wavedrom](https://github.com/wavedrom/wavedrom), check [wavedrom website](https://wavedrom.com) for more information.
+
 ```wavedrom
 {signal: [
   {name: 'clk', wave: 'p.....|...'},
@@ -232,7 +241,5 @@ Diagram(
 ### Footnotes
 
 It's implemented in showdown-footnotes.js, use for reference the [showdown-footnotes](https://github.com/Kriegslustig/showdown-footnotes).
-
-#### Footnotes examples
 
 [^1]: The explanation.

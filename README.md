@@ -4,6 +4,8 @@
 
 A lib that make markdown to html with some extensions of showdown.js.
 
+**In browser environment, it is implemented to dynamically load js lib files related to more showdown diagrams extension for using [showdowns >= 0.3.0 version](https://github.com/jhuix/showdowns).** 
+
 ## Markdown To Html
 
 It can converte markdown content to html that using the [showdown.js](https://github.com/showdownjs/showdown).
@@ -15,13 +17,23 @@ It can converte markdown content to html that using the [showdown.js](https://gi
 
 ### Supporting some markdown extension features
 
-[LaTeX math and AsciiMath](https://github.com/jhuix/showdowns/blob/master/docs/demo.md#latex-math-and-asciimath)
-
 [Table of Contents](https://github.com/jhuix/showdowns/blob/master/docs/demo.md#table-of-contents)
+
+[LaTeX math and AsciiMath](https://github.com/jhuix/showdowns/blob/master/docs/demo.md#latex-math-and-asciimath)
 
 [Mermaid](https://github.com/jhuix/showdowns/blob/master/docs/demo.md#mermaid)
 
 [Plantuml](https://github.com/jhuix/showdowns/blob/master/docs/demo.md#plantuml)
+
+[Flowchart](https://github.com/jhuix/showdowns/blob/master/docs/demo.md#flowchart)
+
+[Network Sequence](https://github.com/jhuix/showdowns/blob/master/docs/demo.md#network-sequence)
+
+[Graphviz's dot](https://github.com/jhuix/showdowns/blob/master/docs/demo.md#graphviz-s-dot)
+
+[Railroad diagrams](https://github.com/jhuix/showdowns/blob/master/docs/demo.md#railroad-diagrams)
+
+[WaveDrom](https://github.com/jhuix/showdowns/blob/master/docs/demo.md#wavedrom)
 
 [Footnotes](https://github.com/jhuix/showdowns/blob/master/docs/demo.md#footnotes)
 
@@ -29,9 +41,9 @@ See more information, refer to the following document:
 
 [Extensions Examples](https://github.com/jhuix/showdowns/blob/master/docs/demo.md)
 
-### Demo
+### Demos
 
-See [showdowns Demo](https://jhuix.github.io/showdowns/)
+View [Extensions Examples](https://github.com/jhuix/showdowns/blob/master/docs/demo.md) is previewed as [Showdowns Demos](https://jhuix.github.io/showdowns/)
 
 ## Usage
 
@@ -46,7 +58,6 @@ Note: add --save if you are using npm < 5.0.0
 In a browser:
 
     <link rel="stylesheet" href="dist/showdowns.min.css">
-    <link rel="stylesheet" href="dist/katex.min.css">
     <script src="dist/showdowns.min.js"></script>
 
 In Node.js:
@@ -57,8 +68,7 @@ For commonjs
 
 or
 
-    import 'showdowns/dist/showdowns.core.min.css'
-    import 'showdowns/dist/katex.min.css'
+    import 'showdowns/dist/showdowns.core.min.css';
     import showdowns from 'showdowns';
 
 For umd
@@ -67,14 +77,12 @@ For umd
 
 or
 
-    import 'showdowns/dist/showdowns.min.css'
-    import 'showdowns/dist/katex.min.css'
+    import 'showdowns/dist/showdowns.min.css';
     import showdowns from 'showdowns/dist/showdowns.min.js';
 
 Support compress markdown content with [wasm-brotli](https://github.com/dfrankland/wasm-brotli) for [google brotli](https://github.com/google/brotli), use the following file:
 
     showdowns/dist/showdowns.br.min.js
-
 
 ### Quick Example
 
@@ -82,30 +90,49 @@ Node
 
     var showdowns  = require('showdowns'),
     showdowns.init()
-    text      = '# hello, markdown!',
-    html      = showdowns.makeHtml(text);
+    var text      = '# hello, markdown!',
+    var html      = showdowns.makeHtml(text);
 
 Browser
 
-    function injectStyleSheet(css) {
-      if (!css || typeof document === 'undefined') {
-        return;
-      }
+    <link rel="stylesheet" href="../dist/showdowns.min.css" />
 
-      var head = document.head || document.getElementsByTagName('head')[0];
-      var link = document.createElement('link');
-      link.rel = 'stylesheet';
-      link.href = css;
-      head.appendChild(link);
-    }
-
-    showdowns.init()
-    text      = '# hello, markdown!',
-    html      = showdowns.makeHtml(text, (types) => {
-      if (types.hasKatex) {
-        injectStyleSheet('showdowns/dist/katex.min.css');
-      }
-    });
+    <div id="main" class="workspace-container"></div>
+    <script src="../dist/showdowns.min.js"></script>
+    <script>
+      (function(element) {
+        showdowns.init();
+        let md = "";
+        window
+          .fetch("https://jhuix.github.io/showdowns/demo.md")
+          .then(function(response) {
+            if (response.ok) {
+              return response.text();
+            }
+          })
+          .then(function(text) {
+            md = text;
+            return window.fetch(
+              "https://jhuix.github.io/showdowns/Showdown's-Markdown-syntax.md"
+            );
+          })
+          .then(function(response) {
+            if (response.ok) {
+              return response.text();
+            }
+          })
+          .then(function(text) {
+            md = md + `\n\n## Showdown's Markdown syntax\n\n` + text;
+            element.innerHTML = showdowns.makeHtml(md);
+          })
+          .catch(function(error) {
+            console.log(error);
+            if (md) {
+              element.innerHTML = showdowns.makeHtml(md);
+            }
+          });
+      })(document.getElementById("main"));
+    </script>
 
 ### Options
 
@@ -143,7 +170,12 @@ Default extensions is described below:
       showdownAlign,
       showdownFootnotes,
       showdownMermaid,
-      showdownKatex(),
+      showdownFlowchart,
+      showdownRailroad,
+      showdownViz,
+      showdownSequence,
+      showdownKatex,
+      showdownWavedrom,
       showdownPlantuml({ imageFormat: 'svg' })
     ];
 
@@ -191,8 +223,20 @@ Type: ({type:'zip', content: string} | string, (types) => void) => string
 
 A function to make markdown to html that showdown.convertor converte it in current showdowns instance.
 
+#### zDecode
+
+Type: string => string
+
+A function to decode data that be encoded using [zEncode](#zencode).
+
+#### zEncode
+
+Type: string => string
+
+A function to encode data with zlib.
+
 ## License
 
-[MIT](http://opensource.org/licenses/MIT)
+[MIT](https://github.com/jhuix/showdowns/blob/master/LICENSE)
 
 Copyright (c) 2019-present, [Jhuix](mailto:jhuix0117@gmail.com) (Hui Jin)
