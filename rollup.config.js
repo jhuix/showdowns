@@ -1,18 +1,23 @@
 import fs from 'fs';
 import path from 'path';
 
-import resolve from 'rollup-plugin-node-resolve'; // 帮助寻找node_modules里的包
-import babel from 'rollup-plugin-babel'; // rollup 的 babel 插件，ES6转ES5
-import commonjs from 'rollup-plugin-commonjs'; // 将非ES6语法的包转为ES6可用
-import { terser } from 'rollup-plugin-terser'; // 压缩包
-import json from 'rollup-plugin-json'; // json
-import builtins from 'rollup-plugin-node-builtins'; //集成zlib crypto等库
+// 帮助寻找node_modules里的包
+import resolve from 'rollup-plugin-node-resolve';
+// rollup 的 babel 插件，ES6转ES5
+import babel from 'rollup-plugin-babel';
+// 将非ES6语法的包转为ES6可用
+import commonjs from 'rollup-plugin-commonjs';
+// 混淆JS文件
+import { terser } from 'rollup-plugin-terser';
+// 集成zlib crypto等库
+import builtins from 'rollup-plugin-node-builtins';
 import globals from 'rollup-plugin-node-globals';
+import json from '@rollup/plugin-json';
 import copy from 'rollup-plugin-copy';
 import pkg from './package.json';
 
 //postcss plugins
-import postcss from 'rollup-plugin-postcss'; // css
+import postcss from 'rollup-plugin-postcss';
 import autoprefixer from 'autoprefixer';
 import simplevars from 'postcss-simple-vars';
 import nested from 'postcss-nested';
@@ -51,8 +56,11 @@ const wasm = function() {
         const wasm_module_dir =
           path.relative(path.dirname(id), path.join(__dirname, 'src/utils')) ||
           '.';
-        return `import wasmModule from '${wasm_module_dir}/wasm-module.js'
-                export default function(imports){ return wasmModule(false, '${src}', imports) }`;
+        return {
+          code: `import wasmModule from '${wasm_module_dir}/wasm-module.js'
+                export default function(imports){ return wasmModule(false, '${src}', imports) }`,
+          map: null
+        };
       }
     }
   };
@@ -62,8 +70,10 @@ const config = {
   input: isWithBrotli ? 'src/showdowns.br.js' : 'src/showdowns.js',
   output: {
     file: pkg.main.replace('.min.js', isWithBrotli ? '.br.js' : '.js'),
-    format: 'cjs', // 输出CJS格式，NODE.js模块规范通用
-    name: 'showdowns', // 打包后的全局变量，如浏览器端 window.ReactRedux;
+    // 输出CJS格式，NODE.js模块规范通用
+    format: 'cjs',
+    // 打包后的全局变量，如浏览器端 window.showdowns;
+    name: 'showdowns',
     sourcemap: true,
     banner: banner,
     globals: {
@@ -79,6 +89,7 @@ const config = {
       warn(msg);
     }
   },
+  // 作用：指出应将哪些模块视为外部模块，否则会被打包进最终的代码里
   external: [
     'mermaid',
     'katex',
@@ -86,7 +97,7 @@ const config = {
     'flowchart.js',
     'viz.js',
     'showdown-katex'
-  ], // 作用：指出应将哪些模块视为外部模块，否则会被打包进最终的代码里
+  ],
   plugins: [
     json(),
     postcss({
@@ -119,7 +130,8 @@ if (isFormatCJS) {
     '.min.js',
     isWithBrotli ? '.br.js' : '.js'
   );
-  config.output.format = 'umd'; //输出UMD格式，各种模块规范通用
+  // 输出UMD格式，各种模块规范通用
+  config.output.format = 'umd';
   config.plugins.push(
     babel({
       exclude: '**/node_modules/**'
@@ -161,40 +173,103 @@ if (!isFormatCJS) {
       copy({
         targets: [
           // railroad-diagrams https://github.com/tabatkins/railroad-diagrams
-          { src: 'node_modules/railroad-diagrams/railroad-diagrams.js', dest: 'docs/dist/diagrams/railroad' },
-          { src: 'node_modules/railroad-diagrams/railroad-diagrams.css', dest: 'docs/dist/diagrams/railroad' },
-          { src: 'node_modules/railroad-diagrams/package.json', dest: 'docs/dist/diagrams/railroad' },
-          { src: 'node_modules/railroad-diagrams/README.md', dest: 'docs/dist/diagrams/railroad' },
+          {
+            src: 'node_modules/railroad-diagrams/railroad-diagrams.js',
+            dest: 'docs/dist/diagrams/railroad'
+          },
+          {
+            src: 'node_modules/railroad-diagrams/railroad-diagrams.css',
+            dest: 'docs/dist/diagrams/railroad'
+          },
+          {
+            src: 'node_modules/railroad-diagrams/package.json',
+            dest: 'docs/dist/diagrams/railroad'
+          },
+          {
+            src: 'node_modules/railroad-diagrams/README.md',
+            dest: 'docs/dist/diagrams/railroad'
+          },
           // @rokt33r/js-sequence-diagrams https://github.com/bramp/js-sequence-diagrams
-          { src: 'node_modules/@rokt33r/js-sequence-diagrams/dist/sequence-diagram-min.*', dest: 'docs/dist/diagrams/sequence/dist' },
-          { src: 'node_modules/@rokt33r/js-sequence-diagrams/dist/sequence-diagram.*', dest: 'docs/dist/diagrams/sequence/dist' },
-          { src: 'node_modules/@rokt33r/js-sequence-diagrams/dist/danielbd.*', dest: 'docs/dist/diagrams/sequence/dist' },
-          { src: 'node_modules/@rokt33r/js-sequence-diagrams/package.json', dest: 'docs/dist/diagrams/sequence' },
-          { src: 'node_modules/@rokt33r/js-sequence-diagrams/README.md', dest: 'docs/dist/diagrams/sequence' },
-          { src: 'node_modules/@rokt33r/js-sequence-diagrams/LICENCE', dest: 'docs/dist/diagrams/sequence' },
+          {
+            src:
+              'node_modules/@rokt33r/js-sequence-diagrams/dist/sequence-diagram-min.*',
+            dest: 'docs/dist/diagrams/sequence/dist'
+          },
+          {
+            src:
+              'node_modules/@rokt33r/js-sequence-diagrams/dist/sequence-diagram.*',
+            dest: 'docs/dist/diagrams/sequence/dist'
+          },
+          {
+            src: 'node_modules/@rokt33r/js-sequence-diagrams/dist/danielbd.*',
+            dest: 'docs/dist/diagrams/sequence/dist'
+          },
+          {
+            src: 'node_modules/@rokt33r/js-sequence-diagrams/package.json',
+            dest: 'docs/dist/diagrams/sequence'
+          },
+          {
+            src: 'node_modules/@rokt33r/js-sequence-diagrams/README.md',
+            dest: 'docs/dist/diagrams/sequence'
+          },
+          {
+            src: 'node_modules/@rokt33r/js-sequence-diagrams/LICENCE',
+            dest: 'docs/dist/diagrams/sequence'
+          },
           { src: 'public/*', dest: 'docs' },
           { src: 'demo', dest: 'docs' },
           { src: 'favicon.ico', dest: 'docs' }
         ]
       })
     );
-  }
-  else {
+  } else {
     config.plugins.push(
       copy({
         targets: [
           // railroad-diagrams https://github.com/tabatkins/railroad-diagrams
-          { src: 'node_modules/railroad-diagrams/railroad-diagrams.js', dest: 'dist/diagrams/railroad' },
-          { src: 'node_modules/railroad-diagrams/railroad-diagrams.css', dest: 'dist/diagrams/railroad' },
-          { src: 'node_modules/railroad-diagrams/package.json', dest: 'dist/diagrams/railroad' },
-          { src: 'node_modules/railroad-diagrams/README.md', dest: 'dist/diagrams/railroad' },
+          {
+            src: 'node_modules/railroad-diagrams/railroad-diagrams.js',
+            dest: 'dist/diagrams/railroad'
+          },
+          {
+            src: 'node_modules/railroad-diagrams/railroad-diagrams.css',
+            dest: 'dist/diagrams/railroad'
+          },
+          {
+            src: 'node_modules/railroad-diagrams/package.json',
+            dest: 'dist/diagrams/railroad'
+          },
+          {
+            src: 'node_modules/railroad-diagrams/README.md',
+            dest: 'dist/diagrams/railroad'
+          },
           // @rokt33r/js-sequence-diagrams https://github.com/bramp/js-sequence-diagrams
-          { src: 'node_modules/@rokt33r/js-sequence-diagrams/dist/sequence-diagram-min.*', dest: 'dist/diagrams/sequence/dist' },
-          { src: 'node_modules/@rokt33r/js-sequence-diagrams/dist/sequence-diagram.*', dest: 'dist/diagrams/sequence/dist' },
-          { src: 'node_modules/@rokt33r/js-sequence-diagrams/dist/danielbd.*', dest: 'dist/diagrams/sequence/dist' },
-          { src: 'node_modules/@rokt33r/js-sequence-diagrams/package.json', dest: 'dist/diagrams/sequence' },
-          { src: 'node_modules/@rokt33r/js-sequence-diagrams/README.md', dest: 'dist/diagrams/sequence' },
-          { src: 'node_modules/@rokt33r/js-sequence-diagrams/LICENCE', dest: 'dist/diagrams/sequence' }
+          {
+            src:
+              'node_modules/@rokt33r/js-sequence-diagrams/dist/sequence-diagram-min.*',
+            dest: 'dist/diagrams/sequence/dist'
+          },
+          {
+            src:
+              'node_modules/@rokt33r/js-sequence-diagrams/dist/sequence-diagram.*',
+            dest: 'dist/diagrams/sequence/dist'
+          },
+          {
+            src: 'node_modules/@rokt33r/js-sequence-diagrams/dist/danielbd.*',
+            dest: 'dist/diagrams/sequence/dist'
+          },
+          {
+            src: 'node_modules/@rokt33r/js-sequence-diagrams/package.json',
+            dest: 'dist/diagrams/sequence'
+          },
+          {
+            src: 'node_modules/@rokt33r/js-sequence-diagrams/README.md',
+            dest: 'dist/diagrams/sequence'
+          },
+          {
+            src: 'node_modules/@rokt33r/js-sequence-diagrams/LICENCE',
+            dest: 'dist/diagrams/sequence'
+          }
         ]
       })
     );
