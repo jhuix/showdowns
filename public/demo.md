@@ -13,13 +13,12 @@ It can converte markdown content to html that using the [Showdown](https://githu
 - [Showdown's Markdown syntax](https://github.com/showdownjs/showdown/wiki/Showdown's-Markdown-syntax)
 - [Showdown Options](https://github.com/showdownjs/showdown/wiki/Showdown-options)
 
-
 ## Table
 
-| Return Code | Style | Value | DESC |
-| ----------- | ----- | ----- | ---- |
-| OK          |  int  |   1   | Succeeded |
-| ERROR       |  int  |   0   | Failed |
+| Return Code | Style | Value | DESC      |
+| ----------- | ----- | ----- | --------- |
+| OK          | int   | 1     | Succeeded |
+| ERROR       | int   | 0     | Failed    |
 
 ## Supporting some markdown extension features
 
@@ -50,6 +49,7 @@ It's implemented sub-TOC in showdown-toc.js.
 [TOC]
 
 #### sub-TOC examples1
+
 #### sub-TOC examples2
 
 ### Mermaid
@@ -140,7 +140,7 @@ cond=>condition: Yes
 or No?:>http://www.google.com
 io=>inputoutput: catch something...
 para=>parallel: parallel tasks
- 
+
 st->op1->cond
 cond(yes)->io->e
 cond(no)->para
@@ -148,7 +148,7 @@ para(path1, bottom)->sub1(right)->op1
 para(path2, top)->op1
 ```
 
-``` flowchart
+```flowchart
 st=>start: Start
 e=>end
 op1=>operation: My Operation
@@ -196,6 +196,18 @@ Diagram(
         Choice(0,
           NonTerminal('name char'),
           NonTerminal('escape'))))
+```
+
+### WaveDrom
+
+```wavedrom
+{signal: [
+  {name: 'clk', wave: 'p.....|...'},
+  {name: 'dat', wave: 'x.345x|=.x', data: ['head', 'body', 'tail', 'data']},
+  {name: 'req', wave: '0.1..0|1.0'},
+  {},
+  {name: 'ack', wave: '1.....|01.'}
+]}
 ```
 
 ### Footnotes
