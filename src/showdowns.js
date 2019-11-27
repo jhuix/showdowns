@@ -11,6 +11,7 @@ import showdownMermaid from './extensions/showdown-mermaid.js';
 import showdownPlantuml from './extensions/showdown-plantuml.js';
 import showdownRailroad from './extensions/showdown-railroad.js';
 import showdownSequence from './extensions/showdown-sequence.js';
+import showdownWavedrom from './extensions/showdown-wavedrom.js';
 import showdownFootnotes from './extensions/showdown-footnotes.js';
 import showdownFlowchart from './extensions/showdown-flowchart.js';
 import showdownCheckType from './extensions/showdown-checktype.js';
@@ -42,6 +43,7 @@ const getExtensions = (extensions = []) => {
     showdownViz,
     showdownSequence,
     showdownKatex,
+    showdownWavedrom,
     showdownPlantuml({ imageFormat: 'svg' })
   ].concat(extensions ? extensions : []);
 };

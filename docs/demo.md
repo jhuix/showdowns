@@ -163,7 +163,7 @@ cond(no)->sub1(right)->op1
 
 ### Network Sequence
 
-```sequence
+```sequence {"theme":"hand"}
 Alice->Bob: Hello Bob, how are you?
 Note right of Bob: Bob thinks
 Bob-->Alice: I am good thanks!
@@ -171,7 +171,7 @@ Bob-->Alice: I am good thanks!
 
 ### Graphviz's dot
 
-```dot
+```dot {"engine":"dot"}
 digraph G {
     main -> parse -> execute;
     main -> init;

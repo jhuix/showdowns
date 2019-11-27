@@ -71,17 +71,11 @@ function renderFlowchartElements(flowchartElements, flowElements, options) {
     cdnjs
       .loadScript('Raphael')
       .then(name => {
-        Raphael =
-          window[name] && window[name].hasOwnProperty('default')
-            ? window[name]['default']
-            : window[name];
+        Raphael = cdnjs.interopDefault(window[name]);
         return cdnjs.loadScript('flowchart');
       })
       .then(name => {
-        Flowchart =
-          window[name] && window[name].hasOwnProperty('default')
-            ? window[name]['default']
-            : window[name];
+        Flowchart = cdnjs.interopDefault(window[name]);
       });
   }
 

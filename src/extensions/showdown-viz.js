@@ -63,10 +63,7 @@ function renderVizElements(elements) {
   const sync = hasViz();
   if (!sync && typeof window !== 'undefined') {
     cdnjs.loadScript('Viz').then(name => {
-      Viz =
-        window[name] && window[name].hasOwnProperty('default')
-          ? window[name]['default']
-          : window[name];
+      Viz = cdnjs.interopDefault(window[name]);
     });
     cdnjs.loadScript('VizRender');
   }

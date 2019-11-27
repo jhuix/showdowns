@@ -34,7 +34,13 @@ const cdnSrc = {
     sequence:
       '../node_modules/@rokt33r/js-sequence-diagrams/dist/sequence-diagram-min.js',
     sequenceCSS:
-      '../node_modules/@rokt33r/js-sequence-diagrams/dist/sequence-diagram-min.css'
+      '../node_modules/@rokt33r/js-sequence-diagrams/dist/sequence-diagram-min.css',
+    WaveDrom: '../node_modules/wavedrom/wavedrom.min.js',
+    WaveDromSkin: {
+      default: '../node_modules/wavedrom/skins/default.js',
+      lowkey: '../node_modules/wavedrom/skins/lowkey.js',
+      narrow: '../node_modules/wavedrom/skins/narrow.js'
+    }
   },
   cdnjs: {
     Viz: scheme + 'cdnjs.cloudflare.com/ajax/libs/viz.js/2.1.2/viz.js',
@@ -60,7 +66,19 @@ const cdnSrc = {
       scheme +
       'cdnjs.cloudflare.com/ajax/libs/underscore.js/1.9.1/underscore-min.js',
     sequence: '../dist/diagrams/sequence/dist/sequence-diagram-min.js',
-    sequenceCSS: '../dist/diagrams/sequence/dist/sequence-diagram-min.css'
+    sequenceCSS: '../dist/diagrams/sequence/dist/sequence-diagram-min.css',
+    WaveDrom:
+      scheme + 'cdnjs.cloudflare.com/ajax/libs/wavedrom/2.1.2/wavedrom.min.js',
+    WaveDromSkin: {
+      default:
+        scheme +
+        'cdnjs.cloudflare.com/ajax/libs/wavedrom/2.1.2/skins/default.js',
+      lowkey:
+        scheme +
+        'cdnjs.cloudflare.com/ajax/libs/wavedrom/2.1.2/skins/lowkey.js',
+      narrow:
+        scheme + 'cdnjs.cloudflare.com/ajax/libs/wavedrom/2.1.2/skins/narrow.js'
+    }
   }
 };
 
@@ -78,8 +96,17 @@ function loadScript(src, name) {
       name = src;
     }
 
-    if (cdnSrc.hasOwnProperty(cdnName) && cdnSrc[cdnName][name]) {
-      src = cdnSrc[cdnName][name];
+    if (cdnSrc.hasOwnProperty(cdnName)) {
+      const cdn = cdnSrc[cdnName];
+      if (typeof name === 'object') {
+        const key = Object.keys(name)[0];
+        const val = name[key];
+        if (cdn[key] && typeof val === 'string' && val && cdn[key][val]) {
+          src = cdn[key][val];
+        }
+      } else if (cdn[name]) {
+        src = cdnSrc[cdnName][name];
+      }
     }
 
     const head = document.head || document.getElementsByTagName('head')[0];
@@ -112,6 +139,10 @@ function loadStyleSheet(css, name) {
   head.appendChild(link);
 }
 
-const cdnjs = { loadScript, loadStyleSheet, setCDN };
+function interopDefault(ex) {
+  return ex && typeof ex === 'object' && 'default' in ex ? ex['default'] : ex;
+}
+
+const cdnjs = { interopDefault, loadScript, loadStyleSheet, setCDN };
 
 export default cdnjs;

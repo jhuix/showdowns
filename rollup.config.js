@@ -34,6 +34,7 @@ const banner =
   ' * Released under the MIT License.\n' +
   ' */';
 
+// 处理import '.wasm'文件的rollup plugin
 const wasm = function() {
   return {
     name: 'wasm',
@@ -81,7 +82,8 @@ const config = {
       'flowchart.js': 'flowchart',
       'viz.js': 'viz',
       mermaid: 'mermaid',
-      katex: 'katex'
+      katex: 'katex',
+      wavedrom: 'WaveDrom'
     }
   },
   onwarn: (msg, warn) => {
@@ -96,7 +98,7 @@ const config = {
     'raphael',
     'flowchart.js',
     'viz.js',
-    'showdown-katex'
+    'wavedrom'
   ],
   plugins: [
     json(),
@@ -124,7 +126,12 @@ const config = {
 };
 
 if (isFormatCJS) {
-  config.external.push('showdown', 'zlib');
+  config.external.push(
+    'showdown',
+    'zlib',
+    'katex/dist/contrib/auto-render',
+    'showdown-katex/src/asciimath-to-tex'
+  );
 } else {
   config.output.file = pkg.browser.replace(
     '.min.js',

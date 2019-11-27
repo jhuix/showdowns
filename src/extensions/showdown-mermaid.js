@@ -56,10 +56,7 @@ function renderMermaidElements(elements, config) {
   const sync = hasMermaid();
   if (!sync && typeof window !== 'undefined') {
     cdnjs.loadScript('mermaid').then(name => {
-      Mermaid =
-        window[name] && window[name].hasOwnProperty('default')
-          ? window[name]['default']
-          : window[name];
+      Mermaid = cdnjs.interopDefault(window[name]);
       Mermaid.initialize(config);
     });
   }

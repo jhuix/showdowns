@@ -22,8 +22,8 @@ THE SOFTWARE.
 */
 
 import katex from 'katex';
-import renderMathInElement from 'katex/dist/contrib/auto-render.js';
-import asciimathToTex from 'showdown-katex/src/asciimath-to-tex.js';
+import renderMathInElement from 'katex/dist/contrib/auto-render';
+import asciimathToTex from 'showdown-katex/src/asciimath-to-tex';
 import cdnjs from './cdn';
 
 if (typeof Katex === 'undefined') {
@@ -82,10 +82,7 @@ function renderBlockElements(latex, asciimath, config) {
   if (!sync && typeof window !== 'undefined') {
     cdnjs.loadStyleSheet('katexCSS');
     cdnjs.loadScript('katex').then(name => {
-      Katex =
-        window[name] && window[name].hasOwnProperty('default')
-          ? window[name]['default']
-          : window[name];
+      Katex = cdnjs.interopDefault(window[name]);
     });
   }
 
