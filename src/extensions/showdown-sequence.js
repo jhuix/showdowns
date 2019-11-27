@@ -14,6 +14,8 @@ let diagram;
 if (typeof window !== 'undefined' && window.Diagram) {
   diagram = window.Diagram;
 }
+
+const themes = ['simple', 'hand'];
 let sequence;
 function hasSequence() {
   return !!sequence;
@@ -25,6 +27,7 @@ function hasSequence() {
 function renderSequence(element, sync) {
   const code = element.textContent.trim();
   const name = element.className;
+  const langattr = element.dataset.lang;
   const id = 'sequence-' + Date.now() + '-' + Math.floor(Math.random() * 10000);
   if (!sync && typeof window !== 'undefined' && window.dispatchEvent) {
     element.id = id;
@@ -35,7 +38,8 @@ function renderSequence(element, sync) {
           detail: {
             id: elementid,
             className: name,
-            data: code
+            data: code,
+            langattr: langattr
           }
         })
       );
@@ -49,7 +53,14 @@ function renderSequence(element, sync) {
     element.parentNode.outerHTML = `<div id="${id}" class="${name}"></div>`;
     const el = doc.getElementById(id);
     const d = sequence.parse(code);
-    const options = { theme: 'hand' };
+    let theme = 'hand';
+    if (langattr) {
+      const obj = JSON.parse(langattr);
+      if (obj && obj.theme && themes.indexOf(obj.theme) != -1) {
+        theme = obj.theme;
+      }
+    }
+    const options = { theme: theme };
     d.drawSVG(el ? el : id, options);
   }
 }
@@ -61,28 +72,31 @@ function renderSequenceElements(elements) {
   }
 
   const sync = hasSequence();
-  if (!sync && typeof window !== 'undefined') {
-    cdnjs.loadStyleSheet('sequenceCSS');
-    cdnjs
-      .loadScript('WebFont')
-      .then(() => {
-        return cdnjs.loadScript('Snap');
-      })
-      .then(() => {
-        return cdnjs.loadScript('underscore');
-      })
-      .then(() => {
-        if (!diagram && window['Diagram']) {
-          diagram = window['Diagram'];
-        }
-        return cdnjs.loadScript('sequence');
-      })
-      .then(() => {
-        sequence = window['Diagram'];
-        if (diagram) {
-          window['Diagram'] = diagram;
-        }
-      });
+  if (typeof window !== 'undefined') {
+    if (!sync) {
+      cdnjs.loadStyleSheet('sequenceCSS');
+      cdnjs
+        .loadScript('WebFont')
+        .then(() => {
+          return cdnjs.loadScript('Snap');
+        })
+        .then(() => {
+          return cdnjs.loadScript('underscore');
+        })
+        .then(() => {
+          if (!diagram && window['Diagram']) {
+            diagram = window['Diagram'];
+          }
+          return cdnjs.loadScript('sequence');
+        })
+        .then(() => {
+          sequence = window['Diagram'];
+          if (diagram) {
+            window['Diagram'] = diagram;
+          }
+        });
+    }
+    sync = false;
   }
 
   elements.forEach(element => {
@@ -97,12 +111,20 @@ function onRenderSequence(element) {
       const id = res.element.id;
       const name = res.element.className;
       const data = res.element.data;
+      let theme = 'hand';
+      const langattr = res.element.langattr;
+      if (langattr) {
+        const obj = JSON.parse(langattr);
+        if (obj && obj.theme && themes.indexOf(obj.theme) != -1) {
+          theme = obj.theme;
+        }
+      }
       let el = window.document.getElementById(id);
       if (el) {
         el.parentNode.outerHTML = `<div id="${id}" class="${name}"></div>`;
         el = window.document.getElementById(id);
         const d = sequence.parse(data);
-        const options = { theme: 'hand' };
+        const options = { theme: theme };
         d.drawSVG(el ? el : id, options);
       }
     } else {

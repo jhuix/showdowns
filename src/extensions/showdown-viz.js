@@ -15,6 +15,8 @@ if (typeof Viz === 'undefined') {
   var Viz = viz;
 }
 
+const engines = ['circo', 'dot', 'neato', 'osage', 'twopi'];
+
 function hasViz() {
   return typeof Viz !== 'undefined' &&
     Viz &&
@@ -30,6 +32,7 @@ function hasViz() {
 function renderViz(element, sync) {
   const code = element.textContent.trim();
   const name = element.className;
+  const langattr = element.dataset.lang;
   const id = 'viz-' + Date.now() + '-' + Math.floor(Math.random() * 10000);
   if (!sync && typeof window !== 'undefined' && window.dispatchEvent) {
     element.id = id;
@@ -40,14 +43,22 @@ function renderViz(element, sync) {
           detail: {
             id: elementid,
             className: name,
-            data: code
+            data: code,
+            langattr: langattr
           }
         })
       );
     });
   } else {
+    let engine = 'dot';
+    if (langattr) {
+      const obj = JSON.parse(langattr);
+      if (obj && obj.engine && engines.indexOf(obj.engine) != -1) {
+        engine = obj.engine;
+      }
+    }
     new Viz()
-      .renderString(code, { format: 'svg', engine: 'dot' })
+      .renderString(code, { format: 'svg', engine: engine })
       .then(svgData => {
         element.parentNode.outerHTML = `<div id="${id}" class="${name}">${svgData}</div>`;
       });
@@ -61,11 +72,14 @@ function renderVizElements(elements) {
   }
 
   const sync = hasViz();
-  if (!sync && typeof window !== 'undefined') {
-    cdnjs.loadScript('Viz').then(name => {
-      Viz = cdnjs.interopDefault(window[name]);
-    });
-    cdnjs.loadScript('VizRender');
+  if (typeof window !== 'undefined') {
+    if (!sync) {
+      cdnjs.loadScript('Viz').then(name => {
+        Viz = cdnjs.interopDefault(window[name]);
+      });
+      cdnjs.loadScript('VizRender');
+    }
+    sync = false;
   }
 
   elements.forEach(element => {
@@ -80,12 +94,20 @@ function onRenderViz(element) {
       const id = res.element.id;
       const name = res.element.className;
       const data = res.element.data;
+      const langattr = res.element.langattr;
       const el = window.document.getElementById(id);
       if (el) {
+        let engine = 'dot';
+        if (langattr) {
+          const obj = JSON.parse(langattr);
+          if (obj && obj.engine && engines.indexOf(obj.engine) != -1) {
+            engine = obj.engine;
+          }
+        }
         new Viz()
           .renderString(data, {
             format: 'svg',
-            engine: 'dot'
+            engine: engine
           })
           .then(svgData => {
             el.parentNode.outerHTML = `<div id="${id}" class="${name}">${svgData}</div>`;

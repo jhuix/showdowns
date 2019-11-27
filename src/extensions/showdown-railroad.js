@@ -51,11 +51,14 @@ function renderRailroadElements(elements) {
   }
 
   const sync = hasRailroad();
-  if (!sync && typeof window !== 'undefined') {
-    cdnjs.loadStyleSheet('railroadCSS');
-    cdnjs.loadScript('railroad').then(() => {
-      railroad = true;
-    });
+  if (typeof window !== 'undefined') {
+    if (!sync) {
+      cdnjs.loadStyleSheet('railroadCSS');
+      cdnjs.loadScript('railroad').then(() => {
+        railroad = true;
+      });
+    }
+    sync = false;
   }
 
   elements.forEach(element => {

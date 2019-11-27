@@ -59,15 +59,18 @@ function renderWavedromElements(elements, skin) {
   }
 
   const sync = hasWavedrom();
-  if (!sync && typeof window !== 'undefined') {
-    cdnjs
-      .loadScript({ WaveDromSkin: skin })
-      .then(() => {
-        return cdnjs.loadScript('WaveDrom');
-      })
-      .then(name => {
-        wavedrom = cdnjs.interopDefault(window[name]);
-      });
+  if (typeof window !== 'undefined') {
+    if (!sync) {
+      cdnjs
+        .loadScript({ WaveDromSkin: skin })
+        .then(() => {
+          return cdnjs.loadScript('WaveDrom');
+        })
+        .then(name => {
+          wavedrom = cdnjs.interopDefault(window[name]);
+        });
+    }
+    sync = false;
   }
 
   elements.forEach(element => {

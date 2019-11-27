@@ -169,9 +169,28 @@ Note right of Bob: Bob thinks
 Bob-->Alice: I am good thanks!
 ```
 
+```sequence {"theme":"simple"}
+Alice->Bob: Hello Bob, how are you?
+Note right of Bob: Bob thinks
+Bob-->Alice: I am good thanks!
+```
+
 ### Graphviz's dot
 
 ```dot {"engine":"dot"}
+digraph G {
+    main -> parse -> execute;
+    main -> init;
+    main -> cleanup;
+    execute -> make_string;
+    execute -> printf
+    init -> make_string;
+    main -> printf;
+    execute -> compare;
+}
+```
+
+```dot {"engine":"circo"}
 digraph G {
     main -> parse -> execute;
     main -> init;

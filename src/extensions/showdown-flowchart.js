@@ -67,16 +67,19 @@ function renderFlowchartElements(flowchartElements, flowElements, options) {
   }
 
   const sync = hasFlowchart();
-  if (!sync && typeof window !== 'undefined') {
-    cdnjs
-      .loadScript('Raphael')
-      .then(name => {
-        Raphael = cdnjs.interopDefault(window[name]);
-        return cdnjs.loadScript('flowchart');
-      })
-      .then(name => {
-        Flowchart = cdnjs.interopDefault(window[name]);
-      });
+  if (typeof window !== 'undefined') {
+    if (!sync) {
+      cdnjs
+        .loadScript('Raphael')
+        .then(name => {
+          Raphael = cdnjs.interopDefault(window[name]);
+          return cdnjs.loadScript('flowchart');
+        })
+        .then(name => {
+          Flowchart = cdnjs.interopDefault(window[name]);
+        });
+    }
+    sync = false;
   }
 
   flowchartElements.forEach(element => {

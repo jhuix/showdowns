@@ -79,11 +79,14 @@ function renderBlockElements(latex, asciimath, config) {
 
   katexElementCount = latex.length + asciimath.length;
   const sync = hasKatex();
-  if (!sync && typeof window !== 'undefined') {
-    cdnjs.loadStyleSheet('katexCSS');
-    cdnjs.loadScript('katex').then(name => {
-      Katex = cdnjs.interopDefault(window[name]);
-    });
+  if (typeof window !== 'undefined') {
+    if (!sync) {
+      cdnjs.loadStyleSheet('katexCSS');
+      cdnjs.loadScript('katex').then(name => {
+        Katex = cdnjs.interopDefault(window[name]);
+      });
+    }
+    sync = false;
   }
 
   latex.forEach(element => {

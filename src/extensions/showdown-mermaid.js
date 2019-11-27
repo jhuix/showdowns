@@ -54,11 +54,14 @@ function renderMermaidElements(elements, config) {
   }
 
   const sync = hasMermaid();
-  if (!sync && typeof window !== 'undefined') {
-    cdnjs.loadScript('mermaid').then(name => {
-      Mermaid = cdnjs.interopDefault(window[name]);
-      Mermaid.initialize(config);
-    });
+  if (typeof window !== 'undefined') {
+    if (!sync) {
+      cdnjs.loadScript('mermaid').then(name => {
+        Mermaid = cdnjs.interopDefault(window[name]);
+        Mermaid.initialize(config);
+      });
+    }
+    sync = false;
   }
 
   elements.forEach(element => {
