@@ -46,9 +46,15 @@ function renderWavedrom(element, sync) {
       );
     });
   } else {
-    element.parentNode.outerHTML = `<div id="${id}" class="${name}"></div>`;
-    const obj = JSON.parse(code);
-    wavedrom.renderWaveForm(index, obj, 'WaveDrom_Display_');
+    element.parentNode.outerHTML = cdnjs.renderCacheElement(
+      element.ownerDocument,
+      id,
+      name,
+      el => {
+        const obj = window.eval(`(${code})`);
+        wavedrom.RenderWaveForm(index, obj, 'WaveDrom_Display_');
+      }
+    );
   }
 }
 
@@ -58,7 +64,7 @@ function renderWavedromElements(elements, skin) {
     return false;
   }
 
-  let sync = hasWavedrom();
+  const sync = hasWavedrom();
   if (typeof window !== 'undefined') {
     if (!sync) {
       cdnjs
@@ -70,7 +76,6 @@ function renderWavedromElements(elements, skin) {
           wavedrom = cdnjs.interopDefault(window[name]);
         });
     }
-    sync = false;
   }
 
   elements.forEach(element => {

@@ -53,10 +53,14 @@ function renderFlowchart(element, options, sync) {
       );
     });
   } else {
-    const doc = element.ownerDocument;
-    element.parentNode.outerHTML = `<div id="${id}" class="${name}"></div>`;
-    const el = doc.getElementById(id);
-    Flowchart.parse(code).drawSVG(el ? el : id, options);
+    element.parentNode.outerHTML = cdnjs.renderCacheElement(
+      element.ownerDocument,
+      id,
+      name,
+      el => {
+        Flowchart.parse(code).drawSVG(el, options);
+      }
+    );
   }
 }
 
@@ -66,7 +70,7 @@ function renderFlowchartElements(flowchartElements, flowElements, options) {
     return false;
   }
 
-  let sync = hasFlowchart();
+  const sync = hasFlowchart();
   if (typeof window !== 'undefined') {
     if (!sync) {
       cdnjs
@@ -79,7 +83,7 @@ function renderFlowchartElements(flowchartElements, flowElements, options) {
           Flowchart = cdnjs.interopDefault(window[name]);
         });
     }
-    sync = false;
+    //sync = false;
   }
 
   flowchartElements.forEach(element => {

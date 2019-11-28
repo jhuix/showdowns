@@ -17,6 +17,7 @@ import showdownFlowchart from './extensions/showdown-flowchart.js';
 import showdownCheckType from './extensions/showdown-checktype.js';
 
 import * as zlibcodec from './utils/zlib-codec.js';
+import cdnjs from './extensions/cdn';
 
 // Override githubCodeBlocks parser;
 // Support language attribute, see the following format:
@@ -148,7 +149,10 @@ const showdowns = {
       this.converter.addExtension(extensions);
     }
   },
-  init: function() {
+  init: function(cdnname, defScheme, distScheme) {
+    if (typeof cdnname === 'string' && cdnname) {
+      cdnjs.setCDN(cdnname, defScheme, distScheme);
+    }
     if (!this.converter) {
       // converter instance of showdown
       this.converter = new showdown.Converter({

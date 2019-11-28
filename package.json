@@ -7,7 +7,7 @@
   "module": "dist/showdowns.core.min.js",
   "unpkg": "dist/showdowns.min.js",
   "scripts": {
-    "build": "npm run build:release && npm run build:demo",
+    "build": "npm run build:release && npm run build:umd && npm run build:cjs && npm run build:demo",
     "build:umd": "rollup -c",
     "build:umd:min": "rollup -c --environment MIN",
     "build:brotli": "rollup -c --environment BROTLI",
@@ -78,7 +78,6 @@
     "snapsvg": "^0.5.1",
     "underscore": "^1.9.1",
     "viz.js": "^2.1.2",
-    "wasm-brotli": "^2.0.2",
     "wavedrom": "^2.1.6",
     "webfontloader": "^1.6.28"
   },

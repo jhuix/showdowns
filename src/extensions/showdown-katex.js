@@ -78,7 +78,7 @@ function renderBlockElements(latex, asciimath, config) {
   }
 
   katexElementCount = latex.length + asciimath.length;
-  let sync = hasKatex();
+  const sync = hasKatex();
   if (typeof window !== 'undefined') {
     if (!sync) {
       cdnjs.loadStyleSheet('katexCSS');
@@ -86,7 +86,6 @@ function renderBlockElements(latex, asciimath, config) {
         Katex = cdnjs.interopDefault(window[name]);
       });
     }
-    sync = false;
   }
 
   latex.forEach(element => {

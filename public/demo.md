@@ -2,17 +2,10 @@
 
 # [Showdowns Demos](https://jhuix.github.io/showdowns)
 
+[TOC]
+
 [Showdowns](https://github.com/jhuix/showdowns) is a lib that make markdown to html with some extensions of showdown.js.
 Click the link to preview the [Showdowns Demos](https://jhuix.github.io/showdowns).
-
-## Markdown To Html
-
-It can converte markdown content to html that using the [Showdown](https://github.com/showdownjs/showdown).
-
-[Showdown](https://github.com/showdownjs/showdown) is a Javascript Markdown to HTML converter, based on the original works by John Gruber. Showdown can be used client side (in the browser) or server side (with NodeJs). For more information, refer to the following document:
-
-- [Showdown's Markdown syntax](https://github.com/showdownjs/showdown/wiki/Showdown's-Markdown-syntax)
-- [Showdown Options](https://github.com/showdownjs/showdown/wiki/Showdown-options)
 
 ## Table
 
@@ -22,6 +15,8 @@ It can converte markdown content to html that using the [Showdown](https://githu
 | ERROR       | int   | 0     | Failed    |
 
 ## Supporting some markdown extension features
+
+**In browser environment, it is implemented to dynamically load js lib files related to more showdown diagrams extension for using [showdowns >= 0.3.0 version](https://github.com/jhuix/showdowns).**
 
 [TOC]
 

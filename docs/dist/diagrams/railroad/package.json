@@ -1,27 +1,28 @@
 {
-  "_from": "railroad-diagrams@^1.0.0",
+  "_from": "railroad-diagrams",
   "_id": "railroad-diagrams@1.0.0",
   "_inBundle": false,
   "_integrity": "sha1-635iZ1SN3t+4mcG5Dlc3RVnN234=",
   "_location": "/railroad-diagrams",
   "_phantomChildren": {},
   "_requested": {
-    "type": "range",
+    "type": "tag",
     "registry": true,
-    "raw": "railroad-diagrams@^1.0.0",
+    "raw": "railroad-diagrams",
     "name": "railroad-diagrams",
     "escapedName": "railroad-diagrams",
-    "rawSpec": "^1.0.0",
+    "rawSpec": "",
     "saveSpec": null,
-    "fetchSpec": "^1.0.0"
+    "fetchSpec": "latest"
   },
   "_requiredBy": [
+    "#USER",
     "/"
   ],
   "_resolved": "https://registry.npm.taobao.org/railroad-diagrams/download/railroad-diagrams-1.0.0.tgz",
   "_shasum": "eb7e6267548ddedfb899c1b90e57374559cddb7e",
-  "_spec": "railroad-diagrams@^1.0.0",
-  "_where": "D:\\Works\\github\\showdowns",
+  "_spec": "railroad-diagrams",
+  "_where": "H:\\works\\works\\showdowns",
   "author": {
     "name": "Tab Atkins Jr."
   },

@@ -34,8 +34,8 @@ function renderViz(element, sync) {
   const name = element.className;
   const langattr = element.dataset.lang;
   const id = 'viz-' + Date.now() + '-' + Math.floor(Math.random() * 10000);
+  element.id = id;
   if (!sync && typeof window !== 'undefined' && window.dispatchEvent) {
-    element.id = id;
     Promise.resolve(id).then(elementid => {
       // dispatch dot custom event
       window.dispatchEvent(
@@ -44,7 +44,8 @@ function renderViz(element, sync) {
             id: elementid,
             className: name,
             data: code,
-            langattr: langattr
+            langattr: langattr,
+            rendered: false
           }
         })
       );
@@ -60,7 +61,30 @@ function renderViz(element, sync) {
     new Viz()
       .renderString(code, { format: 'svg', engine: engine })
       .then(svgData => {
-        element.parentNode.outerHTML = `<div id="${id}" class="${name}">${svgData}</div>`;
+        if (typeof window !== 'undefined' && window.dispatchEvent) {
+          // dispatch dot custom event
+          window.dispatchEvent(
+            new CustomEvent('dot', {
+              detail: {
+                id: id,
+                className: name,
+                data: svgData,
+                rendered: true
+              }
+            })
+          );
+        } else {
+          new require('events').EventEmitter().emit('dot', [
+            {
+              detail: {
+                id: id,
+                className: name,
+                data: svgData,
+                rendered: true
+              }
+            }
+          ]);
+        }
       });
   }
 }
@@ -71,7 +95,7 @@ function renderVizElements(elements) {
     return false;
   }
 
-  let sync = hasViz();
+  const sync = hasViz();
   if (typeof window !== 'undefined') {
     if (!sync) {
       cdnjs.loadScript('Viz').then(name => {
@@ -79,7 +103,6 @@ function renderVizElements(elements) {
       });
       cdnjs.loadScript('VizRender');
     }
-    sync = false;
   }
 
   elements.forEach(element => {
@@ -94,24 +117,28 @@ function onRenderViz(element) {
       const id = res.element.id;
       const name = res.element.className;
       const data = res.element.data;
-      const langattr = res.element.langattr;
       const el = window.document.getElementById(id);
       if (el) {
-        let engine = 'dot';
-        if (langattr) {
-          const obj = JSON.parse(langattr);
-          if (obj && obj.engine && engines.indexOf(obj.engine) != -1) {
-            engine = obj.engine;
+        if (res.element.rendered) {
+          el.parentNode.outerHTML = `<div id="${id}" class="${name}">${data}</div>`;
+        } else {
+          const langattr = res.element.langattr;
+          let engine = 'dot';
+          if (langattr) {
+            const obj = JSON.parse(langattr);
+            if (obj && obj.engine && engines.indexOf(obj.engine) != -1) {
+              engine = obj.engine;
+            }
           }
+          new Viz()
+            .renderString(data, {
+              format: 'svg',
+              engine: engine
+            })
+            .then(svgData => {
+              el.parentNode.outerHTML = `<div id="${id}" class="${name}">${svgData}</div>`;
+            });
         }
-        new Viz()
-          .renderString(data, {
-            format: 'svg',
-            engine: engine
-          })
-          .then(svgData => {
-            el.parentNode.outerHTML = `<div id="${id}" class="${name}">${svgData}</div>`;
-          });
       }
     } else {
       setTimeout(() => {
@@ -124,7 +151,7 @@ function onRenderViz(element) {
 function showdownViz() {
   const parser = new DOMParser();
 
-  if (!hasViz() && typeof window !== 'undefined' && window.dispatchEvent) {
+  if (typeof window !== 'undefined' && window.dispatchEvent) {
     // Listen dot custom event
     window.addEventListener('dot', event => {
       if (event.detail) {

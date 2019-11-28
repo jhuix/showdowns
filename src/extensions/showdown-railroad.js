@@ -50,7 +50,7 @@ function renderRailroadElements(elements) {
     return false;
   }
 
-  let sync = hasRailroad();
+  const sync = hasRailroad();
   if (typeof window !== 'undefined') {
     if (!sync) {
       cdnjs.loadStyleSheet('railroadCSS');
@@ -58,7 +58,6 @@ function renderRailroadElements(elements) {
         railroad = true;
       });
     }
-    sync = false;
   }
 
   elements.forEach(element => {

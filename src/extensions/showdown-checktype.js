@@ -22,9 +22,23 @@ function showdownCheckType(checktype_callback) {
           const doc = parser.parseFromString(html, 'text/html');
           const wrapper = typeof doc.body !== 'undefined' ? doc.body : doc;
           // find the katex elements
-          const katexs = wrapper.querySelectorAll('span.katex-display');
+          const katexs =
+            wrapper.querySelectorAll('span.katex-display') ||
+            wrapper.querySelectorAll('code.latex.language-latex') ||
+            wrapper.querySelectorAll('code.asciimath.language-asciimath');
+
+          const sequences =
+            wrapper.querySelectorAll('div.sequence') ||
+            wrapper.querySelectorAll('code.sequence.language-sequence');
+
+          const railroad =
+            wrapper.querySelectorAll('div.railroad') ||
+            wrapper.querySelectorAll('code.railroad.language-railroad');
+
           checktype_callback({
-            hasKatex: katexs.length > 0 ? true : false
+            hasKatex: katexs.length > 0 ? true : false,
+            hasSequence: sequences.length > 0 ? true : false,
+            hasRailroad: railroad.length > 0 ? true : false
           });
         }
         // return html text content

@@ -80,7 +80,7 @@ const config = {
     globals: {
       raphael: 'Raphael',
       'flowchart.js': 'flowchart',
-      'viz.js': 'viz',
+      'viz.js': 'Viz',
       mermaid: 'mermaid',
       katex: 'katex',
       wavedrom: 'WaveDrom'
@@ -276,7 +276,9 @@ if (!isFormatCJS) {
           {
             src: 'node_modules/@rokt33r/js-sequence-diagrams/LICENCE',
             dest: 'dist/diagrams/sequence'
-          }
+          },
+          // Publish common dist resource
+          { src: 'public/dist/*', dest: 'dist' }
         ]
       })
     );

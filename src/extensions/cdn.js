@@ -9,20 +9,19 @@
 'use strict';
 
 let cdnName = 'cdnjs';
-
-const scheme =
+let scheme =
   document.location.protocol === 'file:'
     ? 'https://'
     : document.location.protocol + '//';
+let defScheme = '';
+let distScheme = '';
 
 const cdnSrc = {
   local: {
     Viz: '../node_modules/viz.js/viz.js',
     VizRender: '../node_modules/viz.js/full.render.js',
-    Raphael: '../node_modules/raphael/raphael-min.js',
-    flowchart:
-      scheme +
-      'cdnjs.cloudflare.com/ajax/libs/flowchart/1.12.2/flowchart.min.js',
+    Raphael: '../node_modules/raphael/raphael.min.js',
+    flowchart: '../dist/diagrams/flowchart/flowchart.min.js',
     mermaid: '../node_modules/mermaid/dist/mermaid.min.js',
     katex: '../node_modules/katex/dist/katex.min.js',
     katexCSS: '../node_modules/katex/dist/katex.min.css',
@@ -47,7 +46,7 @@ const cdnSrc = {
     VizRender:
       scheme + 'cdnjs.cloudflare.com/ajax/libs/viz.js/2.1.2/full.render.js',
     Raphael:
-      scheme + 'cdnjs.cloudflare.com/ajax/libs/raphael/2.2.0/raphael-min.js',
+      scheme + 'cdnjs.cloudflare.com/ajax/libs/raphael/2.2.7/raphael.min.js',
     flowchart:
       scheme +
       'cdnjs.cloudflare.com/ajax/libs/flowchart/1.12.2/flowchart.min.js',
@@ -82,8 +81,45 @@ const cdnSrc = {
   }
 };
 
-function setCDN(name) {
-  cdnName = name;
+function setCDN(name, scheme_default, scheme_dist) {
+  if (name in cdnSrc) {
+    cdnName = name;
+  }
+
+  if (typeof scheme_default === 'string' && scheme_default) {
+    defScheme = scheme_default;
+  }
+
+  if (typeof scheme_dist === 'string' && scheme_dist) {
+    distScheme = scheme_dist;
+  }
+}
+
+function getSrc(name, def) {
+  if (cdnSrc.hasOwnProperty(cdnName)) {
+    const cdn = cdnSrc[cdnName];
+    let url = '';
+    if (typeof name === 'object') {
+      const key = Object.keys(name)[0];
+      const val = name[key];
+      if (cdn[key] && typeof val === 'string' && val && cdn[key][val]) {
+        url = cdn[key][val];
+      }
+    } else if (cdn[name]) {
+      url = cdn[name];
+    }
+
+    if (url) {
+      if (url.substr(0, scheme.length) === scheme) {
+        def = url;
+      } else if (url.substr(0, 8) === '../dist/') {
+        def = distScheme + url;
+      } else {
+        def = defScheme + url;
+      }
+    }
+  }
+  return def;
 }
 
 function loadScript(src, name) {
@@ -96,19 +132,7 @@ function loadScript(src, name) {
       name = src;
     }
 
-    if (cdnSrc.hasOwnProperty(cdnName)) {
-      const cdn = cdnSrc[cdnName];
-      if (typeof name === 'object') {
-        const key = Object.keys(name)[0];
-        const val = name[key];
-        if (cdn[key] && typeof val === 'string' && val && cdn[key][val]) {
-          src = cdn[key][val];
-        }
-      } else if (cdn[name]) {
-        src = cdnSrc[cdnName][name];
-      }
-    }
-
+    src = getSrc(name, src);
     const head = document.head || document.getElementsByTagName('head')[0];
     const script = document.createElement('script');
     script.src = src;
@@ -128,10 +152,7 @@ function loadStyleSheet(css, name) {
     name = css;
   }
 
-  if (cdnSrc.hasOwnProperty(cdnName) && cdnSrc[cdnName][name]) {
-    css = cdnSrc[cdnName][name];
-  }
-
+  css = getSrc(name, css);
   var head = document.head || document.getElementsByTagName('head')[0];
   var link = document.createElement('link');
   link.rel = 'stylesheet';
@@ -143,6 +164,29 @@ function interopDefault(ex) {
   return ex && typeof ex === 'object' && 'default' in ex ? ex['default'] : ex;
 }
 
-const cdnjs = { interopDefault, loadScript, loadStyleSheet, setCDN };
+function renderCacheElement(doc, id, name, callback) {
+  if (typeof window !== 'undefined' && window.document) {
+    doc = window.document;
+  }
+  const el = doc.createElement('div');
+  el.id = id;
+  el.className = name;
+  el.style.display = 'none';
+  doc.body.appendChild(el);
+  if (typeof callback === 'function' && callback) {
+    callback(el);
+  }
+  doc.body.removeChild(el);
+  el.style.display = '';
+  return el.outerHTML;
+}
+
+const cdnjs = {
+  interopDefault,
+  loadScript,
+  loadStyleSheet,
+  renderCacheElement,
+  setCDN
+};
 
 export default cdnjs;

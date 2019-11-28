@@ -10,13 +10,22 @@
 
 import cdnjs from './cdn';
 
+// js-sequence-diagrams can create a global object named Diagrams of window,
+// To be compatible with railroad diagrams extension that also has window.Diagram object,
+// You need to save the original Diagrams object of railroad diagrams extension here.
 let diagram;
 if (typeof window !== 'undefined' && window.Diagram) {
   diagram = window.Diagram;
+  if (window.Diagram['Signal']) {
+    var sequence = window.Diagram;
+  }
 }
 
 const themes = ['simple', 'hand'];
-let sequence;
+if (typeof sequence === 'undefined' && typeof window !== 'undefined') {
+  var sequence = window.SequenceJS;
+}
+
 function hasSequence() {
   return !!sequence;
 }
@@ -29,8 +38,8 @@ function renderSequence(element, sync) {
   const name = element.className;
   const langattr = element.dataset.lang;
   const id = 'sequence-' + Date.now() + '-' + Math.floor(Math.random() * 10000);
+  element.id = id;
   if (!sync && typeof window !== 'undefined' && window.dispatchEvent) {
-    element.id = id;
     Promise.resolve(id).then(elementid => {
       // dispatch sequence custom event
       window.dispatchEvent(
@@ -45,23 +54,30 @@ function renderSequence(element, sync) {
       );
     });
   } else {
-    if (!sequence) {
-      if (typeof Diagram === 'undefined') return;
-      sequence = Diagram;
+    if (typeof window !== 'undefined' && window.dispatchEvent) {
+      // dispatch sequence custom event
+      window.dispatchEvent(
+        new CustomEvent('sequence', {
+          detail: {
+            id: id,
+            className: name,
+            data: code,
+            langattr: langattr
+          }
+        })
+      );
+    } else {
+      new require('events').EventEmitter().emit('sequence', [
+        {
+          detail: {
+            id: id,
+            className: name,
+            data: code,
+            langattr: langattr
+          }
+        }
+      ]);
     }
-    const doc = element.ownerDocument;
-    element.parentNode.outerHTML = `<div id="${id}" class="${name}"></div>`;
-    const el = doc.getElementById(id);
-    const d = sequence.parse(code);
-    let theme = 'hand';
-    if (langattr) {
-      const obj = JSON.parse(langattr);
-      if (obj && obj.theme && themes.indexOf(obj.theme) != -1) {
-        theme = obj.theme;
-      }
-    }
-    const options = { theme: theme };
-    d.drawSVG(el ? el : id, options);
   }
 }
 
@@ -71,7 +87,7 @@ function renderSequenceElements(elements) {
     return false;
   }
 
-  let sync = hasSequence();
+  const sync = hasSequence();
   if (typeof window !== 'undefined') {
     if (!sync) {
       cdnjs.loadStyleSheet('sequenceCSS');
@@ -84,6 +100,7 @@ function renderSequenceElements(elements) {
           return cdnjs.loadScript('underscore');
         })
         .then(() => {
+          // You need to save the original Diagrams object of railroad diagrams extension here.
           if (!diagram && window['Diagram']) {
             diagram = window['Diagram'];
           }
@@ -91,12 +108,13 @@ function renderSequenceElements(elements) {
         })
         .then(() => {
           sequence = window['Diagram'];
+          window.SequenceJS = sequence;
+          // You need to replace the original Diagrams object of railroad diagrams extension here.
           if (diagram) {
             window['Diagram'] = diagram;
           }
         });
     }
-    sync = false;
   }
 
   elements.forEach(element => {
@@ -138,7 +156,7 @@ function onRenderSequence(element) {
 function showdownSequence() {
   const parser = new DOMParser();
 
-  if (!hasSequence() && typeof window !== 'undefined' && window.dispatchEvent) {
+  if (typeof window !== 'undefined' && window.dispatchEvent) {
     // Listen sequence custom event
     window.addEventListener('sequence', event => {
       if (event.detail) {

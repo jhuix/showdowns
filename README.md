@@ -4,7 +4,7 @@
 
 A lib that make markdown to html with some extensions of showdown.js.
 
-**In browser environment, it is implemented to dynamically load js lib files related to more showdown diagrams extension for using [showdowns >= 0.3.0 version](https://github.com/jhuix/showdowns).** 
+**In browser environment, it is implemented to dynamically load js lib files related to more showdown diagrams extension for using [showdowns >= 0.3.0 version](https://github.com/jhuix/showdowns).**
 
 ## Markdown To Html
 
@@ -213,9 +213,12 @@ A function to add or update extensions of showdown.convertor.
 
 #### init
 
-Type: void => showdonws
+Type: (cdnname: string, defSheme: string, distScheme: string) => showdonws
 
 A function to init that be created showdown.convertor instance for showdowns.
+Parameter cdnname can be selected 'local' or 'cdnjs'.
+Parameter defSheme is default prefix scheme string of source url.
+Parameter distScheme is dist prefix scheme string of source url that has prefix string is '../dist/'.
 
 #### makeHtml
 
@@ -225,15 +228,15 @@ A function to make markdown to html that showdown.convertor converte it in curre
 
 #### zDecode
 
-Type: string => string
+Type: (data: string) => string
 
 A function to decode data that be encoded using [zEncode](#zencode).
 
 #### zEncode
 
-Type: string => string
+Type: (content: string) => string
 
-A function to encode data with zlib.
+A function to encode content with zlib.
 
 ## License
 
