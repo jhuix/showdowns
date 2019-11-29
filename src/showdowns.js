@@ -161,6 +161,30 @@ const showdowns = {
 
       // set options of this instance (include flavor)
       this.addOptions(this.defaultOptions);
+
+      // Because removeExtension function of converter has bug in showdown.js,
+      // it needs to override.
+      this.converter.removeExtension = function(extension) {
+        if (!showdown.helper.isArray(extension)) {
+          extension = [extension];
+        }
+        const exts = this.getAllExtensions();
+        let langExtensions = exts.language;
+        let outputModifiers = exts.output;
+        for (var a = 0; a < extension.length; ++a) {
+          const ext = extension[a];
+          for (var i = 0; i < langExtensions.length; ++i) {
+            if (langExtensions[i] === ext) {
+              langExtensions.splice(i, 1);
+            }
+          }
+          for (var j = 0; j < outputModifiers.length; ++j) {
+            if (outputModifiers[j] === ext) {
+              outputModifiers.splice(j, 1);
+            }
+          }
+        }
+      };
     }
     return this;
   },
@@ -185,15 +209,14 @@ const showdowns = {
       content = doc;
     }
     if (this.converter) {
-      this.converter.addExtension(
-        showdownCheckType(data => {
-          if (typeof callback === 'function') {
-            callback(data);
-          }
-        }),
-        'showdown-checktype'
-      );
+      const ext = showdownCheckType(data => {
+        if (typeof callback === 'function') {
+          callback(data);
+        }
+      });
+      this.converter.addExtension(ext, 'showdown-checktype');
       content = content ? this.converter.makeHtml(content) : '';
+      this.converter.removeExtension(ext);
     } else {
       content = '';
     }

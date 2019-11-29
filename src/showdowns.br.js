@@ -20,6 +20,7 @@ showdowns.brDecode = function(data) {
   ).toString();
 };
 
+// Override markdownDecodeFilter and process to decode content with brotli.
 showdowns.markdownDecodeFilter = function(doc) {
   switch (doc.type) {
     case 'br':
