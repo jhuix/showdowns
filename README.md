@@ -49,42 +49,42 @@ View [Extensions Examples](https://github.com/jhuix/showdowns/blob/master/docs/s
 
 ### Installation
 
-1. Using npm:
+1.  Using npm:
 
         npm install @jhuix/showdowns
 
     Note: add --save if you are using npm < 5.0.0
 
-2. In a browser:
+2.  In a browser:
 
     put the following line into your HTML page \<header> or \<body>:
 
-       <link rel="stylesheet" href="dist/showdowns.min.css">
-       <script src="dist/showdowns.min.js"></script>
+        <link rel="stylesheet" href="dist/showdowns.min.css">
+        <script src="dist/showdowns.min.js"></script>
 
-3. In Node.js:
+3.  In Node.js:
 
     For commonjs
 
-       var showdowns = require('showdowns');
+        var showdowns = require('showdowns');
 
     or
 
-       import 'showdowns/dist/showdowns.core.min.css';
-       import showdowns from 'showdowns';
+        import 'showdowns/dist/showdowns.core.min.css';
+        import showdowns from 'showdowns';
 
     For umd
 
-       var showdowns = require('showdowns/dist/showdowns.min.js');
+        var showdowns = require('showdowns/dist/showdowns.min.js');
 
     or
 
-       import 'showdowns/dist/showdowns.min.css';
-       import showdowns from 'showdowns/dist/showdowns.min.js';
+        import 'showdowns/dist/showdowns.min.css';
+        import showdowns from 'showdowns/dist/showdowns.min.js';
 
-4. Support compress markdown content with [wasm-brotli](https://github.com/dfrankland/wasm-brotli) for [google brotli](https://github.com/google/brotli), use the following file:
+4.  Support compress markdown content with [wasm-brotli](https://github.com/dfrankland/wasm-brotli) for [google brotli](https://github.com/google/brotli), use the following file:
 
-       showdowns/dist/showdowns.br.min.js
+        showdowns/dist/showdowns.br.min.js
 
 ### Quick Example
 
@@ -226,7 +226,7 @@ Parameter distScheme is dist prefix scheme string of source url that has prefix 
 
 #### makeHtml
 
-Type: ({type:'zip', content: string} | string, (types) => void) => string
+Type: ({type:'zip', content: string} | string, (csstypes: { hasKatex: boolean; hasRailroad: boolean; hasSequence: boolean }) => void) => string
 
 A function to make markdown to html that showdown.convertor converte it in current showdowns instance.
 
