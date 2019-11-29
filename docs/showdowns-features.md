@@ -2,10 +2,10 @@
 
 # [Showdowns Features](https://jhuix.github.io/showdowns)
 
-[TOC]
-
 [Showdowns](https://github.com/jhuix/showdowns) is a lib that make markdown to html with some extensions of showdown.js.
 Click the link to preview the [showdowns features](https://jhuix.github.io/showdowns).
+
+Showdowns Markdown Syntax, refer to the document -- [Showdown's Markdown Syntax](https://github.com/showdownjs/showdown/wiki/Showdown's-Markdown-syntax).
 
 ## Table
 

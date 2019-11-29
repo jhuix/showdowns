@@ -15,8 +15,8 @@ if (typeof wavedrom === 'undefined') {
   var wavedrom = WaveDrom;
 }
 
+let wdCount = 0;
 let indexWD = 0;
-
 function hasWavedrom() {
   return !!wavedrom;
 }
@@ -30,6 +30,12 @@ function renderWavedrom(element, sync) {
   const index = indexWD;
   const id = 'WaveDrom_Display_' + index;
   ++indexWD;
+  // When index of wavwdrom is 0, there will be some special logic in the WaveDrom lib.
+  // So the index needs to be cleared after all WavwDrom element are rendered.
+  --wdCount;
+  if (!wdCount) {
+    indexWD = 0;
+  }
   if (!sync && typeof window !== 'undefined' && window.dispatchEvent) {
     element.id = id;
     Promise.resolve(id).then(elementid => {
@@ -53,6 +59,13 @@ function renderWavedrom(element, sync) {
       el => {
         const obj = window.eval(`(${code})`);
         wavedrom.RenderWaveForm(index, obj, 'WaveDrom_Display_');
+        // Replace the created cache element with the original element with the same id.
+        const wdel = document.getElementById('WaveDrom_Display_' + index);
+        if (el != wdel) {
+          while (wdel.childNodes.length) {
+            el.appendChild(wdel.removeChild(wdel.childNodes[0]));
+          }
+        }
       }
     );
   }
@@ -64,6 +77,7 @@ function renderWavedromElements(elements, skin) {
     return false;
   }
 
+  wdCount = elements.length;
   const sync = hasWavedrom();
   if (typeof window !== 'undefined') {
     if (!sync) {

@@ -2,7 +2,7 @@
 node_modules
 /dist
 /lib
-/fonts
+/testdemo
 *-lock.json
 
 # local env files
