@@ -1,11 +1,11 @@
 ![Showdowns](https://jhuix.github.io/showdowns/logo.png)
 
-# [Showdowns Demos](https://jhuix.github.io/showdowns)
+# [Showdowns Features](https://jhuix.github.io/showdowns)
 
 [TOC]
 
 [Showdowns](https://github.com/jhuix/showdowns) is a lib that make markdown to html with some extensions of showdown.js.
-Click the link to preview the [Showdowns Demos](https://jhuix.github.io/showdowns).
+Click the link to preview the [showdowns features](https://jhuix.github.io/showdowns).
 
 ## Table
 
@@ -14,7 +14,7 @@ Click the link to preview the [Showdowns Demos](https://jhuix.github.io/showdown
 | OK          | int   | 1     | Succeeded |
 | ERROR       | int   | 0     | Failed    |
 
-## Supporting some markdown extension features
+## markdown extension features
 
 **In browser environment, it is implemented to dynamically load js lib files related to more showdown diagrams extension for using [showdowns >= 0.3.0 version](https://github.com/jhuix/showdowns).**
 
@@ -230,6 +230,21 @@ It's implemented in showdown-viz.js, render diagrams of wavedrom using [wavedrom
   {name: 'req', wave: '0.1..0|1.0'},
   {},
   {name: 'ack', wave: '1.....|01.'}
+]}
+```
+
+```wavedrom
+{ signal: [
+  { name: "pclk", wave: 'p.......' },
+  { name: "Pclk", wave: 'P.......' },
+  { name: "nclk", wave: 'n.......' },
+  { name: "Nclk", wave: 'N.......' },
+  {},
+  { name: 'clk0', wave: 'phnlPHNL' },
+  { name: 'clk1', wave: 'xhlhLHl.' },
+  { name: 'clk2', wave: 'hpHplnLn' },
+  { name: 'clk3', wave: 'nhNhplPl' },
+  { name: 'clk4', wave: 'xlh.L.Hx' },
 ]}
 ```
 

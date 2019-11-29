@@ -2,7 +2,7 @@
 
 <h1 align="center">Showdowns</h1>
 
-A lib that make markdown to html with some extensions of showdown.js.
+[Showdowns](https://github.com/jhuix/showdowns) is a lib that make markdown to html with some extensions features(include more diagrams extensions) of showdown.js.
 
 **In browser environment, it is implemented to dynamically load js lib files related to more showdown diagrams extension for using [showdowns >= 0.3.0 version](https://github.com/jhuix/showdowns).**
 
@@ -17,83 +17,87 @@ It can converte markdown content to html that using the [showdown.js](https://gi
 
 ### Supporting some markdown extension features
 
-[Table of Contents](https://github.com/jhuix/showdowns/blob/master/docs/demo.md#table-of-contents)
+[Table of Contents](https://github.com/jhuix/showdowns/blob/master/docs/showdowns-features.md#table-of-contents)
 
-[LaTeX math and AsciiMath](https://github.com/jhuix/showdowns/blob/master/docs/demo.md#latex-math-and-asciimath)
+[LaTeX math and AsciiMath](https://github.com/jhuix/showdowns/blob/master/docs/showdowns-features.md#latex-math-and-asciimath)
 
-[Mermaid](https://github.com/jhuix/showdowns/blob/master/docs/demo.md#mermaid)
+[Mermaid](https://github.com/jhuix/showdowns/blob/master/docs/showdowns-features.md#mermaid)
 
-[Plantuml](https://github.com/jhuix/showdowns/blob/master/docs/demo.md#plantuml)
+[Plantuml](https://github.com/jhuix/showdowns/blob/master/docs/showdowns-features.md#plantuml)
 
-[Flowchart](https://github.com/jhuix/showdowns/blob/master/docs/demo.md#flowchart)
+[Flowchart](https://github.com/jhuix/showdowns/blob/master/docs/showdowns-features.md#flowchart)
 
-[Network Sequence](https://github.com/jhuix/showdowns/blob/master/docs/demo.md#network-sequence)
+[Network Sequence](https://github.com/jhuix/showdowns/blob/master/docs/showdowns-features.md#network-sequence)
 
-[Graphviz's dot](https://github.com/jhuix/showdowns/blob/master/docs/demo.md#graphviz-s-dot)
+[Graphviz's dot](https://github.com/jhuix/showdowns/blob/master/docs/showdowns-features.md#graphviz-s-dot)
 
-[Railroad diagrams](https://github.com/jhuix/showdowns/blob/master/docs/demo.md#railroad-diagrams)
+[Railroad diagrams](https://github.com/jhuix/showdowns/blob/master/docs/showdowns-features.md#railroad-diagrams)
 
-[WaveDrom](https://github.com/jhuix/showdowns/blob/master/docs/demo.md#wavedrom)
+[WaveDrom](https://github.com/jhuix/showdowns/blob/master/docs/showdowns-features.md#wavedrom)
 
-[Footnotes](https://github.com/jhuix/showdowns/blob/master/docs/demo.md#footnotes)
+[Footnotes](https://github.com/jhuix/showdowns/blob/master/docs/showdowns-features.md#footnotes)
 
 See more information, refer to the following document:
 
-[Extensions Examples](https://github.com/jhuix/showdowns/blob/master/docs/demo.md)
+[Extensions Examples](https://github.com/jhuix/showdowns/blob/master/docs/showdowns-features.md)
 
-### Demos
+### Preview
 
-View [Extensions Examples](https://github.com/jhuix/showdowns/blob/master/docs/demo.md) is previewed as [Showdowns Demos](https://jhuix.github.io/showdowns/)
+View [Extensions Examples](https://github.com/jhuix/showdowns/blob/master/docs/showdowns-features.md) is previewed as [Showdowns Features](https://jhuix.github.io/showdowns/)
 
 ## Usage
 
 ### Installation
 
-Using npm:
+1. Using npm:
 
-    npm install @jhuix/showdowns
+        npm install @jhuix/showdowns
 
-Note: add --save if you are using npm < 5.0.0
+    Note: add --save if you are using npm < 5.0.0
 
-In a browser:
+2. In a browser:
 
-    <link rel="stylesheet" href="dist/showdowns.min.css">
-    <script src="dist/showdowns.min.js"></script>
+    put the following line into your HTML page \<header> or \<body>:
 
-In Node.js:
+       <link rel="stylesheet" href="dist/showdowns.min.css">
+       <script src="dist/showdowns.min.js"></script>
 
-For commonjs
+3. In Node.js:
 
-    var showdowns = require('showdowns');
+    For commonjs
 
-or
+       var showdowns = require('showdowns');
 
-    import 'showdowns/dist/showdowns.core.min.css';
-    import showdowns from 'showdowns';
+    or
 
-For umd
+       import 'showdowns/dist/showdowns.core.min.css';
+       import showdowns from 'showdowns';
 
-    var showdowns = require('showdowns/dist/showdowns.min.js');
+    For umd
 
-or
+       var showdowns = require('showdowns/dist/showdowns.min.js');
 
-    import 'showdowns/dist/showdowns.min.css';
-    import showdowns from 'showdowns/dist/showdowns.min.js';
+    or
 
-Support compress markdown content with [wasm-brotli](https://github.com/dfrankland/wasm-brotli) for [google brotli](https://github.com/google/brotli), use the following file:
+       import 'showdowns/dist/showdowns.min.css';
+       import showdowns from 'showdowns/dist/showdowns.min.js';
 
-    showdowns/dist/showdowns.br.min.js
+4. Support compress markdown content with [wasm-brotli](https://github.com/dfrankland/wasm-brotli) for [google brotli](https://github.com/google/brotli), use the following file:
+
+       showdowns/dist/showdowns.br.min.js
 
 ### Quick Example
 
-Node
+#### Node
 
     var showdowns  = require('showdowns'),
     showdowns.init()
     var text      = '# hello, markdown!',
     var html      = showdowns.makeHtml(text);
 
-Browser
+#### Browser
+
+Put the following line into your HTML page \<header> or \<body>:
 
     <link rel="stylesheet" href="../dist/showdowns.min.css" />
 
@@ -104,7 +108,7 @@ Browser
         showdowns.init();
         let md = "";
         window
-          .fetch("https://jhuix.github.io/showdowns/demo.md")
+          .fetch("https://jhuix.github.io/showdowns/showdowns-features")
           .then(function(response) {
             if (response.ok) {
               return response.text();
