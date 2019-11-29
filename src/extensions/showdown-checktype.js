@@ -8,37 +8,34 @@
 
 'use strict';
 
-function showdownCheckType(checktype_callback) {
+function showdownCheckType(check_csstypes_callback) {
   const parser = new DOMParser();
   return [
     {
       type: 'output',
       filter: function(html) {
-        if (
-          typeof checktype_callback === 'function' &&
-          (typeof window === 'undefined' || !window.dispatchEvent)
-        ) {
+        if (typeof check_csstypes_callback === 'function') {
           // parse html
           const doc = parser.parseFromString(html, 'text/html');
           const wrapper = typeof doc.body !== 'undefined' ? doc.body : doc;
-          // find the katex elements
+          // find the katex and assciimath elements
           const katexs =
-            wrapper.querySelectorAll('span.katex-display') ||
-            wrapper.querySelectorAll('code.latex.language-latex') ||
-            wrapper.querySelectorAll('code.asciimath.language-asciimath');
-
+            wrapper.querySelectorAll('span.katex-display').length ||
+            wrapper.querySelectorAll('code.latex.language-latex').length ||
+            wrapper.querySelectorAll('code.asciimath.language-asciimath').length;
+          // find the network-sequences elements
           const sequences =
-            wrapper.querySelectorAll('div.sequence') ||
-            wrapper.querySelectorAll('code.sequence.language-sequence');
-
+            wrapper.querySelectorAll('div.sequence').length ||
+            wrapper.querySelectorAll('code.sequence.language-sequence').length;
+          // find the railroad-diagrams elements
           const railroad =
-            wrapper.querySelectorAll('div.railroad') ||
-            wrapper.querySelectorAll('code.railroad.language-railroad');
+            wrapper.querySelectorAll('div.railroad').length ||
+            wrapper.querySelectorAll('code.railroad.language-railroad').length;
 
-          checktype_callback({
-            hasKatex: katexs.length > 0 ? true : false,
-            hasSequence: sequences.length > 0 ? true : false,
-            hasRailroad: railroad.length > 0 ? true : false
+          check_csstypes_callback({
+            hasKatex: katexs > 0 ? true : false,
+            hasSequence: sequences > 0 ? true : false,
+            hasRailroad: railroad > 0 ? true : false
           });
         }
         // return html text content
