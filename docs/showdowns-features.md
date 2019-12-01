@@ -236,7 +236,7 @@ The \<theme name> of json "theme" field value in syntax language attribute is "h
 
 #### Network Sequence example
 
-Sequence example with hand theme:
+- Sequence example with hand theme:
 
 ```sequence {"theme":"hand"}
 Alice->Bob: Hello Bob, how are you?
@@ -244,7 +244,8 @@ Note right of Bob: Bob thinks
 Bob-->Alice: I am good thanks!
 ```
 
-Sequence example with simple theme:
+<br>
+- Sequence example with simple theme:
 
 ```sequence {"theme":"simple"}
 Alice->Bob: Hello Bob, how are you?
@@ -266,7 +267,7 @@ The \<engine name> of json "engine" field value in syntax language attribute is 
 
 #### Graphviz's dot example
 
-Dot example with dot engine:
+- Dot example with dot engine:
 
 ```dot {"engine":"dot"}
 digraph G {
@@ -281,7 +282,8 @@ digraph G {
 }
 ```
 
-Dot example with circo engine:
+<br>
+- Dot example with circo engine:
 
 ```dot {"engine":"circo"}
 digraph G {
@@ -375,7 +377,7 @@ OR
 
 #### Vega and Vega-Lite example
 
-Vega example:
+- Vega example:
 
 ```vega
 {
@@ -467,7 +469,8 @@ Vega example:
 }
 ```
 
-Vega-Lite example:
+<br>
+- Vega-Lite example:
 
 ```vega-lite
 {
