@@ -39,7 +39,6 @@ It's implemented sub-TOC in showdown-toc.js.
 
 ### LaTeX math and AsciiMath
 
-87；l
 It's supported by [showdown-katex](https://github.com/obedm503/showdown-katex.git), that render [LaTeX](https://www.latex-project.org/) math and [AsciiMath](http://asciimath.org/) using [KaTeX](https://github.com/Khan/KaTeX), You can check [KaTeX supported functions/symbols](https://khan.github.io/KaTeX/function-support.html).
 
 #### Markdown Syntax
