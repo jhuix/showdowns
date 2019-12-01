@@ -5,6 +5,7 @@ import './less/preview.less';
 import showdown from 'showdown';
 import showdownToc from './extensions/showdown-toc.js';
 import showdownViz from './extensions/showdown-viz.js';
+import showdownVega from './extensions/showdown-vega.js';
 import showdownAlign from './extensions/showdown-align.js';
 import showdownKatex from './extensions/showdown-katex.js';
 import showdownMermaid from './extensions/showdown-mermaid.js';
@@ -109,7 +110,7 @@ const getOptions = (options = {}) => {
   };
 };
 
-const getExtensions = (mermaidTheme, extensions = []) => {
+const getExtensions = (mermaidTheme, vegaTheme, extensions = []) => {
   return [
     showdownToc,
     showdownAlign,
@@ -120,6 +121,7 @@ const getExtensions = (mermaidTheme, extensions = []) => {
     showdownViz,
     showdownSequence,
     showdownKatex,
+    showdownVega({ theme: vegaTheme }),
     showdownWavedrom,
     showdownPlantuml({ imageFormat: 'svg' })
   ].concat(extensions ? extensions : []);
@@ -154,16 +156,27 @@ const showdowns = {
       cdnjs.setCDN(cdnname, defScheme, distScheme);
     }
   },
-  init: function(mermaidTheme) {
+  init: function(mermaidTheme, vegaTheme) {
     if (!this.converter) {
       if (
         !mermaidTheme ||
         ['default', 'forest', 'dark', 'neutral'].indexOf(mermaidTheme) === -1
       ) {
-        mermaidTheme = 'forest';
+        mermaidTheme = 'default';
+      }
+
+      if (
+        !vegaTheme ||
+        ['excel', 'ggplot2', 'quartz', 'vox', 'dark'].indexOf(vegaTheme) === -1
+      ) {
+        vegaTheme = 'quartz';
       }
       const options = getOptions(this.defaultOptions);
-      const extensions = getExtensions(mermaidTheme, this.defaultExtensions);
+      const extensions = getExtensions(
+        mermaidTheme,
+        vegaTheme,
+        this.defaultExtensions
+      );
 
       // converter instance of showdown
       this.converter = new showdown.Converter({

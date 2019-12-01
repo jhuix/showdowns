@@ -83,8 +83,11 @@ const config = {
       'viz.js': 'Viz',
       mermaid: 'mermaid',
       katex: 'katex',
-      wavedrom: 'WaveDrom'
-    }
+      wavedrom: 'WaveDrom',
+      "vega": 'vega',
+      "vega-lite": 'vegaLite',
+      "vega-embed": 'vegaEmbed'
+     }
   },
   onwarn: (msg, warn) => {
     if (!/Circular/.test(msg)) {
@@ -98,7 +101,10 @@ const config = {
     'raphael',
     'flowchart.js',
     'viz.js',
-    'wavedrom'
+    'wavedrom',
+    'vega',
+    'vega-lite',
+    'vega-embed'
   ],
   plugins: [
     json(),
@@ -179,50 +185,6 @@ if (!isFormatCJS) {
     config.plugins.push(
       copy({
         targets: [
-          // railroad-diagrams https://github.com/tabatkins/railroad-diagrams
-          {
-            src: 'node_modules/railroad-diagrams/railroad-diagrams.js',
-            dest: 'docs/dist/diagrams/railroad'
-          },
-          {
-            src: 'node_modules/railroad-diagrams/railroad-diagrams.css',
-            dest: 'docs/dist/diagrams/railroad'
-          },
-          {
-            src: 'node_modules/railroad-diagrams/package.json',
-            dest: 'docs/dist/diagrams/railroad'
-          },
-          {
-            src: 'node_modules/railroad-diagrams/README.md',
-            dest: 'docs/dist/diagrams/railroad'
-          },
-          // @rokt33r/js-sequence-diagrams https://github.com/bramp/js-sequence-diagrams
-          {
-            src:
-              'node_modules/@rokt33r/js-sequence-diagrams/dist/sequence-diagram-min.*',
-            dest: 'docs/dist/diagrams/sequence/dist'
-          },
-          {
-            src:
-              'node_modules/@rokt33r/js-sequence-diagrams/dist/sequence-diagram.*',
-            dest: 'docs/dist/diagrams/sequence/dist'
-          },
-          {
-            src: 'node_modules/@rokt33r/js-sequence-diagrams/dist/danielbd.*',
-            dest: 'docs/dist/diagrams/sequence/dist'
-          },
-          {
-            src: 'node_modules/@rokt33r/js-sequence-diagrams/package.json',
-            dest: 'docs/dist/diagrams/sequence'
-          },
-          {
-            src: 'node_modules/@rokt33r/js-sequence-diagrams/README.md',
-            dest: 'docs/dist/diagrams/sequence'
-          },
-          {
-            src: 'node_modules/@rokt33r/js-sequence-diagrams/LICENCE',
-            dest: 'docs/dist/diagrams/sequence'
-          },
           { src: 'public/*', dest: 'docs' },
           { src: 'demo', dest: 'docs' },
           { src: 'favicon.ico', dest: 'docs' }
@@ -233,50 +195,6 @@ if (!isFormatCJS) {
     config.plugins.push(
       copy({
         targets: [
-          // railroad-diagrams https://github.com/tabatkins/railroad-diagrams
-          {
-            src: 'node_modules/railroad-diagrams/railroad-diagrams.js',
-            dest: 'dist/diagrams/railroad'
-          },
-          {
-            src: 'node_modules/railroad-diagrams/railroad-diagrams.css',
-            dest: 'dist/diagrams/railroad'
-          },
-          {
-            src: 'node_modules/railroad-diagrams/package.json',
-            dest: 'dist/diagrams/railroad'
-          },
-          {
-            src: 'node_modules/railroad-diagrams/README.md',
-            dest: 'dist/diagrams/railroad'
-          },
-          // @rokt33r/js-sequence-diagrams https://github.com/bramp/js-sequence-diagrams
-          {
-            src:
-              'node_modules/@rokt33r/js-sequence-diagrams/dist/sequence-diagram-min.*',
-            dest: 'dist/diagrams/sequence/dist'
-          },
-          {
-            src:
-              'node_modules/@rokt33r/js-sequence-diagrams/dist/sequence-diagram.*',
-            dest: 'dist/diagrams/sequence/dist'
-          },
-          {
-            src: 'node_modules/@rokt33r/js-sequence-diagrams/dist/danielbd.*',
-            dest: 'dist/diagrams/sequence/dist'
-          },
-          {
-            src: 'node_modules/@rokt33r/js-sequence-diagrams/package.json',
-            dest: 'dist/diagrams/sequence'
-          },
-          {
-            src: 'node_modules/@rokt33r/js-sequence-diagrams/README.md',
-            dest: 'dist/diagrams/sequence'
-          },
-          {
-            src: 'node_modules/@rokt33r/js-sequence-diagrams/LICENCE',
-            dest: 'dist/diagrams/sequence'
-          },
           // Publish common dist resource
           { src: 'public/dist/*', dest: 'dist' }
         ]

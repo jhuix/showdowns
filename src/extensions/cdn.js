@@ -8,7 +8,7 @@
 
 'use strict';
 
-let cdnName = 'cdnjs';
+let cdnName = 'jsdelivr';
 let scheme =
   document.location.protocol === 'file:'
     ? 'https://'
@@ -55,8 +55,9 @@ const cdnSrc = {
     katex: scheme + 'cdnjs.cloudflare.com/ajax/libs/KaTeX/0.11.1/katex.min.js',
     katexCSS:
       scheme + 'cdnjs.cloudflare.com/ajax/libs/KaTeX/0.11.1/katex.min.css',
-    railroad: '../dist/diagrams/railroad/railroad-diagrams.js',
-    railroadCSS: '../dist/diagrams/railroad/railroad-diagrams.css',
+    railroad: scheme + 'cdn.jsdelivr.net/npm/railroad-diagrams',
+    railroadCSS:
+      scheme + 'cdn.jsdelivr.net/npm/railroad-diagrams/railroad-diagrams.css',
     Snap:
       scheme + 'cdnjs.cloudflare.com/ajax/libs/snap.svg/0.5.1/snap.svg-min.js',
     WebFont:
@@ -64,8 +65,10 @@ const cdnSrc = {
     underscore:
       scheme +
       'cdnjs.cloudflare.com/ajax/libs/underscore.js/1.9.1/underscore-min.js',
-    sequence: '../dist/diagrams/sequence/dist/sequence-diagram-min.js',
-    sequenceCSS: '../dist/diagrams/sequence/dist/sequence-diagram-min.css',
+    sequence: scheme + 'cdn.jsdelivr.net/npm/@rokt33r/js-sequence-diagrams',
+    sequenceCSS:
+      scheme +
+      'cdn.jsdelivr.net/npm/@rokt33r/js-sequence-diagrams/dist/sequence-diagram-min.css',
     WaveDrom:
       scheme + 'cdnjs.cloudflare.com/ajax/libs/wavedrom/2.1.2/wavedrom.min.js',
     WaveDromSkin: {
@@ -77,7 +80,44 @@ const cdnSrc = {
         'cdnjs.cloudflare.com/ajax/libs/wavedrom/2.1.2/skins/lowkey.js',
       narrow:
         scheme + 'cdnjs.cloudflare.com/ajax/libs/wavedrom/2.1.2/skins/narrow.js'
-    }
+    },
+    vega: scheme + 'cdnjs.cloudflare.com/ajax/libs/vega/5.7.0/vega.min.js',
+    vegaLite:
+      scheme +
+      'cdnjs.cloudflare.com/ajax/libs/vega-lite/3.4.0/vega-lite.min.js',
+    vegaEmbed:
+      scheme +
+      'cdnjs.cloudflare.com/ajax/libs/vega-embed/5.1.3/vega-embed.min.js'
+  },
+  jsdelivr: {
+    Viz: scheme + 'cdn.jsdelivr.net/npm/viz.js',
+    VizRender: scheme + 'cdn.jsdelivr.net/npm/viz.js/full.render.js',
+    Raphael: scheme + 'cdn.jsdelivr.net/npm/raphael',
+    flowchart:
+      scheme +
+      'cdnjs.cloudflare.com/ajax/libs/flowchart/1.12.2/flowchart.min.js',
+    mermaid: scheme + 'cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js',
+    katex: scheme + 'cdn.jsdelivr.net/npm/katex',
+    katexCSS: scheme + 'cdn.jsdelivr.net/npm/katex/dist/katex.min.css',
+    railroad: scheme + 'cdn.jsdelivr.net/npm/railroad-diagrams',
+    railroadCSS:
+      scheme + 'cdn.jsdelivr.net/npm/railroad-diagrams/railroad-diagrams.css',
+    Snap: scheme + 'cdn.jsdelivr.net/npm/snapsvg',
+    WebFont: scheme + 'cdn.jsdelivr.net/npm/webfontloader',
+    underscore: scheme + 'cdn.jsdelivr.net/npm/underscore',
+    sequence: scheme + 'cdn.jsdelivr.net/npm/@rokt33r/js-sequence-diagrams',
+    sequenceCSS:
+      scheme +
+      'cdn.jsdelivr.net/npm/@rokt33r/js-sequence-diagrams/dist/sequence-diagram-min.css',
+    WaveDrom: scheme + 'cdn.jsdelivr.net/npm/wavedrom/wavedrom.min.js',
+    WaveDromSkin: {
+      default: scheme + 'cdn.jsdelivr.net/npm/wavedrom/skins/default.js',
+      lowkey: scheme + 'cdn.jsdelivr.net/npm/wavedrom/skins/lowkey.js',
+      narrow: scheme + 'cdn.jsdelivr.net/npm/wavedrom/skins/narrow.js'
+    },
+    vega: scheme + 'cdn.jsdelivr.net/npm/vega',
+    vegaLite: scheme + 'cdn.jsdelivr.net/npm/vega-lite',
+    vegaEmbed: scheme + 'cdn.jsdelivr.net/npm/vega-embed'
   }
 };
 
