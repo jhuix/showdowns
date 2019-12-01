@@ -51,6 +51,7 @@ It's supported by [showdown-katex](https://github.com/obedm503/showdown-katex.gi
         ```
 
 - LaTex syntax:
+
         ```latex
         <code content>
         ```
