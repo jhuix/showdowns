@@ -91,6 +91,7 @@ function renderVegaElements(vegaElements, vegaLiteElements, options) {
 const getOptions = (userOptions = {}) => ({
   actions: { editor: false },
   theme: 'vox',
+  renderer: 'svg',
   ...userOptions
 });
 
