@@ -38,19 +38,19 @@ It's implemented sub-TOC in showdown-toc.js.
 ##### sub-TOC examples2
 
 ### LaTeX math and AsciiMath
+
 87；l
 It's supported by [showdown-katex](https://github.com/obedm503/showdown-katex.git), that render [LaTeX](https://www.latex-project.org/) math and [AsciiMath](http://asciimath.org/) using [KaTeX](https://github.com/Khan/KaTeX), You can check [KaTeX supported functions/symbols](https://khan.github.io/KaTeX/function-support.html).
 
 #### Markdown Syntax
 
-* AsciiMath syntax:
+- AsciiMath syntax:
 
         ```asciimath
         <code content>
         ```
 
-* LaTex syntax:
-    
+- LaTex syntax:
         ```latex
         <code content>
         ```
@@ -64,27 +64,28 @@ x = (-b +- sqrt(b^2-4ac)) / (2a)
 ```latex
 x=\frac{ -b\pm\sqrt{ b^2-4ac } } {2a}
 ```
+
 ### Mermaid
 
 It's implemented in showdown-mermaid.js, render diagrams of Flowchart or Sequence or Gantt using [mermaid](https://github.com/knsv/mermaid), check [mermaid doc](https://mermaidjs.github.io) for more information.
 
 #### Markdown Syntax
 
-* Flowchart syntax:
+- Flowchart syntax:
 
         ```mermaid
         graph TD;
         <code content>
         ```
 
-* Sequence diagram syntax:
+- Sequence diagram syntax:
 
         ```mermaid
         sequenceDiagram
         <code content>
         ```
 
-* Gantt diagram syntax:
+- Gantt diagram syntax:
 
         ```mermaid
         gantt
@@ -137,7 +138,6 @@ sequenceDiagram
 ### Plantuml
 
 It's implemented in showdown-plantuml.js. render diagrams of uml using [plantuml](http://plantuml.com). To know more about PlantUML, please visit [plantuml website](http://plantuml.com/).
-
 
 #### Markdown Syntax
 
@@ -346,6 +346,153 @@ It's implemented in showdown-viz.js, render diagrams of wavedrom using [wavedrom
   { name: 'clk3', wave: 'nhNhplPl' },
   { name: 'clk4', wave: 'xlh.L.Hx' },
 ]}
+```
+
+### Vega and Vega-Lite
+
+It's implemented in showdown-vega.js, render diagrams of [Vega](https://github.com/vega/vega) and [Vega-Lite](https://github.com/vega/vega-lite) using [vega-embed](https://github.com/vega/vega-embed), check [vega website](https://vega.github.io/vega/) and [vega-lite website](https://vega.github.io/vega-lite) for more information.
+
+#### Markdown Syntax
+
+    ```vega
+    <code content>
+    ```
+
+OR
+
+    ```vega-lite
+    <code content>
+    ```
+
+#### WaveDrom example
+
+```vega
+{
+  "$schema": "https://vega.github.io/schema/vega/v5.json",
+  "width": 400,
+  "height": 200,
+  "padding": 5,
+
+  "data": [
+    {
+      "name": "table",
+      "values": [
+        {"category": "A", "amount": 28},
+        {"category": "B", "amount": 55},
+        {"category": "C", "amount": 43},
+        {"category": "D", "amount": 91},
+        {"category": "E", "amount": 81},
+        {"category": "F", "amount": 53},
+        {"category": "G", "amount": 19},
+        {"category": "H", "amount": 87}
+      ]
+    }
+  ],
+
+  "signals": [
+    {
+      "name": "tooltip",
+      "value": {},
+      "on": [
+        {"events": "rect:mouseover", "update": "datum"},
+        {"events": "rect:mouseout",  "update": "{}"}
+      ]
+    }
+  ],
+
+  "scales": [
+    {
+      "name": "xscale",
+      "type": "band",
+      "domain": {"data": "table", "field": "category"},
+      "range": "width",
+      "padding": 0.05,
+      "round": true
+    },
+    {
+      "name": "yscale",
+      "domain": {"data": "table", "field": "amount"},
+      "nice": true,
+      "range": "height"
+    }
+  ],
+
+  "axes": [
+    { "orient": "bottom", "scale": "xscale" },
+    { "orient": "left", "scale": "yscale" }
+  ],
+
+  "marks": [
+    {
+      "type": "rect",
+      "from": {"data":"table"},
+      "encode": {
+        "enter": {
+          "x": {"scale": "xscale", "field": "category"},
+          "width": {"scale": "xscale", "band": 1},
+          "y": {"scale": "yscale", "field": "amount"},
+          "y2": {"scale": "yscale", "value": 0}
+        },
+        "update": {
+          "fill": {"value": "steelblue"}
+        },
+        "hover": {
+          "fill": {"value": "red"}
+        }
+      }
+    },
+    {
+      "type": "text",
+      "encode": {
+        "enter": {
+          "align": {"value": "center"},
+          "baseline": {"value": "bottom"},
+          "fill": {"value": "#333"}
+        },
+        "update": {
+          "x": {"scale": "xscale", "signal": "tooltip.category", "band": 0.5},
+          "y": {"scale": "yscale", "signal": "tooltip.amount", "offset": -2},
+          "text": {"signal": "tooltip.amount"},
+          "fillOpacity": [
+            {"test": "isNaN(tooltip.amount)", "value": 0},
+            {"value": 1}
+          ]
+        }
+      }
+    }
+  ]
+}
+```
+
+```vega-lite
+{
+    $schema: 'https://vega.github.io/schema/vega-lite/v4.json',
+    data: {
+      values: [
+        {a: 'C', b: 2},
+        {a: 'C', b: 7},
+        {a: 'C', b: 4},
+        {a: 'D', b: 1},
+        {a: 'D', b: 2},
+        {a: 'D', b: 6},
+        {a: 'E', b: 8},
+        {a: 'E', b: 4},
+        {a: 'E', b: 7}
+      ]
+    },
+    mark: 'bar',
+    encoding: {
+      y: {field: 'a', type: 'nominal'},
+      x: {
+        aggregate: 'average',
+        field: 'b',
+        type: 'quantitative',
+        axis: {
+          title: 'Average of b'
+        }
+      }
+    }
+}
 ```
 
 ### Footnotes
