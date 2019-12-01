@@ -17,6 +17,8 @@ It can converte markdown content to html that using the [showdown.js](https://gi
 
 ### Supporting some markdown extension features
 
+[Footnotes](https://github.com/jhuix/showdowns/blob/master/docs/showdowns-features.md#footnotes)
+
 [Table of Contents](https://github.com/jhuix/showdowns/blob/master/docs/showdowns-features.md#table-of-contents)
 
 [LaTeX math and AsciiMath](https://github.com/jhuix/showdowns/blob/master/docs/showdowns-features.md#latex-math-and-asciimath)
@@ -35,7 +37,7 @@ It can converte markdown content to html that using the [showdown.js](https://gi
 
 [WaveDrom](https://github.com/jhuix/showdowns/blob/master/docs/showdowns-features.md#wavedrom)
 
-[Footnotes](https://github.com/jhuix/showdowns/blob/master/docs/showdowns-features.md#footnotes)
+[Vega and Vega-Lite](https://github.com/jhuix/showdowns/blob/master/docs/showdowns-features.md#vega-and-vega-lite)
 
 See more information, refer to the following document:
 
