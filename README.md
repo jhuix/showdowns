@@ -173,7 +173,7 @@ Default extensions is described below:
       showdownToc,
       showdownAlign,
       showdownFootnotes,
-      showdownMermaid,
+      showdownMermaid({theme: mermaidTheme}),
       showdownFlowchart,
       showdownRailroad,
       showdownViz,
@@ -215,14 +215,22 @@ Type: \[extensions] => void
 
 A function to add or update extensions of showdown.convertor.
 
-#### init
+#### setCDN
 
-Type: (cdnname: string, defSheme: string, distScheme: string) => showdonws
+Type: (cdnname: string, defSheme: string, distScheme: string) => void
 
-A function to init that be created showdown.convertor instance for showdowns.
-Parameter cdnname can be selected 'local' or 'cdnjs'.
+A function to set cdn source when dynamically load js lib files related to more showdown diagrams extension.
+Parameter cdnname can be selected 'local' or 'cdnjs' source.
 Parameter defSheme is default prefix scheme string of source url.
 Parameter distScheme is dist prefix scheme string of source url that has prefix string is '../dist/'.
+
+#### init
+
+Type: (mermaidTheme: string) => showdonws
+
+A function to init that be created showdown.convertor instance for showdowns.
+Parameter mermaidTheme is mermaid theme name be selected in ['default', 'forest', 'dark', 'neutral'];
+When mermaidTheme set empty, mermaidTheme is set to 'forest' theme name.
 
 #### makeHtml
 

@@ -14,15 +14,46 @@ Showdowns Markdown Syntax, refer to the document -- [Showdown's Markdown Syntax]
 | OK          | int   | 1     | Succeeded |
 | ERROR       | int   | 0     | Failed    |
 
-## markdown extension features
+## Markdown extension features
 
 **In browser environment, it is implemented to dynamically load js lib files related to more showdown diagrams extension for using [showdowns >= 0.3.0 version](https://github.com/jhuix/showdowns).**
+**In codeblock of markdown, expanded syntax language attribute from "\```codename" to "\```codename {json}" or "\```codename [json]"**. For example, see following [Network Sequence](#network-sequence) example.
 
 [TOC]
 
-### LaTeX math and AsciiMath
+### Table of Contents
 
+It's implemented sub-TOC in showdown-toc.js.
+
+#### Markdown Syntax
+
+    [TOC]
+
+#### sub-TOC example
+
+[TOC]
+
+##### sub-TOC examples1
+
+##### sub-TOC examples2
+
+### LaTeX math and AsciiMath
+87；l
 It's supported by [showdown-katex](https://github.com/obedm503/showdown-katex.git), that render [LaTeX](https://www.latex-project.org/) math and [AsciiMath](http://asciimath.org/) using [KaTeX](https://github.com/Khan/KaTeX), You can check [KaTeX supported functions/symbols](https://khan.github.io/KaTeX/function-support.html).
+
+#### Markdown Syntax
+
+* AsciiMath syntax:
+
+        ```asciimath
+        <code content>
+        ```
+
+* LaTex syntax:
+    
+        ```latex
+        <code content>
+        ```
 
 #### Math examples
 
@@ -33,24 +64,32 @@ x = (-b +- sqrt(b^2-4ac)) / (2a)
 ```latex
 x=\frac{ -b\pm\sqrt{ b^2-4ac } } {2a}
 ```
-
-### Table of Contents
-
-It's implemented sub-TOC in showdown-toc.js.
-
-```
-  [TOC]
-```
-
-[TOC]
-
-#### sub-TOC examples1
-
-#### sub-TOC examples2
-
 ### Mermaid
 
 It's implemented in showdown-mermaid.js, render diagrams of Flowchart or Sequence or Gantt using [mermaid](https://github.com/knsv/mermaid), check [mermaid doc](https://mermaidjs.github.io) for more information.
+
+#### Markdown Syntax
+
+* Flowchart syntax:
+
+        ```mermaid
+        graph TD;
+        <code content>
+        ```
+
+* Sequence diagram syntax:
+
+        ```mermaid
+        sequenceDiagram
+        <code content>
+        ```
+
+* Gantt diagram syntax:
+
+        ```mermaid
+        gantt
+        <code content>
+        ```
 
 #### Mermaid examples
 
@@ -99,6 +138,17 @@ sequenceDiagram
 
 It's implemented in showdown-plantuml.js. render diagrams of uml using [plantuml](http://plantuml.com). To know more about PlantUML, please visit [plantuml website](http://plantuml.com/).
 
+
+#### Markdown Syntax
+
+    ```plantuml
+    @startuml
+    <code content>
+    @enduml
+    ```
+
+#### Plantuml example
+
 ```plantuml
       @startuml
       participant User
@@ -126,6 +176,20 @@ It's implemented in showdown-plantuml.js. render diagrams of uml using [plantuml
 ### Flowchart
 
 It's implemented in showdown-flowchart.js, render diagrams of flowchart using [flowchart.js](https://github.com/adrai/flowchart.js), check [flowchart website](http://flowchart.js.org/) for more information.
+
+#### Markdown Syntax
+
+    ```flow
+    <code content>
+    ```
+
+OR
+
+    ```flowchart
+    <code content>
+    ```
+
+#### Flowchart example
 
 ```flow
 st=>start: Start:>http://www.google.com[blank]
@@ -161,6 +225,16 @@ cond(no)->sub1(right)->op1
 
 It's implemented in showdown-sequence.js, render diagrams of sequence using [js-sequence-diagrams](https://github.com/bramp/js-sequence-diagrams).
 
+#### Markdown Syntax
+
+The \<theme name> of json "theme" field value in syntax language attribute is "hand" or "simple";
+
+    ```sequence {"theme": "<theme name>"}
+    <code content>
+    ```
+
+#### Network Sequence example
+
 ```sequence {"theme":"hand"}
 Alice->Bob: Hello Bob, how are you?
 Note right of Bob: Bob thinks
@@ -176,6 +250,16 @@ Bob-->Alice: I am good thanks!
 ### Graphviz's dot
 
 It's implemented in showdown-viz.js, render diagrams of graphviz's dot using [viz.js](https://github.com/mdaines/viz.js).
+
+#### Markdown Syntax
+
+The \<engine name> of json "engine" field value in syntax language attribute is 'circo', 'dot', 'neato', 'osage', 'twopi'.
+
+    ```dot {"engine": "<engine name>"}
+    <code content>
+    ```
+
+#### Graphviz's dot example
 
 ```dot {"engine":"dot"}
 digraph G {
@@ -207,6 +291,14 @@ digraph G {
 
 It's implemented in showdown-viz.js, render diagrams of railroad using [railroad-diagrams](https://github.com/tabatkins/railroad-diagrams).
 
+#### Markdown Syntax
+
+    ```railroad
+    <code content>
+    ```
+
+#### Railroad diagrams example
+
 ```railroad
 Diagram(
   Optional('+', 'skip'),
@@ -222,6 +314,14 @@ Diagram(
 ### WaveDrom
 
 It's implemented in showdown-viz.js, render diagrams of wavedrom using [wavedrom](https://github.com/wavedrom/wavedrom), check [wavedrom website](https://wavedrom.com) for more information.
+
+#### Markdown Syntax
+
+    ```wavedrom
+    <code content>
+    ```
+
+#### WaveDrom example
 
 ```wavedrom
 {signal: [

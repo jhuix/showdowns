@@ -96,18 +96,6 @@
     <script>
       window.addEventListener("showdownsLoaded", function(e) {
         (function(element) {
-          function injectStyleSheet(css) {
-            if (!css || typeof document === "undefined") {
-              return;
-            }
-
-            var head =
-              document.head || document.getElementsByTagName("head")[0];
-            var link = document.createElement("link");
-            link.rel = "stylesheet";
-            link.href = css;
-            head.appendChild(link);
-          }
           showdowns.init();
           let md = "";
           axios
@@ -120,32 +108,18 @@
             })
             .then(function(res) {
               md = md + `\n\n## Showdown's Markdown syntax\n\n` + res.data;
-              element.innerHTML = showdowns.makeHtml(
-                {
-                  type: "br",
-                  content: showdowns.brEncode(md)
-                },
-                types => {
-                  if (types.hasKatex) {
-                    injectStyleSheet("../dist/katex.min.css");
-                  }
-                }
-              );
+              element.innerHTML = showdowns.makeHtml({
+                type: "br",
+                content: showdowns.brEncode(md)
+              });
             })
             .catch(function(error) {
               console.log(error);
               if (md) {
-                element.innerHTML = showdowns.makeHtml(
-                  {
-                    type: "br",
-                    content: showdowns.brEncode(md)
-                  },
-                  types => {
-                    if (types.hasKatex) {
-                      injectStyleSheet("../dist/katex.min.css");
-                    }
-                  }
-                );
+                element.innerHTML = showdowns.makeHtml({
+                  type: "br",
+                  content: showdowns.brEncode(md)
+                });
               }
             });
         })(document.getElementById("main"));

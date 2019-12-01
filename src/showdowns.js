@@ -109,12 +109,12 @@ const getOptions = (options = {}) => {
   };
 };
 
-const getExtensions = (extensions = []) => {
+const getExtensions = (mermaidTheme, extensions = []) => {
   return [
     showdownToc,
     showdownAlign,
     showdownFootnotes,
-    showdownMermaid,
+    showdownMermaid({ theme: mermaidTheme }),
     showdownFlowchart,
     showdownRailroad,
     showdownViz,
@@ -128,8 +128,8 @@ const getExtensions = (extensions = []) => {
 const showdowns = {
   showdown: showdown,
   converter: null,
-  defaultOptions: getOptions(),
-  defaultExtensions: getExtensions(),
+  defaultOptions: {},
+  defaultExtensions: [],
   markdownDecodeFilter: function(doc) {
     return '';
   },
@@ -149,18 +149,29 @@ const showdowns = {
       this.converter.addExtension(extensions);
     }
   },
-  init: function(cdnname, defScheme, distScheme) {
+  setCDN: function(cdnname, defScheme, distScheme) {
     if (typeof cdnname === 'string' && cdnname) {
       cdnjs.setCDN(cdnname, defScheme, distScheme);
     }
+  },
+  init: function(mermaidTheme) {
     if (!this.converter) {
+      if (
+        !mermaidTheme ||
+        ['default', 'forest', 'dark', 'neutral'].indexOf(mermaidTheme) === -1
+      ) {
+        mermaidTheme = 'forest';
+      }
+      const options = getOptions(this.defaultOptions);
+      const extensions = getExtensions(mermaidTheme, this.defaultExtensions);
+
       // converter instance of showdown
       this.converter = new showdown.Converter({
-        extensions: this.defaultExtensions
+        extensions: extensions
       });
 
       // set options of this instance (include flavor)
-      this.addOptions(this.defaultOptions);
+      this.addOptions(options);
 
       // Because removeExtension function of converter has bug in showdown.js,
       // it needs to override.
@@ -208,15 +219,17 @@ const showdowns = {
     } else {
       content = doc;
     }
-    if (this.converter) {
-      const ext = showdownCheckType(data => {
-        if (typeof callback === 'function') {
+    if (this.converter && content) {
+      if (typeof callback === 'function' && callback) {
+        const ext = showdownCheckType(data => {
           callback(data);
-        }
-      });
-      this.converter.addExtension(ext, 'showdown-checktype');
-      content = content ? this.converter.makeHtml(content) : '';
-      this.converter.removeExtension(ext);
+        });
+        this.converter.addExtension(ext, 'showdown-checktype');
+        content = this.converter.makeHtml(content);
+        this.converter.removeExtension(ext);
+      } else {
+        content = this.converter.makeHtml(content);
+      }
     } else {
       content = '';
     }

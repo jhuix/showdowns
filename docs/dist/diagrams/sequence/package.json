@@ -1,31 +1,28 @@
 {
-  "_from": "@rokt33r/js-sequence-diagrams",
+  "_from": "@rokt33r/js-sequence-diagrams@^2.0.6-2",
   "_id": "@rokt33r/js-sequence-diagrams@2.0.6-2",
   "_inBundle": false,
   "_integrity": "sha1-/pxK2PcMNWhzc5SF0e/1z3UAiCE=",
   "_location": "/@rokt33r/js-sequence-diagrams",
-  "_phantomChildren": {
-    "eve": "0.4.1"
-  },
+  "_phantomChildren": {},
   "_requested": {
-    "type": "tag",
+    "type": "range",
     "registry": true,
-    "raw": "@rokt33r/js-sequence-diagrams",
+    "raw": "@rokt33r/js-sequence-diagrams@^2.0.6-2",
     "name": "@rokt33r/js-sequence-diagrams",
     "escapedName": "@rokt33r%2fjs-sequence-diagrams",
     "scope": "@rokt33r",
-    "rawSpec": "",
+    "rawSpec": "^2.0.6-2",
     "saveSpec": null,
-    "fetchSpec": "latest"
+    "fetchSpec": "^2.0.6-2"
   },
   "_requiredBy": [
-    "#USER",
     "/"
   ],
   "_resolved": "https://registry.npm.taobao.org/@rokt33r/js-sequence-diagrams/download/@rokt33r/js-sequence-diagrams-2.0.6-2.tgz",
   "_shasum": "fe9c4ad8f70c356873739485d1eff5cf75008821",
-  "_spec": "@rokt33r/js-sequence-diagrams",
-  "_where": "H:\\works\\works\\showdowns",
+  "_spec": "@rokt33r/js-sequence-diagrams@^2.0.6-2",
+  "_where": "D:\\Works\\github\\showdowns",
   "bugs": {
     "url": "https://github.com/bramp/js-sequence-diagrams/issues"
   },
