@@ -245,6 +245,7 @@ Bob-->Alice: I am good thanks!
 ```
 
 <br>
+
 - Sequence example with simple theme:
 
 ```sequence {"theme":"simple"}
@@ -283,6 +284,7 @@ digraph G {
 ```
 
 <br>
+
 - Dot example with circo engine:
 
 ```dot {"engine":"circo"}
@@ -470,6 +472,7 @@ OR
 ```
 
 <br>
+
 - Vega-Lite example:
 
 ```vega-lite
