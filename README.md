@@ -223,7 +223,8 @@ A function to add or update extensions of showdown.convertor.
 Type: (cdnname: string, defSheme: string, distScheme: string) => void
 
 A function to set cdn source when dynamically load js lib files related to more showdown diagrams extension.
-- Parameter cdnname can be selected 'local' or 'cdnjs' source.
+
+- Parameter cdnname can be selected 'local' or 'cdnjs' or 'jsdelivr' source.
 - Parameter defSheme is default prefix scheme string of source url.
 - Parameter distScheme is dist prefix scheme string of source url that has prefix string is '../dist/'.
 
@@ -232,9 +233,10 @@ A function to set cdn source when dynamically load js lib files related to more 
 Type: (mermaidTheme: string, vegaTheme: string) => showdonws
 
 A function to init that be created showdown.convertor instance for showdowns.
+
 - Parameter mermaidTheme is mermaid theme name be selected in ['default', 'forest', 'dark', 'neutral'];When mermaidTheme set empty, mermaidTheme is set to 'default' theme name.
 - Parameter vegaTheme is vega theme name be selected in ['excel', 'ggplot2', 'quartz', 'vox', 'dark'];
-When vegaTheme set empty, vegaTheme is set to 'vox' theme name.
+  When vegaTheme set empty, vegaTheme is set to 'vox' theme name.
 
 #### makeHtml
 

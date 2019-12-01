@@ -39,7 +39,10 @@ const cdnSrc = {
       default: '../node_modules/wavedrom/skins/default.js',
       lowkey: '../node_modules/wavedrom/skins/lowkey.js',
       narrow: '../node_modules/wavedrom/skins/narrow.js'
-    }
+    },
+    vega: '../node_modules/vega/build/vega.min.js',
+    vegaLite: '../node_modules/vega-lite/build/vega-lite.min.js',
+    vegaEmbed: '../node_modules/vega-embed/build/vega-embed.min.js'
   },
   cdnjs: {
     Viz: scheme + 'cdnjs.cloudflare.com/ajax/libs/viz.js/2.1.2/viz.js',
