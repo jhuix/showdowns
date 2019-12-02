@@ -166,13 +166,13 @@ Default options is described below:
 
 - showdown: showdown options object
 
-For more showdown options, refer to the following document:
+  For more showdown options, refer to the following document:
 
-[Showdown Options](https://github.com/showdownjs/showdown/blob/master/README.md#options)
+  [Showdown Options](https://github.com/showdownjs/showdown/blob/master/README.md#options)
 
 - plantuml: plantuml options object
 
-For more plantuml options:
+  For more plantuml options:
 
     {
       umlWebSite: "www.plantuml.com/plantuml",
@@ -181,15 +181,15 @@ For more plantuml options:
 
 - mermaid: mermaid options object
 
-For more mermaid options, refer to the following document:
+  For more mermaid options, refer to the following document:
 
-[Mermaid Options](http://mermaid-js.github.io/mermaid/#/mermaidAPI)
+  [Mermaid Options](http://mermaid-js.github.io/mermaid/#/mermaidAPI)
 
 - vega: vega-embed options object
 
-For more vega-embed options, refer to the following document:
+  For more vega-embed options, refer to the following document:
 
-[Vega-embed Options](https://github.com/vega/vega-embed#options)
+  [Vega-embed Options](https://github.com/vega/vega-embed#options)
 
 #### defaultExtensions
 
