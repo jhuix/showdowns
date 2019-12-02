@@ -16,8 +16,9 @@ Showdowns Markdown Syntax, refer to the document -- [Showdown's Markdown Syntax]
 
 ## Markdown extension features
 
-**In browser environment, it is implemented to dynamically load js lib files related to more showdown diagrams extension for using [showdowns >= 0.3.0 version](https://github.com/jhuix/showdowns).**
-**In codeblock of markdown, expanded syntax language attribute from "\```codename" to "\```codename {json}" or "\```codename [json]"**. For example, see following [Network Sequence](#network-sequence) example.
+- **In browser environment, it is implemented to dynamically load js lib files related to more showdown diagrams extension for using [showdowns >= 0.3.0 version](https://github.com/jhuix/showdowns).**
+
+- **In codeblock of markdown, expanded syntax language attribute from "\```codename" to "\```codename {json}" or "\```codename [json]", The common "align" field value of json is "center" or "right" in syntax language attribute, and it is empty means left align.** For example, see following [Network Sequence](#network-sequence) example.
 
 [TOC]
 
@@ -45,23 +46,27 @@ It's supported by [showdown-katex](https://github.com/obedm503/showdown-katex.gi
 
 - AsciiMath syntax:
 
-        ```asciimath
+        ```asciimath {"align": "<align>"}
         <code content>
         ```
 
 - LaTex syntax:
 
-        ```latex
+        ```latex {"align": "<align>"}
         <code content>
         ```
 
 #### Math examples
 
-```asciimath
+```latex
+x=\frac{ -b\pm\sqrt{ b^2-4ac } } {2a}
+```
+
+```asciimath {"align":"center"}
 x = (-b +- sqrt(b^2-4ac)) / (2a)
 ```
 
-```latex
+```latex {"align":"right"}
 x=\frac{ -b\pm\sqrt{ b^2-4ac } } {2a}
 ```
 
@@ -73,21 +78,21 @@ It's implemented in showdown-mermaid.js, render diagrams of Flowchart or Sequenc
 
 - Flowchart syntax:
 
-        ```mermaid
+        ```mermaid {"align": "<align>"}
         graph TD;
         <code content>
         ```
 
 - Sequence diagram syntax:
 
-        ```mermaid
+        ```mermaid {"align": "<align>"}
         sequenceDiagram
         <code content>
         ```
 
 - Gantt diagram syntax:
 
-        ```mermaid
+        ```mermaid {"align": "<align>"}
         gantt
         <code content>
         ```
@@ -141,7 +146,7 @@ It's implemented in showdown-plantuml.js. render diagrams of uml using [plantuml
 
 #### Markdown Syntax
 
-    ```plantuml
+    ```plantuml {"align": "<align>"}
     @startuml
     <code content>
     @enduml
@@ -179,13 +184,13 @@ It's implemented in showdown-flowchart.js, render diagrams of flowchart using [f
 
 #### Markdown Syntax
 
-    ```flow
+    ```flow {"align": "<align>"}
     <code content>
     ```
 
 OR
 
-    ```flowchart
+    ```flowchart {"align": "<align>"}
     <code content>
     ```
 
@@ -227,9 +232,9 @@ It's implemented in showdown-sequence.js, render diagrams of sequence using [js-
 
 #### Markdown Syntax
 
-The \<theme name> of json "theme" field value in syntax language attribute is "hand" or "simple";
+The \<theme name> of json's "theme" field value is "hand" or "simple" in syntax language attribute;
 
-    ```sequence {"theme": "<theme name>"}
+    ```sequence {"theme": "<theme name>", "align": "<align>"}
     <code content>
     ```
 
@@ -259,9 +264,9 @@ It's implemented in showdown-viz.js, render diagrams of graphviz's dot using [vi
 
 #### Markdown Syntax
 
-The \<engine name> of json "engine" field value in syntax language attribute is 'circo', 'dot', 'neato', 'osage', 'twopi'.
+The \<engine name> of json's "engine" field value is 'circo', 'dot', 'neato', 'osage', 'twopi' in syntax language attribute.
 
-    ```dot {"engine": "<engine name>"}
+    ```dot {"engine": "<engine name>", "align": "<align>"}
     <code content>
     ```
 
@@ -305,7 +310,7 @@ It's implemented in showdown-viz.js, render diagrams of railroad using [railroad
 
 #### Markdown Syntax
 
-    ```railroad
+    ```railroad {"align": "<align>"}
     <code content>
     ```
 
@@ -329,7 +334,7 @@ It's implemented in showdown-viz.js, render diagrams of wavedrom using [wavedrom
 
 #### Markdown Syntax
 
-    ```wavedrom
+    ```wavedrom {"align": "<align>"}
     <code content>
     ```
 
@@ -366,13 +371,13 @@ It's implemented in showdown-vega.js, render diagrams of [Vega](https://github.c
 
 #### Markdown Syntax
 
-    ```vega
+    ```vega {"align": "<align>"}
     <code content>
     ```
 
 OR
 
-    ```vega-lite
+    ```vega-lite {"align": "<align>"}
     <code content>
     ```
 

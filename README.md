@@ -142,32 +142,58 @@ Put the following line into your HTML page \<header> or \<body>:
 
 ### Options
 
-For more showdown options and extensions, refer to the following document:
-
-[Showdown Options](https://github.com/showdownjs/showdown/blob/master/README.md#options)
-
-[Showdown Extensions](https://github.com/showdownjs/showdown/blob/master/README.md#extensions)
-
 #### defaultOptions
 
-Type: Object
+Type: {showdown: object, plantuml: object, mermaid: object, vega: object }
 
 Default options is described below:
 
     defaultOptions = {
-      flavor: 'github',
-      strikethrough: true,
-      tables: true,
-      tasklists: true,
-      underline: true,
-      emoji: true,
-      ghCompatibleHeaderId: false,
-      rawHeaderId: true
+      showdown: {
+        flavor: 'github',
+        strikethrough: true,
+        tables: true,
+        tasklists: true,
+        underline: true,
+        emoji: true,
+        ghCompatibleHeaderId: false,
+        rawHeaderId: true
+      },
+      plantuml: { imageFormat: 'svg' },
+      mermaid: { theme: 'default' },
+      vega: { theme: 'vox' }
     };
+
+- showdown: showdown options object
+
+For more showdown options, refer to the following document:
+
+[Showdown Options](https://github.com/showdownjs/showdown/blob/master/README.md#options)
+
+- plantuml: plantuml options object
+
+For more plantuml options:
+
+    {
+      umlWebSite: "www.plantuml.com/plantuml",
+      imageFormat: "svg" | "png" | "jpg"
+    };
+
+- mermaid: mermaid options object
+
+For more mermaid options, refer to the following document:
+
+[Mermaid Options](http://mermaid-js.github.io/mermaid/#/mermaidAPI)
+
+- vega: vega-embed options object
+
+For more vega-embed options, refer to the following document:
+
+[Vega-embed Options](https://github.com/vega/vega-embed#options)
 
 #### defaultExtensions
 
-Type: Array
+Type: Array of showdown extensions
 
 Default extensions is described below:
 
@@ -175,16 +201,20 @@ Default extensions is described below:
       showdownToc,
       showdownAlign,
       showdownFootnotes,
-      showdownMermaid({ theme: mermaidTheme }),
+      showdownMermaid(mermaidOptions),
       showdownFlowchart,
       showdownRailroad,
       showdownViz,
       showdownSequence,
       showdownKatex,
-      showdownVega({ theme: vegaTheme }),
+      showdownVega(vegaOptions),
       showdownWavedrom,
-      showdownPlantuml({ imageFormat: 'svg' })
+      showdownPlantuml(plantumlOptions)
     ];
+
+For more showdown extensions, refer to the following document:
+
+[Showdown Extensions](https://github.com/showdownjs/showdown/blob/master/README.md#extensions)
 
 ### Properties
 
@@ -228,15 +258,43 @@ A function to set cdn source when dynamically load js lib files related to more 
 - Parameter defSheme is default prefix scheme string of source url.
 - Parameter distScheme is dist prefix scheme string of source url that has prefix string is '../dist/'.
 
+#### setShowdownOptions
+
+Type: (options: object) => object
+
+See [showdown options of defaultOptions](#defaultOptions).
+
+- flavor field value: ['github', 'ghost', 'vanilla', 'allOn'],default set to 'github' flavor.
+
+#### setPlantumlOptions
+
+Type: (options: object) => object
+
+See [plantuml options of defaultOptions](#defaultOptions).
+
+- imageFormat field value: "svg" | "png" | "jpg", default 'png'.
+
+#### setMermaidOptions
+
+Type: (options: object) => object
+
+See [mermaid options of defaultOptions](#defaultOptions).
+
+- mermaid theme field value be selected in ['default', 'forest', 'dark', 'neutral']; When it be set empty, default set to 'default' theme.
+
+#### setVegaOptions
+
+Type: (options: object) => object
+
+See [vega-embed options of defaultOptions](#defaultOptions).
+
+- vega theme field value be selected in ['excel', 'ggplot2', 'quartz', 'vox', 'dark']; When it be set empty, default set to 'vox' theme.
+
 #### init
 
-Type: (mermaidTheme: string, vegaTheme: string) => showdonws
+Type: (void) => showdonws
 
 A function to init that be created showdown.convertor instance for showdowns.
-
-- Parameter mermaidTheme is mermaid theme name be selected in ['default', 'forest', 'dark', 'neutral'];When mermaidTheme set empty, mermaidTheme is set to 'default' theme name.
-- Parameter vegaTheme is vega theme name be selected in ['excel', 'ggplot2', 'quartz', 'vox', 'dark'];
-  When vegaTheme set empty, vegaTheme is set to 'vox' theme name.
 
 #### makeHtml
 

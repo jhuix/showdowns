@@ -1,5 +1,4 @@
 .markdown-preview {
-
   div,
   dl,
   dt,
@@ -382,27 +381,46 @@
     background-color: #f9f9f9;
   }
 
-  .diagram-center:not(.vega-embed) {
+  .diagram-center:not(.vega-embed):not(.asciimath):not(.latex) {
     svg {
       margin: auto;
       display: inherit;
     }
   }
-
-  .diagram-right:not(.vega-embed) {
+  .diagram-right:not(.vega-embed):not(.asciimath):not(.latex) {
     svg {
       margin: auto 0 auto auto;
       display: inherit;
     }
   }
-
   .diagram-center.vega-embed {
     margin: auto;
     display: table;
   }
-
   .diagram-right.vega-embed {
     margin: auto 0 auto auto;
     display: table;
+  }
+
+  .asciimath:not(.diagram-center):not(.diagram-right),
+  .latex:not(.diagram-center):not(.diagram-right) {
+    .katex-display,
+    .katex {
+      text-align: unset;
+    }
+  }
+  .asciimath.diagram-center,
+  .latex.diagram-center {
+    .katex-display,
+    .katex {
+      text-align: center;
+    }
+  }
+  .asciimath.diagram-right,
+  .latex.diagram-right {
+    .katex-display,
+    .katex {
+      text-align: right;
+    }
   }
 }

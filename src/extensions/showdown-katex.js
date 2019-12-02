@@ -48,8 +48,19 @@ function hasKatex() {
 function renderKatex(element, config, isAsciimath, sync) {
   const latex = element.textContent.trim();
   const code = isAsciimath ? asciimathToTex(latex) : latex;
+  const langattr = element.dataset.lang;
+  const langobj = langattr ? JSON.parse(langattr) : null;
+  let diagramClass = '';
+  if (langobj && langobj.align) {
+    //default left
+    if (langobj.align === 'center') {
+      diagramClass = 'diagram-center';
+    } else if (langobj.align === 'right') {
+      diagramClass = 'diagram-right';
+    }
+  }
+  const name = element.className + (!element.className || !diagramClass ? '' : ' ') + diagramClass;
   if (!sync && typeof window !== 'undefined' && window.dispatchEvent) {
-    const name = element.className;
     const id = 'katex-' + Date.now() + '-' + Math.floor(Math.random() * 10000);
     element.id = id;
     Promise.resolve(id).then(elementid => {
@@ -68,7 +79,7 @@ function renderKatex(element, config, isAsciimath, sync) {
     });
   } else {
     const html = Katex.renderToString(code, config);
-    element.parentNode.outerHTML = `<span title="${latex}">${html}</span>`;
+    element.parentNode.outerHTML = `<div title="${latex}" class="${name}">${html}</div>`;
   }
 }
 
@@ -100,14 +111,14 @@ function onRenderKatex(element) {
   Promise.resolve({ canRender: hasKatex(), element: element }).then(res => {
     if (res.canRender) {
       const id = res.element.id;
-      //const name = res.element.className;
+      const name = res.element.className;
       const input = res.element.input;
       const data = res.element.data;
       const config = res.element.options;
       const el = window.document.getElementById(id);
       if (el) {
         const html = Katex.renderToString(data, config);
-        el.parentNode.outerHTML = `<span title="${input}">${html}</span>`;
+        el.parentNode.outerHTML = `<div title="${input}" class="${name}">${html}</div>`;
       }
       --katexElementCount;
       if (!katexElementCount) {
