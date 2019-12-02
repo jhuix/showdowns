@@ -96,7 +96,7 @@ It's implemented in showdown-mermaid.js, render diagrams of Flowchart or Sequenc
 
 ##### Flowchart
 
-```mermaid
+```mermaid {"align":"center"}
 graph TD;
            A-->B;
            A-->C;
@@ -106,7 +106,7 @@ graph TD;
 
 ##### Sequence diagram
 
-```mermaid
+```mermaid {"align":"right"}
 sequenceDiagram
            participant Alice
            participant Bob
@@ -149,7 +149,7 @@ It's implemented in showdown-plantuml.js. render diagrams of uml using [plantuml
 
 #### Plantuml example
 
-```plantuml
+```plantuml  {"align":"right"}
       @startuml
       participant User
 
@@ -191,7 +191,7 @@ OR
 
 #### Flowchart example
 
-```flow
+```flow  {"align":"center"}
 st=>start: Start:>http://www.google.com[blank]
 e=>end:>http://www.google.com
 op1=>operation: My Operation
@@ -208,7 +208,7 @@ para(path1, bottom)->sub1(right)->op1
 para(path2, top)->op1
 ```
 
-```flowchart
+```flowchart {"align":"right"}
 st=>start: Start
 e=>end
 op1=>operation: My Operation
@@ -237,7 +237,7 @@ The \<theme name> of json "theme" field value in syntax language attribute is "h
 
 - Sequence example with hand theme:
 
-```sequence {"theme":"hand"}
+```sequence {"theme":"hand", "align":"center"}
 Alice->Bob: Hello Bob, how are you?
 Note right of Bob: Bob thinks
 Bob-->Alice: I am good thanks!
@@ -247,7 +247,7 @@ Bob-->Alice: I am good thanks!
 
 - Sequence example with simple theme:
 
-```sequence {"theme":"simple"}
+```sequence {"theme":"simple", "align":"right"}
 Alice->Bob: Hello Bob, how are you?
 Note right of Bob: Bob thinks
 Bob-->Alice: I am good thanks!
@@ -269,7 +269,7 @@ The \<engine name> of json "engine" field value in syntax language attribute is 
 
 - Dot example with dot engine:
 
-```dot {"engine":"dot"}
+```dot {"engine":"dot", "align":"center"}
 digraph G {
     main -> parse -> execute;
     main -> init;
@@ -286,7 +286,7 @@ digraph G {
 
 - Dot example with circo engine:
 
-```dot {"engine":"circo"}
+```dot {"engine":"circo", "align":"right"}
 digraph G {
     main -> parse -> execute;
     main -> init;
@@ -311,7 +311,7 @@ It's implemented in showdown-viz.js, render diagrams of railroad using [railroad
 
 #### Railroad diagrams example
 
-```railroad
+```railroad {"align":"center"}
 Diagram(
   Optional('+', 'skip'),
     Choice(0,
@@ -335,7 +335,7 @@ It's implemented in showdown-viz.js, render diagrams of wavedrom using [wavedrom
 
 #### WaveDrom example
 
-```wavedrom
+```wavedrom {"align":"center"}
 {signal: [
   {name: 'clk', wave: 'p.....|...'},
   {name: 'dat', wave: 'x.345x|=.x', data: ['head', 'body', 'tail', 'data']},
@@ -345,7 +345,7 @@ It's implemented in showdown-viz.js, render diagrams of wavedrom using [wavedrom
 ]}
 ```
 
-```wavedrom
+```wavedrom {"align":"right"}
 { signal: [
   { name: "pclk", wave: 'p.......' },
   { name: "Pclk", wave: 'P.......' },
@@ -380,7 +380,7 @@ OR
 
 - Vega example:
 
-```vega
+```vega {"align":"center"}
 {
   "$schema": "https://vega.github.io/schema/vega/v5.json",
   "width": 200,
@@ -474,7 +474,7 @@ OR
 
 - Vega-Lite example:
 
-```vega-lite
+```vega-lite {"align":"right"}
 {
   "$schema": "https://vega.github.io/schema/vega-lite/v4.json",
   "description": "Plots two functions using a generated sequence.",

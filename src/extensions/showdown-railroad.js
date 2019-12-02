@@ -19,8 +19,19 @@ function hasRailroad() {
  * render railroad graphs
  */
 function renderRailroad(element, sync) {
+  const langattr = element.dataset.lang;
+  const langobj = langattr ? JSON.parse(langattr) : null;
+  let diagramClass = '';
+  if (langobj && langobj.align) {
+    //default left
+    if (langobj.align === 'center') {
+      diagramClass = 'diagram-center';
+    } else if (langobj.align === 'right') {
+      diagramClass = 'diagram-right';
+    }
+  }
   const code = element.textContent.trim();
-  const name = element.className;
+  const name = element.className + (!element.className || !diagramClass ? '' : ' ') + diagramClass;
   const id = 'railroad-' + Date.now() + '-' + Math.floor(Math.random() * 10000);
   if (!sync && typeof window !== 'undefined' && window.dispatchEvent) {
     element.id = id;
@@ -112,9 +123,7 @@ function showdownRailroad() {
         const wrapper = typeof doc.body !== 'undefined' ? doc.body : doc;
 
         // find the railroad in code blocks
-        const elements = wrapper.querySelectorAll(
-          'code.railroad.language-railroad'
-        );
+        const elements = wrapper.querySelectorAll('code.railroad.language-railroad');
         if (!renderRailroadElements(elements)) {
           return html;
         }

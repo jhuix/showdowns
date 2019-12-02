@@ -1,4 +1,5 @@
 .markdown-preview {
+
   div,
   dl,
   dt,
@@ -379,5 +380,29 @@
   .sequence,
   .wavedrom {
     background-color: #f9f9f9;
+  }
+
+  .diagram-center:not(.vega-embed) {
+    svg {
+      margin: auto;
+      display: inherit;
+    }
+  }
+
+  .diagram-right:not(.vega-embed) {
+    svg {
+      margin: auto 0 auto auto;
+      display: inherit;
+    }
+  }
+
+  .diagram-center.vega-embed {
+    margin: auto;
+    display: table;
+  }
+
+  .diagram-right.vega-embed {
+    margin: auto 0 auto auto;
+    display: table;
   }
 }

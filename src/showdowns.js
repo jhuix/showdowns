@@ -37,12 +37,7 @@ showdown.subParser('githubCodeBlocks', function(text, options, globals) {
     return text;
   }
 
-  text = globals.converter._dispatch(
-    'githubCodeBlocks.before',
-    text,
-    options,
-    globals
-  );
+  text = globals.converter._dispatch('githubCodeBlocks.before', text, options, globals);
 
   text += '¨0';
 
@@ -59,9 +54,7 @@ showdown.subParser('githubCodeBlocks', function(text, options, globals) {
 
       codeblock =
         '<pre><code' +
-        (language
-          ? ' class="' + language + ' language-' + language + '"'
-          : '') +
+        (language ? ' class="' + language + ' language-' + language + '"' : '') +
         (langattr ? ` data-lang='${langattr}'` : '') +
         '>' +
         codeblock +
@@ -88,12 +81,7 @@ showdown.subParser('githubCodeBlocks', function(text, options, globals) {
   // attacklab: strip sentinel
   text = text.replace(/¨0/, '');
 
-  return globals.converter._dispatch(
-    'githubCodeBlocks.after',
-    text,
-    options,
-    globals
-  );
+  return globals.converter._dispatch('githubCodeBlocks.after', text, options, globals);
 });
 
 const getOptions = (options = {}) => {
@@ -110,30 +98,53 @@ const getOptions = (options = {}) => {
   };
 };
 
-const getExtensions = (mermaidTheme, vegaTheme, extensions = []) => {
+const getExtensions = (options, extensions = []) => {
+  const mermaidOptions = options ? options.mermaid || {} : {};
+  const plantumlOptions = options ? options.plantuml || {} : {};
+  const vegaOptions = options ? options.vega || {} : {};
+
   return [
     showdownToc,
     showdownAlign,
     showdownFootnotes,
-    showdownMermaid({ theme: mermaidTheme }),
+    showdownMermaid(mermaidOptions),
     showdownFlowchart,
     showdownRailroad,
     showdownViz,
     showdownSequence,
     showdownKatex,
-    showdownVega({ theme: vegaTheme }),
+    showdownVega(vegaOptions),
     showdownWavedrom,
-    showdownPlantuml({ imageFormat: 'svg' })
+    showdownPlantuml(plantumlOptions)
   ].concat(extensions ? extensions : []);
 };
 
+// defaultOptions.vega is EmbedOptions of vega-embed;
+// defaultOptions.mermaid is Config of mermaidAPI;
+// defaultOptions.plantuml is {umlWebSite: string, imageFormat: string};
+// defaultOptions.showdown is flavor and ShowdownOptions of showdown
 const showdowns = {
   showdown: showdown,
   converter: null,
-  defaultOptions: {},
+  defaultOptions: {
+    showdown: getOptions(),
+    plantuml: { imageFormat: 'svg' },
+    mermaid: { theme: 'default' },
+    vega: { theme: 'vox' }
+  },
   defaultExtensions: [],
   markdownDecodeFilter: function(doc) {
     return '';
+  },
+  initDefaultOptions: function() {
+    if (!this.defaultOptions) {
+      this.defaultOptions = {
+        showdown: {},
+        plantuml: {},
+        mermaid: {},
+        vega: {}
+      };
+    }
   },
   addOptions: function(options) {
     if (this.converter) {
@@ -156,27 +167,55 @@ const showdowns = {
       cdnjs.setCDN(cdnname, defScheme, distScheme);
     }
   },
-  init: function(mermaidTheme, vegaTheme) {
+  setShowdownOptions: function(options) {
+    this.initDefaultOptions();
+    if (typeof options !== 'object' || !options) options = {};
+    this.defaultOptions.showdown = Object.assign(this.defaultOptions.showdown || {}, options);
+    const flavor = this.defaultOptions.showdown.flavor;
+    if (flavor && ['github', 'ghost', 'vanilla', 'allOn'].indexOf(flavor) === -1) {
+      this.defaultOptions.showdown.flavor = 'github';
+    }
+    return this.defaultOptions.showdown;
+  },
+  setPlantumlOptions: function(options) {
+    this.initDefaultOptions();
+    if (typeof options !== 'object' || !options) options = {};
+    this.defaultOptions.plantuml = Object.assign(this.defaultOptions.plantuml || {}, options);
+    const imageFormat = this.defaultOptions.plantuml.imageFormat;
+    if (imageFormat && ['svg', 'png', 'jpg'].indexOf(imageFormat) === -1) {
+      this.defaultOptions.plantuml.imageFormat = 'png';
+    }
+    return this.defaultOptions.plantuml;
+  },
+  setMermaidOptions: function(options) {
+    this.initDefaultOptions();
+    if (typeof options !== 'object' || !options) options = {};
+    this.defaultOptions.mermaid = Object.assign(this.defaultOptions.mermaid || {}, options);
+    const theme = this.defaultOptions.mermaid.theme;
+    if (theme && ['default', 'forest', 'dark', 'neutral'].indexOf(theme) === -1) {
+      this.defaultOptions.mermaid.theme = 'default';
+    }
+    return this.defaultOptions.mermaid;
+  },
+  setVegaOptions: function(options) {
+    this.initDefaultOptions();
+    if (typeof options !== 'object' || !options) options = {};
+    this.defaultOptions.vega = Object.assign(this.defaultOptions.vega || {}, options);
+    const theme = this.defaultOptions.vega.theme;
+    if (theme && ['excel', 'ggplot2', 'quartz', 'vox', 'dark'].indexOf(theme) === -1) {
+      this.defaultOptions.vega.theme = 'vox';
+    }
+    const renderer = this.defaultOptions.vega.renderer;
+    if (renderer && ['canvas', 'svg', 'none'].indexOf(renderer) === -1) {
+      this.defaultOptions.vega.renderer = 'canvas';
+    }
+    return this.defaultOptions.vega;
+  },
+  init: function() {
     if (!this.converter) {
-      if (
-        !mermaidTheme ||
-        ['default', 'forest', 'dark', 'neutral'].indexOf(mermaidTheme) === -1
-      ) {
-        mermaidTheme = 'default';
-      }
-
-      if (
-        !vegaTheme ||
-        ['excel', 'ggplot2', 'quartz', 'vox', 'dark'].indexOf(vegaTheme) === -1
-      ) {
-        vegaTheme = 'quartz';
-      }
-      const options = getOptions(this.defaultOptions);
-      const extensions = getExtensions(
-        mermaidTheme,
-        vegaTheme,
-        this.defaultExtensions
-      );
+      const showdownOptions = this.defaultOptions ? this.defaultOptions.showdown || {} : {};
+      const options = getOptions(showdownOptions);
+      const extensions = getExtensions(this.defaultOptions, this.defaultExtensions);
 
       // converter instance of showdown
       this.converter = new showdown.Converter({

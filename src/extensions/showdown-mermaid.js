@@ -23,8 +23,19 @@ function hasMermaid() {
  * render mermaid graphs
  */
 function renderMermaid(element, sync) {
+  const langattr = element.dataset.lang;
+  const langobj = langattr ? JSON.parse(langattr) : null;
+  let diagramClass = '';
+  if (langobj && langobj.align) {
+    //default left
+    if (langobj.align === 'center') {
+      diagramClass = 'diagram-center';
+    } else if (langobj.align === 'right') {
+      diagramClass = 'diagram-right';
+    }
+  }
   const code = element.textContent.trim();
-  const name = element.className;
+  const name = element.className + (!element.className || !diagramClass ? '' : ' ') + diagramClass;
   const id = 'mermaid-' + Date.now() + '-' + Math.floor(Math.random() * 10000);
   if (!sync && typeof window !== 'undefined' && window.dispatchEvent) {
     element.id = id;
@@ -98,8 +109,7 @@ function onRenderMermaid(element) {
       const data = res.element.data;
       let el = window.document.getElementById(id);
       if (el) {
-        const svgId =
-          'mermaid-' + Date.now() + '-' + Math.floor(Math.random() * 10000);
+        const svgId = 'mermaid-' + Date.now() + '-' + Math.floor(Math.random() * 10000);
         Mermaid.render(svgId, data, svgCode => {
           el.parentNode.outerHTML = `<div class="${name}">${svgCode}</div>`;
         });
@@ -135,9 +145,7 @@ function showdownMermaid(userConfig) {
         const wrapper = typeof doc.body !== 'undefined' ? doc.body : doc;
 
         // find the mermaid in code blocks
-        const elements = wrapper.querySelectorAll(
-          'code.mermaid.language-mermaid'
-        );
+        const elements = wrapper.querySelectorAll('code.mermaid.language-mermaid');
 
         if (!renderMermaidElements(elements, config)) {
           return html;

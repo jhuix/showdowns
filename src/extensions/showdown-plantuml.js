@@ -19,23 +19,26 @@ function renderPlantumlElements(elements, config) {
     return false;
   }
   elements.forEach(element => {
+    const langattr = element.dataset.lang;
+    const langobj = langattr ? JSON.parse(langattr) : null;
+    let diagramClass = '';
+    if (langobj && langobj.align) {
+      //default left
+      if (langobj.align === 'center') {
+        diagramClass = 'diagram-center';
+      } else if (langobj.align === 'right') {
+        diagramClass = 'diagram-right';
+      }
+    }
     const code = element.textContent.trim();
-    const name = element.className;
+    const name = element.className + (!element.className || !diagramClass ? '' : ' ') + diagramClass;
     const imageFormat = config.imageFormat;
     const protocol = window && window.location.protocol;
-    const website =
-      (protocol === 'http:' || protocol === 'https:' ? '//' : 'https://') +
-      config.umlWebSite;
-    const imageExtension =
-      imageFormat !== defaultImageFormat ? `.${imageFormat}` : '';
+    const website = (protocol === 'http:' || protocol === 'https:' ? '//' : 'https://') + config.umlWebSite;
+    const imageExtension = imageFormat !== defaultImageFormat ? `.${imageFormat}` : '';
     const uml = plantumlcodec.encodeuml(code);
     const src = `${website}/${imageFormat}/${uml}${imageExtension}`;
-    if (
-      imageFormat === 'svg' &&
-      typeof window !== 'undefined' &&
-      window.fetch &&
-      window.dispatchEvent
-    ) {
+    if (imageFormat === 'svg' && typeof window !== 'undefined' && window.fetch && window.dispatchEvent) {
       const elid = 'plantuml-' + Date.now() + '-' + Math.floor(Math.random() * 10000);
       element.id = elid;
       window
@@ -75,12 +78,7 @@ function showdownPlantuml(userConfig) {
   const parser = new DOMParser();
   const config = getConfig(userConfig);
 
-  if (
-    config.imageFormat === 'svg' &&
-    typeof window !== 'undefined' &&
-    window.fetch &&
-    window.dispatchEvent
-  ) {
+  if (config.imageFormat === 'svg' && typeof window !== 'undefined' && window.fetch && window.dispatchEvent) {
     // Listen plantuml custom event
     window.addEventListener('plantuml', event => {
       if (event.detail) {
@@ -104,9 +102,7 @@ function showdownPlantuml(userConfig) {
         const wrapper = typeof doc.body !== 'undefined' ? doc.body : doc;
 
         // find the plantuml in code blocks
-        const elements = wrapper.querySelectorAll(
-          'code.plantuml.language-plantuml'
-        );
+        const elements = wrapper.querySelectorAll('code.plantuml.language-plantuml');
 
         if (!renderPlantumlElements(elements, config)) {
           return html;

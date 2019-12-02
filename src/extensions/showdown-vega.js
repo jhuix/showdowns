@@ -23,8 +23,19 @@ function hasVegaEmbed() {
  * render VegaEmbed graphs
  */
 function renderVega(element, options, isVegaLite, sync) {
+  const langattr = element.dataset.lang;
+  const langobj = langattr ? JSON.parse(langattr) : null;
+  let diagramClass = '';
+  if (langobj && langobj.align) {
+    //default left
+    if (langobj.align === 'center') {
+      diagramClass = 'diagram-center';
+    } else if (langobj.align === 'right') {
+      diagramClass = 'diagram-right';
+    }
+  }
   const code = element.textContent.trim();
-  const name = element.className;
+  const name = element.className + (!element.className || !diagramClass ? '' : ' ') + diagramClass;
   const id = 'vega-' + Date.now() + '-' + Math.floor(Math.random() * 10000);
   if (!sync && typeof window !== 'undefined' && window.dispatchEvent) {
     element.id = id;
@@ -43,14 +54,9 @@ function renderVega(element, options, isVegaLite, sync) {
       );
     });
   } else {
-    element.parentNode.outerHTML = cdnjs.renderCacheElement(
-      element.ownerDocument,
-      id,
-      name,
-      el => {
-        VegaEmbed(el, JSON.parse(code), options);
-      }
-    );
+    element.parentNode.outerHTML = cdnjs.renderCacheElement(element.ownerDocument, id, name, el => {
+      VegaEmbed(el, JSON.parse(code), options);
+    });
   }
 }
 
@@ -91,7 +97,6 @@ function renderVegaElements(vegaElements, vegaLiteElements, options) {
 const getOptions = (userOptions = {}) => ({
   actions: { editor: false },
   theme: 'vox',
-  renderer: 'svg',
   ...userOptions
 });
 
@@ -119,11 +124,7 @@ function showdownVega(userOptions) {
   const parser = new DOMParser();
   const options = getOptions(userOptions);
 
-  if (
-    !hasVegaEmbed() &&
-    typeof window !== 'undefined' &&
-    window.dispatchEvent
-  ) {
+  if (!hasVegaEmbed() && typeof window !== 'undefined' && window.dispatchEvent) {
     // Listen vegaembed custom event
     window.addEventListener('vega', event => {
       if (event.detail) {
@@ -141,12 +142,8 @@ function showdownVega(userOptions) {
         const wrapper = typeof doc.body !== 'undefined' ? doc.body : doc;
 
         // find the VegaEmbed in code blocks
-        const vegaElements = wrapper.querySelectorAll(
-          'code.vega.language-vega'
-        );
-        const vegaLiteElements = wrapper.querySelectorAll(
-          'code.vega-lite.language-vega-lite'
-        );
+        const vegaElements = wrapper.querySelectorAll('code.vega.language-vega');
+        const vegaLiteElements = wrapper.querySelectorAll('code.vega-lite.language-vega-lite');
 
         if (!renderVegaElements(vegaElements, vegaLiteElements, options)) {
           return html;

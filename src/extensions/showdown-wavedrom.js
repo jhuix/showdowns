@@ -25,8 +25,19 @@ function hasWavedrom() {
  * render wavedrom graphs
  */
 function renderWavedrom(element, sync) {
+  const langattr = element.dataset.lang;
+  const langobj = langattr ? JSON.parse(langattr) : null;
+  let diagramClass = '';
+  if (langobj && langobj.align) {
+    //default left
+    if (langobj.align === 'center') {
+      diagramClass = 'diagram-center';
+    } else if (langobj.align === 'right') {
+      diagramClass = 'diagram-right';
+    }
+  }
   const code = element.textContent.trim();
-  const name = element.className;
+  const name = element.className + (!element.className || !diagramClass ? '' : ' ') + diagramClass;
   const index = indexWD;
   const id = 'WaveDrom_Display_' + index;
   ++indexWD;
@@ -52,22 +63,17 @@ function renderWavedrom(element, sync) {
       );
     });
   } else {
-    element.parentNode.outerHTML = cdnjs.renderCacheElement(
-      element.ownerDocument,
-      id,
-      name,
-      el => {
-        const obj = window.eval(`(${code})`);
-        wavedrom.RenderWaveForm(index, obj, 'WaveDrom_Display_');
-        // Replace the created cache element with the original element with the same id.
-        const wdel = document.getElementById('WaveDrom_Display_' + index);
-        if (el != wdel) {
-          while (wdel.childNodes.length) {
-            el.appendChild(wdel.removeChild(wdel.childNodes[0]));
-          }
+    element.parentNode.outerHTML = cdnjs.renderCacheElement(element.ownerDocument, id, name, el => {
+      const obj = window.eval(`(${code})`);
+      wavedrom.RenderWaveForm(index, obj, 'WaveDrom_Display_');
+      // Replace the created cache element with the original element with the same id.
+      const wdel = document.getElementById('WaveDrom_Display_' + index);
+      if (el != wdel) {
+        while (wdel.childNodes.length) {
+          el.appendChild(wdel.removeChild(wdel.childNodes[0]));
         }
       }
-    );
+    });
   }
 }
 
@@ -147,9 +153,7 @@ function showdownWavedrom(config) {
         const wrapper = typeof doc.body !== 'undefined' ? doc.body : doc;
 
         // find the wavedrom in code blocks
-        const elements = wrapper.querySelectorAll(
-          'code.wavedrom.language-wavedrom'
-        );
+        const elements = wrapper.querySelectorAll('code.wavedrom.language-wavedrom');
         if (!renderWavedromElements(elements, skin)) {
           return html;
         }
