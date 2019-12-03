@@ -264,9 +264,9 @@ A function to set cdn source when dynamically load js lib files related to more 
 
 #### setShowdownOptions
 
-Type: (options: object) => object
+Type: (options: object) => objecto
 
-See [showdown options of defaultOptions](#defaultOptions).
+See [showdown options of defaultOptions](#defaultoptions).
 
 - flavor field value: ['github', 'ghost', 'vanilla', 'allOn'],default set to 'github' flavor.
 
@@ -274,7 +274,7 @@ See [showdown options of defaultOptions](#defaultOptions).
 
 Type: (options: object) => object
 
-See [plantuml options of defaultOptions](#defaultOptions).
+See [plantuml options of defaultOptions](#defaultoptions).
 
 - imageFormat field value: "svg" | "png" | "jpg", default 'png'.
 
@@ -282,7 +282,7 @@ See [plantuml options of defaultOptions](#defaultOptions).
 
 Type: (options: object) => object
 
-See [mermaid options of defaultOptions](#defaultOptions).
+See [mermaid options of defaultOptions](#defaultoptions).
 
 - mermaid theme field value be selected in ['default', 'forest', 'dark', 'neutral']; When it be set empty, default set to 'default' theme.
 
@@ -290,7 +290,7 @@ See [mermaid options of defaultOptions](#defaultOptions).
 
 Type: (options: object) => object
 
-See [vega-embed options of defaultOptions](#defaultOptions).
+See [vega-embed options of defaultOptions](#defaultoptions).
 
 - vega theme field value be selected in ['excel', 'ggplot2', 'quartz', 'vox', 'dark']; When it be set empty, default set to 'vox' theme.
 
