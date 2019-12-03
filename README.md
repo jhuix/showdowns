@@ -49,7 +49,7 @@ See more information, refer to the following document:
 
 - View video
 
-<video controls="" autoplay="" name="media"><source src="https://jhuix.github.io/showdowns/media/demo.mp4" type="video/mp4"></video>
+[![demovideo](https://jhuix.github.io/showdowns/media/demo-video.png)](https://jhuix.github.io/showdowns/media/demo.mp4)
 
 ## Usage
 
