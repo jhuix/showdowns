@@ -45,7 +45,11 @@ See more information, refer to the following document:
 
 ### Preview
 
-View [Extensions Examples](https://github.com/jhuix/showdowns/blob/master/docs/showdowns-features.md) is previewed as [Showdowns Features](https://jhuix.github.io/showdowns/)
+- View [Extensions Examples](https://github.com/jhuix/showdowns/blob/master/docs/showdowns-features.md) is previewed as [Showdowns Features](https://jhuix.github.io/showdowns/)
+
+- View video
+
+<video controls="" autoplay="" name="media"><source src="https://jhuix.github.io/showdowns/media/demo.mp4" type="video/mp4"></video>
 
 ## Usage
 
