@@ -49,7 +49,7 @@ See more information, refer to the following document:
 
 - View video
 
-[![demovideo](https://jhuix.github.io/showdowns/media/demo-video.png)](https://jhuix.github.io/showdowns/media/demo.mp4)
+[![demovideo](https://jhuix.github.io/showdowns/media/demo-video.jpg)](https://jhuix.github.io/showdowns/media/demo.mp4)
 
 ## Usage
 
