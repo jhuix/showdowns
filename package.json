@@ -2,7 +2,7 @@
   "name": "@jhuix/showdowns",
   "version": "0.3.3",
   "description": "A lib that make markdown to html with some extensions of showdown.js.",
-  "main": "dist/showdowns.core.min.js",
+  "main": "dist/showdowns.min.js",
   "browser": "dist/showdowns.min.js",
   "module": "dist/showdowns.core.min.js",
   "unpkg": "dist/showdowns.min.js",

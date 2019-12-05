@@ -28,9 +28,16 @@ const isFormatCJS = process.env.TARGET === 'cjs';
 const isDemoBuild = process.env.DEMO === 'true';
 const isWithBrotli = process.env.BROTLI === 'true';
 const version = process.env.VERSION || pkg.version;
+
+const out_file = (isFormatCJS ? pkg.module : pkg.main).replace(
+  '.min.js',
+  (isWithBrotli ? '.br' : '') + (isMinBuild ? '.min.js' : '.js')
+);
+const filename = path.basename(out_file);
+
 const jsbanner =
   '/*!\n' +
-  ` * showdowns.js v${version}\n` +
+  ` * ${filename} v${version}\n` +
   ` * Copyright (c) 2019-present, Jhuix (Hui Jin) <jhuix0117@gmail.com>\n` +
   ' * Released under the MIT License.\n' +
   ' */';
@@ -73,9 +80,10 @@ const wasm = function() {
 const config = {
   input: isWithBrotli ? 'src/showdowns.br.js' : 'src/showdowns.js',
   output: {
-    file: pkg.main.replace('.min.js', isWithBrotli ? '.br.js' : '.js'),
-    // 输出CJS格式，NODE.js模块规范通用
-    format: 'cjs',
+    file: out_file,
+    // 输出CJS格式，NODE.js模块规范通用;
+    // 输出UMD格式，各种模块规范通用.
+    format: isFormatCJS ? 'cjs' : 'umd',
     // 打包后的全局变量，如浏览器端 window.showdowns;
     name: 'showdowns',
     sourcemap: true,
@@ -99,7 +107,18 @@ const config = {
     }
   },
   // 作用：指出应将哪些模块视为外部模块，否则会被打包进最终的代码里
-  external: ['mermaid', 'katex', 'raphael', 'flowchart.js', 'viz.js', 'wavedrom', 'vega', 'vega-lite', 'vega-embed', '@rokt33r/js-sequence-diagrams'],
+  external: [
+    'mermaid',
+    'katex',
+    'raphael',
+    'flowchart.js',
+    'viz.js',
+    'wavedrom',
+    'vega',
+    'vega-lite',
+    'vega-embed',
+    '@rokt33r/js-sequence-diagrams'
+  ],
   plugins: [
     json(),
     postcss({
@@ -136,9 +155,6 @@ const config = {
 if (isFormatCJS) {
   config.external.push('showdown', 'zlib', 'katex/dist/contrib/auto-render', 'showdown-katex/src/asciimath-to-tex');
 } else {
-  config.output.file = pkg.browser.replace('.min.js', isWithBrotli ? '.br.js' : '.js');
-  // 输出UMD格式，各种模块规范通用
-  config.output.format = 'umd';
   config.plugins.push(
     babel({
       exclude: '**/node_modules/**'
@@ -160,7 +176,6 @@ if (isFormatCJS) {
 }
 
 if (isMinBuild) {
-  config.output.file = config.output.file.replace('.js', '.min.js');
   config.plugins.push(
     terser({
       include: [/^.+\.min\.js$/],
