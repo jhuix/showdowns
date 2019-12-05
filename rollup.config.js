@@ -98,7 +98,8 @@ const config = {
       vega: 'vega',
       'vega-lite': 'vegaLite',
       'vega-embed': 'vegaEmbed',
-      '@rokt33r/js-sequence-diagrams': 'Diagram'
+      '@rokt33r/js-sequence-diagrams': 'Diagram',
+      'katex/dist/contrib/auto-render': 'renderMathInElement'
     }
   },
   onwarn: (msg, warn) => {
@@ -117,7 +118,8 @@ const config = {
     'vega',
     'vega-lite',
     'vega-embed',
-    '@rokt33r/js-sequence-diagrams'
+    '@rokt33r/js-sequence-diagrams',
+    'katex/dist/contrib/auto-render'
   ],
   plugins: [
     json(),
@@ -153,7 +155,7 @@ const config = {
 };
 
 if (isFormatCJS) {
-  config.external.push('showdown', 'zlib', 'katex/dist/contrib/auto-render', 'showdown-katex/src/asciimath-to-tex');
+  config.external.push('showdown', 'zlib', 'showdown-katex/src/asciimath-to-tex');
 } else {
   config.plugins.push(
     babel({
