@@ -22,6 +22,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
+if (typeof window === 'undefined') {
+  throw Error('The showdown katex extension can only be used in browser environment!');
+}
+
 import renderMathInElement from 'katex/dist/contrib/auto-render';
 import asciimathToTex from 'showdown-katex/src/asciimath-to-tex';
 import cdnjs from './cdn';
@@ -31,7 +35,7 @@ import cdnjs from './cdn';
 // }
 
 if (typeof katex === 'undefined') {
-  var katex = typeof window !== 'undefined' ? window.katex || undefined : require('katex');
+  var katex = window.katex || undefined;
 }
 
 if (typeof RenderMathInElement === 'undefined') {
@@ -39,27 +43,51 @@ if (typeof RenderMathInElement === 'undefined') {
 }
 
 let katexElementCount = 0;
-
 function hasKatex() {
   return typeof RenderMathInElement !== 'undefined' && RenderMathInElement && typeof katex !== 'undefined' && katex
     ? true
     : false;
 }
 
-function renderKatex(element, config, isAsciimath, sync) {
+let dync = false;
+function dyncLoadScript() {
+  const sync = hasKatex();
+  if (typeof window !== 'undefined') {
+    if (!sync && !dync) {
+      dync = true;
+      cdnjs.loadStyleSheet('katexCSS');
+      cdnjs.loadScript('katex').then(name => {
+        katex = cdnjs.interopDefault(window[name]);
+      });
+    }
+  }
+  return sync;
+}
+
+function renderKatex(element, config, isAsciimath) {
   const latex = element.textContent.trim();
   const code = isAsciimath ? asciimathToTex(latex) : latex;
   const langattr = element.dataset.lang;
   const langobj = langattr ? JSON.parse(langattr) : null;
   let diagramClass = '';
-  if (langobj && langobj.align) {
-    //default left
-    if (langobj.align === 'center') {
-      diagramClass = 'diagram-center';
-    } else if (langobj.align === 'right') {
-      diagramClass = 'diagram-right';
+  if (langobj) {
+    if (
+      (typeof langobj.codeblock === 'boolean' && langobj.codeblock) ||
+      (typeof langobj.codeblock === 'string' && langobj.codeblock.toLowerCase() === 'true')
+    ) {
+      return;
+    }
+
+    if (langobj.align) {
+      //default left
+      if (langobj.align === 'center') {
+        diagramClass = 'diagram-center';
+      } else if (langobj.align === 'right') {
+        diagramClass = 'diagram-right';
+      }
     }
   }
+  const sync = dyncLoadScript();
   const name =
     (element.classList.length > 0 ? element.classList[0] : '') +
     (!element.className || !diagramClass ? '' : ' ') +
@@ -87,29 +115,18 @@ function renderKatex(element, config, isAsciimath, sync) {
   }
 }
 
-let dync = false;
 function renderBlockElements(latex, asciimath, config) {
   if (!latex.length && !asciimath.length) {
     return;
   }
 
   katexElementCount = latex.length + asciimath.length;
-  const sync = hasKatex();
-  if (typeof window !== 'undefined') {
-    if (!sync && !dync) {
-      dync = true;
-      cdnjs.loadStyleSheet('katexCSS');
-      cdnjs.loadScript('katex').then(name => {
-        katex = cdnjs.interopDefault(window[name]);
-      });
-    }
-  }
 
   latex.forEach(element => {
-    renderKatex(element, config, false, sync);
+    renderKatex(element, config, false);
   });
   asciimath.forEach(element => {
-    renderKatex(element, config, true, sync);
+    renderKatex(element, config, true);
   });
 }
 

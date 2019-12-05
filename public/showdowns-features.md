@@ -7,6 +7,16 @@ Click the link to preview the [showdowns features](https://jhuix.github.io/showd
 
 Showdowns Markdown Syntax, refer to the document -- [Showdown's Markdown Syntax](https://github.com/showdownjs/showdown/wiki/Showdown's-Markdown-syntax).
 
+- **In browser environment, it is implemented to dynamically load js lib files related to more showdown diagrams extension for using [showdowns >= 0.3.0 version](https://github.com/jhuix/showdowns).**
+
+- **In codeblock of markdown, expanded syntax language attribute from "\```codename" to "\```codename {json}" or "\```codename [json]".**
+
+    - **The common "align" field value of json is "left" or "center" or "right" in syntax language attribute, and it is empty means "left" align.**
+
+    - **The common "codeblock" field value of json is "true" or "false" in syntax language attribute, and it is empty means "false". It is "true" means the codeblock is forced to display as  normal code block, otherwise the codeblock is tried to parse as corresponding diagrams.**
+
+    - For example, see following [Network Sequence](#network-sequence) example.
+
 ## Table
 
 | Return Code | Style | Value | DESC      |
@@ -15,10 +25,6 @@ Showdowns Markdown Syntax, refer to the document -- [Showdown's Markdown Syntax]
 | ERROR       | int   | 0     | Failed    |
 
 ## Markdown extension features
-
-- **In browser environment, it is implemented to dynamically load js lib files related to more showdown diagrams extension for using [showdowns >= 0.3.0 version](https://github.com/jhuix/showdowns).**
-
-- **In codeblock of markdown, expanded syntax language attribute from "\```codename" to "\```codename {json}" or "\```codename [json]", The common "align" field value of json is "center" or "right" in syntax language attribute, and it is empty means left align.** For example, see following [Network Sequence](#network-sequence) example.
 
 [TOC]
 
@@ -38,6 +44,15 @@ It's implemented sub-TOC in showdown-toc.js.
 
 ##### sub-TOC examples2
 
+### Footnotes
+
+It's implemented in showdown-footnotes.js, use for reference the [showdown-footnotes](https://github.com/Kriegslustig/showdown-footnotes).
+
+For example:
+
+[^1]: The explanation.
+
+
 ### LaTeX math and AsciiMath
 
 It's supported by [showdown-katex](https://github.com/obedm503/showdown-katex.git), that render [LaTeX](https://www.latex-project.org/) math and [AsciiMath](http://asciimath.org/) using [KaTeX](https://github.com/Khan/KaTeX), You can check [KaTeX supported functions/symbols](https://khan.github.io/KaTeX/function-support.html).
@@ -46,13 +61,13 @@ It's supported by [showdown-katex](https://github.com/obedm503/showdown-katex.gi
 
 - AsciiMath syntax:
 
-        ```asciimath {"align": "<align>"}
+        ```asciimath {"align": "left | center | right", "codeblock": true | false}
         <code content>
         ```
 
 - LaTex syntax:
 
-        ```latex {"align": "<align>"}
+        ```latex {"align": "left | center | right", "codeblock": true | false}
         <code content>
         ```
 
@@ -78,21 +93,21 @@ It's implemented in showdown-mermaid.js, render diagrams of Flowchart or Sequenc
 
 - Flowchart syntax:
 
-        ```mermaid {"align": "<align>"}
+        ```mermaid {"align": "left | center | right", "codeblock": true | false}
         graph TD;
         <code content>
         ```
 
 - Sequence diagram syntax:
 
-        ```mermaid {"align": "<align>"}
+        ```mermaid {"align": "left | center | right", "codeblock": true | false}
         sequenceDiagram
         <code content>
         ```
 
 - Gantt diagram syntax:
 
-        ```mermaid {"align": "<align>"}
+        ```mermaid {"align": "left | center | right", "codeblock": true | false}
         gantt
         <code content>
         ```
@@ -100,6 +115,14 @@ It's implemented in showdown-mermaid.js, render diagrams of Flowchart or Sequenc
 #### Mermaid examples
 
 ##### Flowchart
+
+```mermaid {"align":"center", "codeblock": true}
+graph TD;
+           A-->B;
+           A-->C;
+           B-->D;
+           C-->D;
+```
 
 ```mermaid {"align":"center"}
 graph TD;
@@ -146,7 +169,7 @@ It's implemented in showdown-plantuml.js. render diagrams of uml using [plantuml
 
 #### Markdown Syntax
 
-    ```plantuml {"align": "<align>"}
+    ```plantuml {"align": "left | center | right", "codeblock": true | false}
     @startuml
     <code content>
     @enduml
@@ -184,13 +207,13 @@ It's implemented in showdown-flowchart.js, render diagrams of flowchart using [f
 
 #### Markdown Syntax
 
-    ```flow {"align": "<align>"}
+    ```flow {"align": "left | center | right", "codeblock": true | false}
     <code content>
     ```
 
 OR
 
-    ```flowchart {"align": "<align>"}
+    ```flowchart {"align": "left | center | right", "codeblock": true | false}
     <code content>
     ```
 
@@ -310,7 +333,7 @@ It's implemented in showdown-viz.js, render diagrams of railroad using [railroad
 
 #### Markdown Syntax
 
-    ```railroad {"align": "<align>"}
+    ```railroad {"align": "left | center | right", "codeblock": true | false}
     <code content>
     ```
 
@@ -334,7 +357,7 @@ It's implemented in showdown-viz.js, render diagrams of wavedrom using [wavedrom
 
 #### Markdown Syntax
 
-    ```wavedrom {"align": "<align>"}
+    ```wavedrom {"align": "left | center | right", "codeblock": true | false}
     <code content>
     ```
 
@@ -371,13 +394,13 @@ It's implemented in showdown-vega.js, render diagrams of [Vega](https://github.c
 
 #### Markdown Syntax
 
-    ```vega {"align": "<align>"}
+    ```vega {"align": "left | center | right", "codeblock": true | false}
     <code content>
     ```
 
 OR
 
-    ```vega-lite {"align": "<align>"}
+    ```vega-lite {"align": "left | center | right", "codeblock": true | false}
     <code content>
     ```
 
@@ -524,9 +547,3 @@ OR
   }
 }
 ```
-
-### Footnotes
-
-It's implemented in showdown-footnotes.js, use for reference the [showdown-footnotes](https://github.com/Kriegslustig/showdown-footnotes).
-
-[^1]: The explanation.

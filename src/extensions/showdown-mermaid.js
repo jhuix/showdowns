@@ -8,6 +8,10 @@
 
 'use strict';
 
+if (typeof window === 'undefined') {
+  throw Error('The showdown mermaid extension can only be used in browser environment!');
+}
+
 import cdnjs from './cdn';
 // import mermaid from 'mermaid';
 // if (typeof Mermaid === 'undefined') {
@@ -15,28 +19,56 @@ import cdnjs from './cdn';
 // }
 
 if (typeof mermaid === 'undefined') {
-  var mermaid = typeof window !== 'undefined' ? window.mermaid || undefined : require('mermaid');
+  var mermaid = window.mermaid || undefined;
 }
 
 function hasMermaid() {
   return typeof mermaid !== 'undefined' && mermaid ? true : false;
 }
 
+let dync = false;
+function dyncLoadScript() {
+  // When window object exists,
+  // it means browser environment, otherwise node.js environment.
+  // In browser environment, html need to be rendered asynchronously.
+  const sync = hasMermaid();
+  if (typeof window !== 'undefined') {
+    if (!sync && !dync) {
+      dync = true;
+      cdnjs.loadScript('mermaid').then(name => {
+        mermaid = cdnjs.interopDefault(window[name]);
+        mermaid.initialize(config);
+      });
+    }
+  }
+  return sync;
+}
+
 /**
  * render mermaid graphs
  */
-function renderMermaid(element, sync) {
+function renderMermaid(element) {
   const langattr = element.dataset.lang;
   const langobj = langattr ? JSON.parse(langattr) : null;
   let diagramClass = '';
-  if (langobj && langobj.align) {
-    //default left
-    if (langobj.align === 'center') {
-      diagramClass = 'diagram-center';
-    } else if (langobj.align === 'right') {
-      diagramClass = 'diagram-right';
+  if (langobj) {
+    if (
+      (typeof langobj.codeblock === 'boolean' && langobj.codeblock) ||
+      (typeof langobj.codeblock === 'string' && langobj.codeblock.toLowerCase() === 'true')
+    ) {
+      return;
+    }
+
+    if (langobj.align) {
+      //default left
+      if (langobj.align === 'center') {
+        diagramClass = 'diagram-center';
+      } else if (langobj.align === 'right') {
+        diagramClass = 'diagram-right';
+      }
     }
   }
+  const sync = dyncLoadScript();
   const code = element.textContent.trim();
   const name =
     (element.classList.length > 0 ? element.classList[0] : '') +
@@ -65,28 +97,13 @@ function renderMermaid(element, sync) {
 }
 
 // <div class="mermaid"></div>
-let dync = false;
 function renderMermaidElements(elements, config) {
   if (!elements.length) {
     return false;
   }
 
-  // When window object exists,
-  // it means browser environment, otherwise node.js environment.
-  // In browser environment, html need to be rendered asynchronously.
-  const sync = hasMermaid();
-  if (typeof window !== 'undefined') {
-    if (!sync && !dync) {
-      dync = true;
-      cdnjs.loadScript('mermaid').then(name => {
-        mermaid = cdnjs.interopDefault(window[name]);
-        mermaid.initialize(config);
-      });
-    }
-  }
-
   elements.forEach(element => {
-    renderMermaid(element, sync);
+    renderMermaid(element);
   });
   return true;
 }

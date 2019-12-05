@@ -23,32 +23,62 @@ import cdnjs from './cdn';
 // }
 
 if (typeof Raphael === 'undefined') {
-  var Raphael = typeof window !== 'undefined' ? window.Raphael || undefined : require('raphael');
+  var Raphael = window.Raphael || undefined;
 }
 
 if (typeof flowchart === 'undefined') {
-  var flowchart = typeof window !== 'undefined' ? window.flowchart || undefined : require('flowchart.js');
+  var flowchart = window.flowchart || undefined;
 }
 
 function hasFlowchart() {
   return typeof Raphael !== 'undefined' && Raphael && typeof flowchart !== 'undefined' && flowchart ? true : false;
 }
 
+let dync = false;
+function dyncLoadScript() {
+  const sync = hasFlowchart();
+  if (typeof window !== 'undefined') {
+    if (!sync && !dync) {
+      dync = true;
+      cdnjs
+        .loadScript('Raphael')
+        .then(name => {
+          Raphael = cdnjs.interopDefault(window[name]);
+          return cdnjs.loadScript('flowchart');
+        })
+        .then(name => {
+          flowchart = cdnjs.interopDefault(window[name]);
+        });
+    }
+  }
+  return sync;
+}
+
 /**
  * render flowchart graphs
  */
-function renderFlowchart(element, options, sync) {
+function renderFlowchart(element, options) {
   const langattr = element.dataset.lang;
   const langobj = langattr ? JSON.parse(langattr) : null;
   let diagramClass = '';
-  if (langobj && langobj.align) {
-    //default left
-    if (langobj.align === 'center') {
-      diagramClass = 'diagram-center';
-    } else if (langobj.align === 'right') {
-      diagramClass = 'diagram-right';
+  if (langobj) {
+    if (
+      (typeof langobj.codeblock === 'boolean' && langobj.codeblock) ||
+      (typeof langobj.codeblock === 'string' && langobj.codeblock.toLowerCase() === 'true')
+    ) {
+      return;
+    }
+
+    if (langobj.align) {
+      //default left
+      if (langobj.align === 'center') {
+        diagramClass = 'diagram-center';
+      } else if (langobj.align === 'right') {
+        diagramClass = 'diagram-right';
+      }
     }
   }
+  const sync = dyncLoadScript();
   const code = element.textContent.trim();
   const name =
     (element.classList.length > 0 ? element.classList[0] : '') +
@@ -78,33 +108,16 @@ function renderFlowchart(element, options, sync) {
 }
 
 // <div class="flowchart || flow"></div>
-let dync = false;
 function renderFlowchartElements(flowchartElements, flowElements, options) {
   if (!flowchartElements.length && !flowElements.length) {
     return false;
   }
 
-  const sync = hasFlowchart();
-  if (typeof window !== 'undefined') {
-    if (!sync && !dync) {
-      dync = true;
-      cdnjs
-        .loadScript('Raphael')
-        .then(name => {
-          Raphael = cdnjs.interopDefault(window[name]);
-          return cdnjs.loadScript('flowchart');
-        })
-        .then(name => {
-          flowchart = cdnjs.interopDefault(window[name]);
-        });
-    }
-  }
-
   flowchartElements.forEach(element => {
-    renderFlowchart(element, options, sync);
+    renderFlowchart(element, options);
   });
   flowElements.forEach(element => {
-    renderFlowchart(element, options, sync);
+    renderFlowchart(element, options);
   });
   return true;
 }

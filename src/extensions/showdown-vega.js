@@ -19,28 +19,60 @@ import cdnjs from './cdn';
 // }
 
 if (typeof vegaEmbed === 'undefined') {
-  var vegaEmbed = typeof window !== 'undefined' ? window.vegaEmbed || undefined : require('vega-embed');
+  var vegaEmbed = window.vegaEmbed || undefined;
 }
 
 function hasVegaEmbed() {
   return typeof vegaEmbed !== 'undefined' && vegaEmbed ? true : false;
 }
 
+let dync = false;
+function dyncLoadScript() {
+  const sync = hasVegaEmbed();
+  if (typeof window !== 'undefined') {
+    if (!sync && !dync) {
+      dync = true;
+      cdnjs
+        .loadScript('vega')
+        .then(() => {
+          return cdnjs.loadScript('vegaLite');
+        })
+        .then(() => {
+          return cdnjs.loadScript('vegaEmbed');
+        })
+        .then(name => {
+          vegaEmbed = cdnjs.interopDefault(window[name]);
+        });
+    }
+  }
+  return sync;
+}
+
 /**
  * render VegaEmbed graphs
  */
-function renderVega(element, options, isVegaLite, sync) {
+function renderVega(element, options, isVegaLite) {
   const langattr = element.dataset.lang;
   const langobj = langattr ? JSON.parse(langattr) : null;
   let diagramClass = '';
-  if (langobj && langobj.align) {
-    //default left
-    if (langobj.align === 'center') {
-      diagramClass = 'diagram-center';
-    } else if (langobj.align === 'right') {
-      diagramClass = 'diagram-right';
+  if (langobj) {
+    if (
+      (typeof langobj.codeblock === 'boolean' && langobj.codeblock) ||
+      (typeof langobj.codeblock === 'string' && langobj.codeblock.toLowerCase() === 'true')
+    ) {
+      return;
+    }
+
+    if (langobj.align) {
+      //default left
+      if (langobj.align === 'center') {
+        diagramClass = 'diagram-center';
+      } else if (langobj.align === 'right') {
+        diagramClass = 'diagram-right';
+      }
     }
   }
+  const sync = dyncLoadScript();
   const code = element.textContent.trim();
   const name =
     (element.classList.length > 0 ? element.classList[0] : '') +
@@ -78,18 +110,6 @@ function renderVega(element, options, isVegaLite, sync) {
         })
       );
     }
-  } else {
-    new require('events').EventEmitter().emit('vega', [
-      {
-        detail: {
-          id: elementid,
-          className: name,
-          data: code,
-          options: options,
-          isVegaLite: isVegaLite
-        }
-      }
-    ]);
   }
   // else {
   //   element.parentNode.outerHTML = cdnjs.renderCacheElement(element.ownerDocument, id, name, el => {
@@ -99,35 +119,16 @@ function renderVega(element, options, isVegaLite, sync) {
 }
 
 // <div class="vegaembed || flow"></div>
-let dync = false;
 function renderVegaElements(vegaElements, vegaLiteElements, options) {
   if (!vegaElements.length && !vegaLiteElements.length) {
     return false;
   }
 
-  const sync = hasVegaEmbed();
-  if (typeof window !== 'undefined') {
-    if (!sync && !dync) {
-      dync = true;
-      cdnjs
-        .loadScript('vega')
-        .then(() => {
-          return cdnjs.loadScript('vegaLite');
-        })
-        .then(() => {
-          return cdnjs.loadScript('vegaEmbed');
-        })
-        .then(name => {
-          vegaEmbed = cdnjs.interopDefault(window[name]);
-        });
-    }
-  }
-
   vegaElements.forEach(element => {
-    renderVega(element, options, false, sync);
+    renderVega(element, options, false);
   });
   vegaLiteElements.forEach(element => {
-    renderVega(element, options, true, sync);
+    renderVega(element, options, true);
   });
   return true;
 }

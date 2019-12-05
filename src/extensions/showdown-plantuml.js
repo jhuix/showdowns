@@ -22,12 +22,21 @@ function renderPlantumlElements(elements, config) {
     const langattr = element.dataset.lang;
     const langobj = langattr ? JSON.parse(langattr) : null;
     let diagramClass = '';
-    if (langobj && langobj.align) {
-      //default left
-      if (langobj.align === 'center') {
-        diagramClass = 'diagram-center';
-      } else if (langobj.align === 'right') {
-        diagramClass = 'diagram-right';
+    if (langobj) {
+      if (
+        (typeof langobj.codeblock === 'boolean' && langobj.codeblock) ||
+        (typeof langobj.codeblock === 'string' && langobj.codeblock.toLowerCase() === 'true')
+      ) {
+        return;
+      }
+
+      if (langobj.align) {
+        //default left
+        if (langobj.align === 'center') {
+          diagramClass = 'diagram-center';
+        } else if (langobj.align === 'right') {
+          diagramClass = 'diagram-right';
+        }
       }
     }
     const code = element.textContent.trim();

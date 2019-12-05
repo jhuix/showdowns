@@ -19,21 +19,46 @@ function hasRailroad() {
   return railroad;
 }
 
+let dync = false;
+function dyncLoadScript() {
+  const sync = hasRailroad();
+  if (typeof window !== 'undefined') {
+    if (!sync && !dync) {
+      dync = true;
+      cdnjs.loadStyleSheet('railroadCSS');
+      cdnjs.loadScript('railroad').then(() => {
+        railroad = true;
+      });
+    }
+  }
+  return sync;
+}
+
 /**
  * render railroad graphs
  */
-function renderRailroad(element, sync) {
+function renderRailroad(element) {
   const langattr = element.dataset.lang;
   const langobj = langattr ? JSON.parse(langattr) : null;
   let diagramClass = '';
-  if (langobj && langobj.align) {
-    //default left
-    if (langobj.align === 'center') {
-      diagramClass = 'diagram-center';
-    } else if (langobj.align === 'right') {
-      diagramClass = 'diagram-right';
+  if (langobj) {
+    if (
+      (typeof langobj.codeblock === 'boolean' && langobj.codeblock) ||
+      (typeof langobj.codeblock === 'string' && langobj.codeblock.toLowerCase() === 'true')
+    ) {
+      return;
+    }
+
+    if (langobj.align) {
+      //default left
+      if (langobj.align === 'center') {
+        diagramClass = 'diagram-center';
+      } else if (langobj.align === 'right') {
+        diagramClass = 'diagram-right';
+      }
     }
   }
+  const sync = dyncLoadScript();
   const code = element.textContent.trim();
   const name =
     (element.classList.length > 0 ? element.classList[0] : '') +
@@ -63,25 +88,13 @@ function renderRailroad(element, sync) {
 }
 
 // <div class="railroad"></div>
-let dync = false;
 function renderRailroadElements(elements) {
   if (!elements.length) {
     return false;
   }
 
-  const sync = hasRailroad();
-  if (typeof window !== 'undefined') {
-    if (!sync && !dync) {
-      dync = true;
-      cdnjs.loadStyleSheet('railroadCSS');
-      cdnjs.loadScript('railroad').then(() => {
-        railroad = true;
-      });
-    }
-  }
-
   elements.forEach(element => {
-    renderRailroad(element, sync);
+    renderRailroad(element);
   });
   return true;
 }

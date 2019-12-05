@@ -19,7 +19,7 @@ import cdnjs from './cdn';
 // }
 
 if (typeof WaveDrom === 'undefined') {
-  var WaveDrom = typeof window !== 'undefined' ? window.WaveDrom || undefined : require('wavedrom');
+  var WaveDrom = window.WaveDrom || undefined;
 }
 
 let wdCount = 0;
@@ -28,21 +28,50 @@ function hasWavedrom() {
   return !!WaveDrom;
 }
 
+let dync = false;
+function dyncLoadScript(skin) {
+  const sync = hasWavedrom();
+  if (!sync && !dync) {
+    dync = true;
+    if (typeof window !== 'undefined') {
+      cdnjs
+        .loadScript({ WaveDromSkin: skin })
+        .then(() => {
+          return cdnjs.loadScript('WaveDrom');
+        })
+        .then(name => {
+          WaveDrom = cdnjs.interopDefault(window[name]);
+        });
+    }
+  }
+  return sync;
+}
+
 /**
  * render wavedrom graphs
  */
-function renderWavedrom(element, sync) {
+function renderWavedrom(element, skin) {
   const langattr = element.dataset.lang;
   const langobj = langattr ? JSON.parse(langattr) : null;
   let diagramClass = '';
-  if (langobj && langobj.align) {
-    //default left
-    if (langobj.align === 'center') {
-      diagramClass = 'diagram-center';
-    } else if (langobj.align === 'right') {
-      diagramClass = 'diagram-right';
+  if (langobj) {
+    if (
+      (typeof langobj.codeblock === 'boolean' && langobj.codeblock) ||
+      (typeof langobj.codeblock === 'string' && langobj.codeblock.toLowerCase() === 'true')
+    ) {
+      return;
+    }
+
+    if (langobj.align) {
+      //default left
+      if (langobj.align === 'center') {
+        diagramClass = 'diagram-center';
+      } else if (langobj.align === 'right') {
+        diagramClass = 'diagram-right';
+      }
     }
   }
+  const sync = dyncLoadScript(skin);
   const code = element.textContent.trim();
   const name =
     (element.classList.length > 0 ? element.classList[0] : '') +
@@ -89,30 +118,14 @@ function renderWavedrom(element, sync) {
 }
 
 // <div class="wavedrom"></div>
-let dync = false;
 function renderWavedromElements(elements, skin) {
   if (!elements.length) {
     return false;
   }
 
   wdCount = elements.length;
-  const sync = hasWavedrom();
-  if (typeof window !== 'undefined') {
-    if (!sync && !dync) {
-      dync = true;
-      cdnjs
-        .loadScript({ WaveDromSkin: skin })
-        .then(() => {
-          return cdnjs.loadScript('WaveDrom');
-        })
-        .then(name => {
-          WaveDrom = cdnjs.interopDefault(window[name]);
-        });
-    }
-  }
-
   elements.forEach(element => {
-    renderWavedrom(element, sync);
+    renderWavedrom(element, skin);
   });
   return true;
 }

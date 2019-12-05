@@ -25,8 +25,6 @@ if (typeof window !== 'undefined') {
       var sequence = window.Diagram;
     }
   }
-} else {
-  var sequence = require('@rokt33r/js-sequence-diagrams');
 }
 
 const themes = ['simple', 'hand'];
@@ -38,21 +36,66 @@ function hasSequence() {
   return !!sequence;
 }
 
+let dync = false;
+function dyncLoadScript() {
+  const sync = hasSequence();
+  if (typeof window !== 'undefined') {
+    if (!sync && !dync) {
+      dync = true;
+      cdnjs.loadStyleSheet('sequenceCSS');
+      cdnjs
+        .loadScript('WebFont')
+        .then(() => {
+          return cdnjs.loadScript('Snap');
+        })
+        .then(() => {
+          return cdnjs.loadScript('underscore');
+        })
+        .then(() => {
+          // You need to save the original Diagrams object of railroad diagrams extension here.
+          if (!diagram && window['Diagram']) {
+            diagram = window['Diagram'];
+          }
+          return cdnjs.loadScript('sequence');
+        })
+        .then(() => {
+          sequence = window['Diagram'];
+          window.SequenceJS = sequence;
+          // You need to replace the original Diagrams object of railroad diagrams extension here.
+          if (diagram) {
+            window['Diagram'] = diagram;
+          }
+        });
+    }
+  }
+  return sync;
+}
+
 /**
  * render sequence graphs
  */
-function renderSequence(element, sync) {
+function renderSequence(element) {
   const langattr = element.dataset.lang;
   const langobj = langattr ? JSON.parse(langattr) : null;
   let diagramClass = '';
-  if (langobj && langobj.align) {
-    //default left
-    if (langobj.align === 'center') {
-      diagramClass = 'diagram-center';
-    } else if (langobj.align === 'right') {
-      diagramClass = 'diagram-right';
+  if (langobj) {
+    if (
+      (typeof langobj.codeblock === 'boolean' && langobj.codeblock) ||
+      (typeof langobj.codeblock === 'string' && langobj.codeblock.toLowerCase() === 'true')
+    ) {
+      return;
+    }
+
+    if (langobj.align) {
+      //default left
+      if (langobj.align === 'center') {
+        diagramClass = 'diagram-center';
+      } else if (langobj.align === 'right') {
+        diagramClass = 'diagram-right';
+      }
     }
   }
+  const sync = dyncLoadScript();
   const code = element.textContent.trim();
   const name = 'js-sequence' + (!diagramClass ? '' : ' ') + diagramClass;
   const id = 'sequence-' + Date.now() + '-' + Math.floor(Math.random() * 10000);
@@ -84,61 +127,17 @@ function renderSequence(element, sync) {
           }
         })
       );
-    } else {
-      new require('events').EventEmitter().emit('sequence', [
-        {
-          detail: {
-            id: id,
-            className: name,
-            data: code,
-            langattr: langattr
-          }
-        }
-      ]);
     }
   }
 }
 
 // <div class="sequence"></div>
-let dync = false;
 function renderSequenceElements(elements) {
   if (!elements.length) {
     return false;
   }
-
-  const sync = hasSequence();
-  if (typeof window !== 'undefined') {
-    if (!sync && !dync) {
-      dync = true;
-      cdnjs.loadStyleSheet('sequenceCSS');
-      cdnjs
-        .loadScript('WebFont')
-        .then(() => {
-          return cdnjs.loadScript('Snap');
-        })
-        .then(() => {
-          return cdnjs.loadScript('underscore');
-        })
-        .then(() => {
-          // You need to save the original Diagrams object of railroad diagrams extension here.
-          if (!diagram && window['Diagram']) {
-            diagram = window['Diagram'];
-          }
-          return cdnjs.loadScript('sequence');
-        })
-        .then(() => {
-          sequence = window['Diagram'];
-          window.SequenceJS = sequence;
-          // You need to replace the original Diagrams object of railroad diagrams extension here.
-          if (diagram) {
-            window['Diagram'] = diagram;
-          }
-        });
-    }
-  }
-
   elements.forEach(element => {
-    renderSequence(element, sync);
+    renderSequence(element);
   });
   return true;
 }

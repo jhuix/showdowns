@@ -19,7 +19,7 @@ import cdnjs from './cdn';
 // }
 
 if (typeof Viz === 'undefined') {
-  var Viz = typeof window !== 'undefined' ? window.Viz || undefined : require('viz.js');
+  var Viz = window.Viz || undefined;
 }
 
 const engines = ['circo', 'dot', 'neato', 'osage', 'twopi'];
@@ -30,21 +30,46 @@ function hasViz() {
     : false;
 }
 
+let dync = false;
+function dyncLoadScript() {
+  const sync = hasViz();
+  if (typeof window !== 'undefined') {
+    if (!sync && !dync) {
+      dync = true;
+      cdnjs.loadScript('Viz').then(name => {
+        Viz = cdnjs.interopDefault(window[name]);
+      });
+      cdnjs.loadScript('VizRender');
+    }
+  }
+  return sync;
+}
+
 /**
  * render Viz graphs
  */
-function renderViz(element, sync) {
+function renderViz(element) {
   const langattr = element.dataset.lang;
   const langobj = langattr ? JSON.parse(langattr) : null;
   let diagramClass = '';
-  if (langobj && langobj.align) {
-    //default left
-    if (langobj.align === 'center') {
-      diagramClass = 'diagram-center';
-    } else if (langobj.align === 'right') {
-      diagramClass = 'diagram-right';
+  if (langobj) {
+    if (
+      (typeof langobj.codeblock === 'boolean' && langobj.codeblock) ||
+      (typeof langobj.codeblock === 'string' && langobj.codeblock.toLowerCase() === 'true')
+    ) {
+      return;
+    }
+
+    if (langobj.align) {
+      //default left
+      if (langobj.align === 'center') {
+        diagramClass = 'diagram-center';
+      } else if (langobj.align === 'right') {
+        diagramClass = 'diagram-right';
+      }
     }
   }
+  const sync = dyncLoadScript();
   const code = element.textContent.trim();
   const name =
     (element.classList.length > 0 ? element.classList[0] : '') +
@@ -85,42 +110,19 @@ function renderViz(element, sync) {
             }
           })
         );
-      } else {
-        new require('events').EventEmitter().emit('dot', [
-          {
-            detail: {
-              id: id,
-              className: name,
-              data: svgData,
-              rendered: true
-            }
-          }
-        ]);
       }
     });
   }
 }
 
 // <div class="dot"></div>
-let dync = false;
 function renderVizElements(elements) {
   if (!elements.length) {
     return false;
   }
 
-  const sync = hasViz();
-  if (typeof window !== 'undefined') {
-    if (!sync && !dync) {
-      dync = true;
-      cdnjs.loadScript('Viz').then(name => {
-        Viz = cdnjs.interopDefault(window[name]);
-      });
-      cdnjs.loadScript('VizRender');
-    }
-  }
-
   elements.forEach(element => {
-    renderViz(element, sync);
+    renderViz(element);
   });
   return true;
 }
