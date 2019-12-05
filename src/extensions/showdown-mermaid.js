@@ -27,7 +27,7 @@ function hasMermaid() {
 }
 
 let dync = false;
-function dyncLoadScript() {
+function dyncLoadScript(config) {
   // When window object exists,
   // it means browser environment, otherwise node.js environment.
   // In browser environment, html need to be rendered asynchronously.
@@ -47,7 +47,7 @@ function dyncLoadScript() {
 /**
  * render mermaid graphs
  */
-function renderMermaid(element) {
+function renderMermaid(element, config) {
   const langattr = element.dataset.lang;
   const langobj = langattr ? JSON.parse(langattr) : null;
   let diagramClass = '';
@@ -68,7 +68,7 @@ function renderMermaid(element) {
       }
     }
   }
-  const sync = dyncLoadScript();
+  const sync = dyncLoadScript(config);
   const code = element.textContent.trim();
   const name =
     (element.classList.length > 0 ? element.classList[0] : '') +
@@ -103,7 +103,7 @@ function renderMermaidElements(elements, config) {
   }
 
   elements.forEach(element => {
-    renderMermaid(element);
+    renderMermaid(element, config);
   });
   return true;
 }
