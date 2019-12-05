@@ -1,5 +1,5 @@
 /*
- * @Description: js-sequence-diagrams showdown extension for markdown
+ * @Description: showdown sequence extension for markdown
  * @Author: Jhuix (Hui Jin) <jhuix0117@gmail.com>
  * @Date: 2019-09-01 11:19:37
  * @LastEditors: Jhuix (Hui Jin) <jhuix0117@gmail.com>
@@ -8,17 +8,25 @@
 
 'use strict';
 
+if (typeof window === 'undefined') {
+  throw Error('The showdown sequence extension can only be used in browser environment!');
+}
+
 import cdnjs from './cdn';
 
 // js-sequence-diagrams can create a global object named Diagrams of window,
 // To be compatible with railroad diagrams extension that also has window.Diagram object,
 // You need to save the original Diagrams object of railroad diagrams extension here.
 let diagram;
-if (typeof window !== 'undefined' && window.Diagram) {
-  diagram = window.Diagram;
-  if (window.Diagram['Signal']) {
-    var sequence = window.Diagram;
+if (typeof window !== 'undefined') {
+  if (window.Diagram) {
+    diagram = window.Diagram;
+    if (window.Diagram['Signal']) {
+      var sequence = window.Diagram;
+    }
   }
+} else {
+  var sequence = require('@rokt33r/js-sequence-diagrams');
 }
 
 const themes = ['simple', 'hand'];
@@ -46,7 +54,7 @@ function renderSequence(element, sync) {
     }
   }
   const code = element.textContent.trim();
-  const name = element.className + (!element.className || !diagramClass ? '' : ' ') + diagramClass;
+  const name = 'js-sequence' + (!diagramClass ? '' : ' ') + diagramClass;
   const id = 'sequence-' + Date.now() + '-' + Math.floor(Math.random() * 10000);
   element.id = id;
   if (!sync && typeof window !== 'undefined' && window.dispatchEvent) {
@@ -92,6 +100,7 @@ function renderSequence(element, sync) {
 }
 
 // <div class="sequence"></div>
+let dync = false;
 function renderSequenceElements(elements) {
   if (!elements.length) {
     return false;
@@ -99,7 +108,8 @@ function renderSequenceElements(elements) {
 
   const sync = hasSequence();
   if (typeof window !== 'undefined') {
-    if (!sync) {
+    if (!sync && !dync) {
+      dync = true;
       cdnjs.loadStyleSheet('sequenceCSS');
       cdnjs
         .loadScript('WebFont')

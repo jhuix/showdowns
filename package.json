@@ -55,6 +55,7 @@
     "autoprefixer": "^9.7.2",
     "cssnano": "^4.1.10",
     "less": "^3.10.3",
+    "postcss-banner": "^3.0.1",
     "postcss-nested": "^4.2.1",
     "postcss-simple-vars": "^5.0.2",
     "rimraf": "^3.0.0",
@@ -66,7 +67,8 @@
     "rollup-plugin-node-globals": "^1.4.0",
     "rollup-plugin-node-resolve": "^5.2.0",
     "rollup-plugin-postcss": "^2.0.3",
-    "rollup-plugin-terser": "^5.1.2"
+    "rollup-plugin-terser": "^5.1.2",
+    "semver": "^6.3.0"
   },
   "dependencies": {
     "@rokt33r/js-sequence-diagrams": "^2.0.6-2",
@@ -74,7 +76,6 @@
     "mermaid": "^8.4.2",
     "railroad-diagrams": "^1.0.0",
     "raphael": "^2.3.0",
-    "semver": "^6.3.0",
     "showdown": "^1.9.1",
     "showdown-katex": "^0.6.0",
     "snapsvg": "^0.5.1",

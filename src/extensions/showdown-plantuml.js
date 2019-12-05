@@ -31,7 +31,10 @@ function renderPlantumlElements(elements, config) {
       }
     }
     const code = element.textContent.trim();
-    const name = element.className + (!element.className || !diagramClass ? '' : ' ') + diagramClass;
+    const name =
+      (element.classList.length > 0 ? element.classList[0] : '') +
+      (!element.className || !diagramClass ? '' : ' ') +
+      diagramClass;
     const imageFormat = config.imageFormat;
     const protocol = window && window.location.protocol;
     const website = (protocol === 'http:' || protocol === 'https:' ? '//' : 'https://') + config.umlWebSite;

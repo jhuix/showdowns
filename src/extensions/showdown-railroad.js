@@ -1,5 +1,5 @@
 /*
- * @Description: railroad-diagrams showdown extension for markdown
+ * @Description: showdown railroad extension for markdown
  * @Author: Jhuix (Hui Jin) <jhuix0117@gmail.com>
  * @Date: 2019-09-01 11:19:37
  * @LastEditors: Jhuix (Hui Jin) <jhuix0117@gmail.com>
@@ -7,6 +7,10 @@
  */
 
 'use strict';
+
+if (typeof window === 'undefined') {
+  throw Error('The showdown railroad extension can only be used in browser environment!');
+}
 
 import cdnjs from './cdn';
 
@@ -31,7 +35,10 @@ function renderRailroad(element, sync) {
     }
   }
   const code = element.textContent.trim();
-  const name = element.className + (!element.className || !diagramClass ? '' : ' ') + diagramClass;
+  const name =
+    (element.classList.length > 0 ? element.classList[0] : '') +
+    (!element.className || !diagramClass ? '' : ' ') +
+    diagramClass;
   const id = 'railroad-' + Date.now() + '-' + Math.floor(Math.random() * 10000);
   if (!sync && typeof window !== 'undefined' && window.dispatchEvent) {
     element.id = id;
@@ -56,6 +63,7 @@ function renderRailroad(element, sync) {
 }
 
 // <div class="railroad"></div>
+let dync = false;
 function renderRailroadElements(elements) {
   if (!elements.length) {
     return false;
@@ -63,7 +71,8 @@ function renderRailroadElements(elements) {
 
   const sync = hasRailroad();
   if (typeof window !== 'undefined') {
-    if (!sync) {
+    if (!sync && !dync) {
+      dync = true;
       cdnjs.loadStyleSheet('railroadCSS');
       cdnjs.loadScript('railroad').then(() => {
         railroad = true;

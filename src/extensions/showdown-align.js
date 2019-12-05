@@ -12,9 +12,7 @@ function renderAlignElements(wrapper) {
   let element = null;
   let childNode = null;
   let result = false;
-  const elements = wrapper.querySelectorAll(
-    'p, li, h1, h2, h3, h4, h5, h6, div.paragraph'
-  );
+  const elements = wrapper.querySelectorAll('p, li, h1, h2, h3, h4, h5, h6, div.paragraph');
   for (let i = 0; i < elements.length; i++) {
     element = elements[i];
     childNode = element.firstChild;
@@ -22,9 +20,7 @@ function renderAlignElements(wrapper) {
       // Text node type is 3.
       if (childNode.nodeType === 3) {
         // Does the element consist of ':-:' or '--:'
-        let results = childNode.nodeValue.match(
-          /^([\s\S]*?)([:-]-:)(?:[\s]?)([\s\S]*)$/
-        );
+        let results = childNode.nodeValue.match(/^([\s\S]*?)([:-]-:)(?:[\s]?)([\s\S]*)$/);
         if (results) {
           if (results[2] === ':-:') {
             // align-center

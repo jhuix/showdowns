@@ -1,5 +1,5 @@
 /*
- * @Description: flowchart.js showdown extension for markdown
+ * @Description: showdown flowchart extension for markdown
  * @Author: Jhuix (Hui Jin) <jhuix0117@gmail.com>
  * @Date: 2019-09-01 11:19:37
  * @LastEditors: Jhuix (Hui Jin) <jhuix0117@gmail.com>
@@ -8,24 +8,34 @@
 
 'use strict';
 
-import raphael from 'raphael';
-import flowchart from 'flowchart.js';
-import cdnjs from './cdn';
-
-if (typeof Raphael === 'undefined') {
-  var Raphael = raphael;
+if (typeof window === 'undefined') {
+  throw Error('The showdown flowchart extension can only be used in browser environment!');
 }
 
-if (typeof Flowchart === 'undefined') {
-  var Flowchart = flowchart;
+import cdnjs from './cdn';
+// import raphael from 'raphael';
+// import flowchart from 'flowchart.js';
+// if (typeof Raphael === 'undefined') {
+//   var Raphael = raphael;
+// }
+// if (typeof Flowchart === 'undefined') {
+//   var Flowchart = flowchart;
+// }
+
+if (typeof Raphael === 'undefined') {
+  var Raphael = typeof window !== 'undefined' ? window.Raphael || undefined : require('raphael');
+}
+
+if (typeof flowchart === 'undefined') {
+  var flowchart = typeof window !== 'undefined' ? window.flowchart || undefined : require('flowchart.js');
 }
 
 function hasFlowchart() {
-  return typeof Raphael !== 'undefined' && Raphael && typeof Flowchart !== 'undefined' && Flowchart ? true : false;
+  return typeof Raphael !== 'undefined' && Raphael && typeof flowchart !== 'undefined' && flowchart ? true : false;
 }
 
 /**
- * render Flowchart graphs
+ * render flowchart graphs
  */
 function renderFlowchart(element, options, sync) {
   const langattr = element.dataset.lang;
@@ -40,7 +50,10 @@ function renderFlowchart(element, options, sync) {
     }
   }
   const code = element.textContent.trim();
-  const name = element.className + (!element.className || !diagramClass ? '' : ' ') + diagramClass;
+  const name =
+    (element.classList.length > 0 ? element.classList[0] : '') +
+    (!element.className || !diagramClass ? '' : ' ') +
+    diagramClass;
   const id = 'flowchart-' + Date.now() + '-' + Math.floor(Math.random() * 10000);
   if (!sync && typeof window !== 'undefined' && window.dispatchEvent) {
     element.id = id;
@@ -59,12 +72,13 @@ function renderFlowchart(element, options, sync) {
     });
   } else {
     element.parentNode.outerHTML = cdnjs.renderCacheElement(element.ownerDocument, id, name, el => {
-      Flowchart.parse(code).drawSVG(el, options);
+      flowchart.parse(code).drawSVG(el, options);
     });
   }
 }
 
 // <div class="flowchart || flow"></div>
+let dync = false;
 function renderFlowchartElements(flowchartElements, flowElements, options) {
   if (!flowchartElements.length && !flowElements.length) {
     return false;
@@ -72,7 +86,8 @@ function renderFlowchartElements(flowchartElements, flowElements, options) {
 
   const sync = hasFlowchart();
   if (typeof window !== 'undefined') {
-    if (!sync) {
+    if (!sync && !dync) {
+      dync = true;
       cdnjs
         .loadScript('Raphael')
         .then(name => {
@@ -80,10 +95,9 @@ function renderFlowchartElements(flowchartElements, flowElements, options) {
           return cdnjs.loadScript('flowchart');
         })
         .then(name => {
-          Flowchart = cdnjs.interopDefault(window[name]);
+          flowchart = cdnjs.interopDefault(window[name]);
         });
     }
-    //sync = false;
   }
 
   flowchartElements.forEach(element => {
@@ -188,7 +202,7 @@ function onRenderFlowchart(element) {
       if (el) {
         el.parentNode.outerHTML = `<div id="${id}" class="${name}"></div>`;
         el = window.document.getElementById(id);
-        Flowchart.parse(data).drawSVG(el ? el : id, res.element.options);
+        flowchart.parse(data).drawSVG(el ? el : id, res.element.options);
       }
     } else {
       setTimeout(() => {

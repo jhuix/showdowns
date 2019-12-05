@@ -22,11 +22,11 @@ import cdnjs from './extensions/cdn';
 
 // Override githubCodeBlocks parser;
 // Support language attribute, see the following format:
-// ```lang {"attr1": "1"}
+// ```lang {"theme": "github", "align": "center"}
 //    code block
 // ```
 // OR
-// ```lang ["attr1", "1"]
+// ```lang ["theme": "vox", "align": "right"]
 //    code block
 // ```
 showdown.subParser('githubCodeBlocks', function(text, options, globals) {
@@ -98,25 +98,35 @@ const getOptions = (options = {}) => {
   };
 };
 
-const getExtensions = (options, extensions = []) => {
+const getExtensions = (options, extensions = {}) => {
   const mermaidOptions = options ? options.mermaid || {} : {};
   const plantumlOptions = options ? options.plantuml || {} : {};
   const vegaOptions = options ? options.vega || {} : {};
 
-  return [
-    showdownToc,
-    showdownAlign,
-    showdownFootnotes,
-    showdownMermaid(mermaidOptions),
-    showdownFlowchart,
-    showdownRailroad,
-    showdownViz,
-    showdownSequence,
-    showdownKatex,
-    showdownVega(vegaOptions),
-    showdownWavedrom,
-    showdownPlantuml(plantumlOptions)
-  ].concat(extensions ? extensions : []);
+  const exts = {
+    'showdown-toc': showdownToc,
+    'showdown-align': showdownAlign,
+    'showdown-footnotes': showdownFootnotes,
+    'showdown-mermaid': showdownMermaid(mermaidOptions),
+    'showdown-flowchart': showdownFlowchart,
+    'showdown-railroad': showdownRailroad,
+    'showdown-viz': showdownViz,
+    'showdown-sequence': showdownSequence,
+    'showdown-katex': showdownKatex,
+    'showdown-vega': showdownVega(vegaOptions),
+    'showdown-wavedrom': showdownWavedrom,
+    'showdown-plantuml': showdownPlantuml(plantumlOptions),
+    ...extensions
+  };
+
+  let extnames = [];
+  for (let prop in exts) {
+    if (exts.hasOwnProperty(prop)) {
+      showdown.extension(prop, exts[prop]);
+      extnames.push(prop);
+    }
+  }
+  return extnames;
 };
 
 // defaultOptions.vega is EmbedOptions of vega-embed;
@@ -132,7 +142,7 @@ const showdowns = {
     mermaid: { theme: 'default' },
     vega: { theme: 'vox' }
   },
-  defaultExtensions: [],
+  defaultExtensions: {},
   markdownDecodeFilter: function(doc) {
     return '';
   },
@@ -147,6 +157,13 @@ const showdowns = {
     }
   },
   addOptions: function(options) {
+    for (const key in options) {
+      if (key === 'flavor') {
+        this.showdown.setFlavor(options[key]);
+      } else {
+        this.showdown.setOption(key, options[key]);
+      }
+    }
     if (this.converter) {
       for (const key in options) {
         if (key === 'flavor') {
@@ -157,10 +174,32 @@ const showdowns = {
       }
     }
   },
-  addExtensions: function(extensions) {
-    if (this.converter) {
-      this.converter.addExtension(extensions);
+  addExtension: function(name, extension) {
+    this.removeExtension(name);
+    if (typeof name === 'string') {
+      try {
+        showdown.extension(name, extension);
+        if (this.converter) {
+          this.converter.addExtension(name);
+        }
+      } catch (err) {
+        console.log(err);
+      }
     }
+  },
+  removeExtension: function(name) {
+    if (typeof name !== 'string') return;
+    if (this.converter) {
+      let ext = null;
+      try {
+        ext = showdown.extension(name);
+      } catch (err) {
+        console.log(err);
+      }
+      if (!ext) return;
+      this.converter.removeExtension(ext);
+    }
+    showdown.removeExtension(name);
   },
   setCDN: function(cdnname, defScheme, distScheme) {
     if (typeof cdnname === 'string' && cdnname) {
@@ -172,8 +211,11 @@ const showdowns = {
     if (typeof options !== 'object' || !options) options = {};
     this.defaultOptions.showdown = Object.assign(this.defaultOptions.showdown || {}, options);
     const flavor = this.defaultOptions.showdown.flavor;
-    if (flavor && ['github', 'ghost', 'vanilla', 'allOn'].indexOf(flavor) === -1) {
+    if (flavor && ['github', 'ghost', 'vanilla'].indexOf(flavor) === -1) {
       this.defaultOptions.showdown.flavor = 'github';
+    }
+    if (this.converter) {
+      this.addOptions(this.defaultOptions.showdown);
     }
     return this.defaultOptions.showdown;
   },
@@ -185,6 +227,9 @@ const showdowns = {
     if (imageFormat && ['svg', 'png', 'jpg'].indexOf(imageFormat) === -1) {
       this.defaultOptions.plantuml.imageFormat = 'png';
     }
+    if (this.converter) {
+      this.addExtension('showdown-plantuml', showdownPlantuml(this.defaultOptions.plantuml));
+    }
     return this.defaultOptions.plantuml;
   },
   setMermaidOptions: function(options) {
@@ -194,6 +239,9 @@ const showdowns = {
     const theme = this.defaultOptions.mermaid.theme;
     if (theme && ['default', 'forest', 'dark', 'neutral'].indexOf(theme) === -1) {
       this.defaultOptions.mermaid.theme = 'default';
+    }
+    if (this.converter) {
+      this.addExtension('showdown-mermaid', showdownMermaid(this.defaultOptions.mermaid));
     }
     return this.defaultOptions.mermaid;
   },
@@ -209,9 +257,12 @@ const showdowns = {
     if (renderer && ['canvas', 'svg', 'none'].indexOf(renderer) === -1) {
       this.defaultOptions.vega.renderer = 'canvas';
     }
+    if (this.converter) {
+      this.addExtension('showdown-vega', showdownVega(this.defaultOptions.vega));
+    }
     return this.defaultOptions.vega;
   },
-  init: function() {
+  init: function(reset) {
     if (!this.converter) {
       const showdownOptions = this.defaultOptions ? this.defaultOptions.showdown || {} : {};
       const options = getOptions(showdownOptions);
@@ -248,6 +299,25 @@ const showdowns = {
           }
         }
       };
+    } else {
+      let resetOptions = {};
+      if (typeof reset === 'boolean' && reset) {
+        resetOptions = { option: true, extension: true };
+      } else {
+        resetOptions = reset;
+      }
+      if (typeof resetOptions === 'object') {
+        if (resetOptions.hasOwnProperty('option') && resetOptions.option) {
+          const showdownOptions = this.defaultOptions ? this.defaultOptions.showdown || {} : {};
+          const options = getOptions(showdownOptions);
+          this.addOptions(options);
+        }
+        if (resetOptions.hasOwnProperty('extension') && resetOptions.extension) {
+          this.addExtension('showdown-mermaid', showdownMermaid(this.defaultOptions.mermaid));
+          this.addExtension('showdown-vega', showdownVega(this.defaultOptions.vega));
+          this.addExtension('showdown-plantuml', showdownPlantuml(this.defaultOptions.plantuml));
+        }
+      }
     }
     return this;
   },
@@ -285,13 +355,13 @@ const showdowns = {
     } else {
       content = '';
     }
-    return `<div class='markdown-preview'>${content}</div>`;
+    return `<div class='showdowns'>${content}</div>`;
   },
   zDecode: function(zContent) {
-    return zlibcodec.decode(zContent);
+    return zlibcodec.zDecode(zContent);
   },
   zEncode: function(content) {
-    return zlibcodec.encode(content);
+    return zlibcodec.zEncode(content);
   }
 };
 

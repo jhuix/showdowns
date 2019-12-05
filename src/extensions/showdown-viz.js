@@ -1,5 +1,5 @@
 /*
- * @Description: Viz.js showdown extension for markdown
+ * @Description: showdown viz extension for markdown
  * @Author: Jhuix (Hui Jin) <jhuix0117@gmail.com>
  * @Date: 2019-09-01 11:19:37
  * @LastEditors: Jhuix (Hui Jin) <jhuix0117@gmail.com>
@@ -8,11 +8,18 @@
 
 'use strict';
 
-import viz from 'viz.js';
+if (typeof window === 'undefined') {
+  throw Error('The showdown viz extension can only be used in browser environment!');
+}
+
 import cdnjs from './cdn';
+// import viz from 'viz.js';
+// if (typeof Viz === 'undefined') {
+//   var Viz = viz;
+// }
 
 if (typeof Viz === 'undefined') {
-  var Viz = viz;
+  var Viz = typeof window !== 'undefined' ? window.Viz || undefined : require('viz.js');
 }
 
 const engines = ['circo', 'dot', 'neato', 'osage', 'twopi'];
@@ -39,7 +46,10 @@ function renderViz(element, sync) {
     }
   }
   const code = element.textContent.trim();
-  const name = element.className + (!element.className || !diagramClass ? '' : ' ') + diagramClass;
+  const name =
+    (element.classList.length > 0 ? element.classList[0] : '') +
+    (!element.className || !diagramClass ? '' : ' ') +
+    diagramClass;
   const id = 'viz-' + Date.now() + '-' + Math.floor(Math.random() * 10000);
   element.id = id;
   if (!sync && typeof window !== 'undefined' && window.dispatchEvent) {
@@ -92,6 +102,7 @@ function renderViz(element, sync) {
 }
 
 // <div class="dot"></div>
+let dync = false;
 function renderVizElements(elements) {
   if (!elements.length) {
     return false;
@@ -99,7 +110,8 @@ function renderVizElements(elements) {
 
   const sync = hasViz();
   if (typeof window !== 'undefined') {
-    if (!sync) {
+    if (!sync && !dync) {
+      dync = true;
       cdnjs.loadScript('Viz').then(name => {
         Viz = cdnjs.interopDefault(window[name]);
       });

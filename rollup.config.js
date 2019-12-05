@@ -21,18 +21,23 @@ import postcss from 'rollup-plugin-postcss';
 import autoprefixer from 'autoprefixer';
 import simplevars from 'postcss-simple-vars';
 import nested from 'postcss-nested';
+import banner from 'postcss-banner';
 
 const isMinBuild = process.env.MIN === 'true';
 const isFormatCJS = process.env.TARGET === 'cjs';
 const isDemoBuild = process.env.DEMO === 'true';
 const isWithBrotli = process.env.BROTLI === 'true';
 const version = process.env.VERSION || pkg.version;
-const banner =
+const jsbanner =
   '/*!\n' +
   ` * showdowns.js v${version}\n` +
   ` * Copyright (c) 2019-present, Jhuix (Hui Jin) <jhuix0117@gmail.com>\n` +
   ' * Released under the MIT License.\n' +
   ' */';
+const cssbanner =
+  `css of showdowns v${version}\n` +
+  'Copyright (c) 2019-present, Jhuix (Hui Jin) <jhuix0117@gmail.com>\n' +
+  'Released under the MIT License.';
 
 // 处理import '.wasm'文件的rollup plugin
 const wasm = function() {
@@ -54,9 +59,7 @@ const wasm = function() {
     transform(code, id) {
       if (code && /\.wasm$/.test(id)) {
         const src = Buffer.from(code, 'binary').toString('base64');
-        const wasm_module_dir =
-          path.relative(path.dirname(id), path.join(__dirname, 'src/utils')) ||
-          '.';
+        const wasm_module_dir = path.relative(path.dirname(id), path.join(__dirname, 'src/utils')) || '.';
         return {
           code: `import wasmModule from '${wasm_module_dir}/wasm-module.js'
                 export default function(imports){ return wasmModule(false, '${src}', imports) }`,
@@ -76,7 +79,7 @@ const config = {
     // 打包后的全局变量，如浏览器端 window.showdowns;
     name: 'showdowns',
     sourcemap: true,
-    banner: banner,
+    banner: jsbanner,
     globals: {
       raphael: 'Raphael',
       'flowchart.js': 'flowchart',
@@ -84,10 +87,11 @@ const config = {
       mermaid: 'mermaid',
       katex: 'katex',
       wavedrom: 'WaveDrom',
-      "vega": 'vega',
-      "vega-lite": 'vegaLite',
-      "vega-embed": 'vegaEmbed'
-     }
+      vega: 'vega',
+      'vega-lite': 'vegaLite',
+      'vega-embed': 'vegaEmbed',
+      '@rokt33r/js-sequence-diagrams': 'Diagram'
+    }
   },
   onwarn: (msg, warn) => {
     if (!/Circular/.test(msg)) {
@@ -95,17 +99,7 @@ const config = {
     }
   },
   // 作用：指出应将哪些模块视为外部模块，否则会被打包进最终的代码里
-  external: [
-    'mermaid',
-    'katex',
-    'raphael',
-    'flowchart.js',
-    'viz.js',
-    'wavedrom',
-    'vega',
-    'vega-lite',
-    'vega-embed'
-  ],
+  external: ['mermaid', 'katex', 'raphael', 'flowchart.js', 'viz.js', 'wavedrom', 'vega', 'vega-lite', 'vega-embed', '@rokt33r/js-sequence-diagrams'],
   plugins: [
     json(),
     postcss({
@@ -113,7 +107,15 @@ const config = {
       extract: true,
       minimize: isMinBuild,
       extensions: ['.css', '.less'],
-      plugins: [autoprefixer(), simplevars(), nested()],
+      plugins: [
+        autoprefixer(),
+        simplevars(),
+        nested(),
+        banner({
+          banner: cssbanner,
+          important: true
+        })
+      ],
       loaders: [
         {
           //生成CJS格式时，不处理node_modules目录下的相关CSS文件
@@ -132,17 +134,9 @@ const config = {
 };
 
 if (isFormatCJS) {
-  config.external.push(
-    'showdown',
-    'zlib',
-    'katex/dist/contrib/auto-render',
-    'showdown-katex/src/asciimath-to-tex'
-  );
+  config.external.push('showdown', 'zlib', 'katex/dist/contrib/auto-render', 'showdown-katex/src/asciimath-to-tex');
 } else {
-  config.output.file = pkg.browser.replace(
-    '.min.js',
-    isWithBrotli ? '.br.js' : '.js'
-  );
+  config.output.file = pkg.browser.replace('.min.js', isWithBrotli ? '.br.js' : '.js');
   // 输出UMD格式，各种模块规范通用
   config.output.format = 'umd';
   config.plugins.push(

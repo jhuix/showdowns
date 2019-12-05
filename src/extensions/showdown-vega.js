@@ -1,5 +1,5 @@
 /*
- * @Description: vega and vega-lite showdown extension for markdown
+ * @Description: showdown vega extension for markdown
  * @Author: Jhuix (Hui Jin) <jhuix0117@gmail.com>
  * @Date: 2019-09-01 11:19:37
  * @LastEditors: Jhuix (Hui Jin) <jhuix0117@gmail.com>
@@ -8,15 +8,22 @@
 
 'use strict';
 
-import vegaEmbed from 'vega-embed';
-import cdnjs from './cdn';
+if (typeof window === 'undefined') {
+  throw Error('The showdown vega extension can only be used in browser environment!');
+}
 
-if (typeof VegaEmbed === 'undefined') {
-  var VegaEmbed = vegaEmbed;
+import cdnjs from './cdn';
+// import vegaEmbed from 'vega-embed';
+// if (typeof VegaEmbed === 'undefined') {
+//   var VegaEmbed = vegaEmbed;
+// }
+
+if (typeof vegaEmbed === 'undefined') {
+  var vegaEmbed = typeof window !== 'undefined' ? window.vegaEmbed || undefined : require('vega-embed');
 }
 
 function hasVegaEmbed() {
-  return typeof VegaEmbed !== 'undefined' && VegaEmbed ? true : false;
+  return typeof vegaEmbed !== 'undefined' && vegaEmbed ? true : false;
 }
 
 /**
@@ -35,16 +42,34 @@ function renderVega(element, options, isVegaLite, sync) {
     }
   }
   const code = element.textContent.trim();
-  const name = element.className + (!element.className || !diagramClass ? '' : ' ') + diagramClass;
+  const name =
+    (element.classList.length > 0 ? element.classList[0] : '') +
+    (!element.className || !diagramClass ? '' : ' ') +
+    diagramClass;
   const id = 'vega-' + Date.now() + '-' + Math.floor(Math.random() * 10000);
-  if (!sync && typeof window !== 'undefined' && window.dispatchEvent) {
-    element.id = id;
-    Promise.resolve(id).then(elementid => {
+  element.id = id;
+  if (typeof window !== 'undefined' && window.dispatchEvent) {
+    if (!sync) {
+      Promise.resolve(id).then(elementid => {
+        // dispatch vegaembed custom event
+        window.dispatchEvent(
+          new CustomEvent('vega', {
+            detail: {
+              id: elementid,
+              className: name,
+              data: code,
+              options: options,
+              isVegaLite: isVegaLite
+            }
+          })
+        );
+      });
+    } else {
       // dispatch vegaembed custom event
       window.dispatchEvent(
         new CustomEvent('vega', {
           detail: {
-            id: elementid,
+            id: id,
             className: name,
             data: code,
             options: options,
@@ -52,15 +77,29 @@ function renderVega(element, options, isVegaLite, sync) {
           }
         })
       );
-    });
+    }
   } else {
-    element.parentNode.outerHTML = cdnjs.renderCacheElement(element.ownerDocument, id, name, el => {
-      VegaEmbed(el, JSON.parse(code), options);
-    });
+    new require('events').EventEmitter().emit('vega', [
+      {
+        detail: {
+          id: elementid,
+          className: name,
+          data: code,
+          options: options,
+          isVegaLite: isVegaLite
+        }
+      }
+    ]);
   }
+  // else {
+  //   element.parentNode.outerHTML = cdnjs.renderCacheElement(element.ownerDocument, id, name, el => {
+  //     vegaEmbed(el, JSON.parse(code), options);
+  //   });
+  // }
 }
 
 // <div class="vegaembed || flow"></div>
+let dync = false;
 function renderVegaElements(vegaElements, vegaLiteElements, options) {
   if (!vegaElements.length && !vegaLiteElements.length) {
     return false;
@@ -68,7 +107,8 @@ function renderVegaElements(vegaElements, vegaLiteElements, options) {
 
   const sync = hasVegaEmbed();
   if (typeof window !== 'undefined') {
-    if (!sync) {
+    if (!sync && !dync) {
+      dync = true;
       cdnjs
         .loadScript('vega')
         .then(() => {
@@ -78,10 +118,9 @@ function renderVegaElements(vegaElements, vegaLiteElements, options) {
           return cdnjs.loadScript('vegaEmbed');
         })
         .then(name => {
-          VegaEmbed = cdnjs.interopDefault(window[name]);
+          vegaEmbed = cdnjs.interopDefault(window[name]);
         });
     }
-    //sync = false;
   }
 
   vegaElements.forEach(element => {
@@ -97,6 +136,7 @@ function renderVegaElements(vegaElements, vegaLiteElements, options) {
 const getOptions = (userOptions = {}) => ({
   actions: { editor: false },
   theme: 'vox',
+  tooltip: false,
   ...userOptions
 });
 
@@ -110,7 +150,7 @@ function onRenderVega(element) {
       if (el) {
         el.parentNode.outerHTML = `<div id="${id}" class="${name}"></div>`;
         el = window.document.getElementById(id);
-        VegaEmbed(el, JSON.parse(data), res.element.options);
+        vegaEmbed(el, JSON.parse(data), res.element.options);
       }
     } else {
       setTimeout(() => {

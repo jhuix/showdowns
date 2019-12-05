@@ -8,15 +8,18 @@
 
 'use strict';
 
-import mermaid from 'mermaid';
 import cdnjs from './cdn';
+// import mermaid from 'mermaid';
+// if (typeof Mermaid === 'undefined') {
+//   var Mermaid = mermaid;
+// }
 
-if (typeof Mermaid === 'undefined') {
-  var Mermaid = mermaid;
+if (typeof mermaid === 'undefined') {
+  var mermaid = typeof window !== 'undefined' ? window.mermaid || undefined : require('mermaid');
 }
 
 function hasMermaid() {
-  return typeof Mermaid !== 'undefined' && Mermaid ? true : false;
+  return typeof mermaid !== 'undefined' && mermaid ? true : false;
 }
 
 /**
@@ -35,7 +38,10 @@ function renderMermaid(element, sync) {
     }
   }
   const code = element.textContent.trim();
-  const name = element.className + (!element.className || !diagramClass ? '' : ' ') + diagramClass;
+  const name =
+    (element.classList.length > 0 ? element.classList[0] : '') +
+    (!element.className || !diagramClass ? '' : ' ') +
+    diagramClass;
   const id = 'mermaid-' + Date.now() + '-' + Math.floor(Math.random() * 10000);
   if (!sync && typeof window !== 'undefined' && window.dispatchEvent) {
     element.id = id;
@@ -52,13 +58,14 @@ function renderMermaid(element, sync) {
       );
     });
   } else {
-    Mermaid.render(id, code, svgCode => {
+    mermaid.render(id, code, svgCode => {
       element.parentNode.outerHTML = `<div class="${name}">${svgCode}</div>`;
     });
   }
 }
 
 // <div class="mermaid"></div>
+let dync = false;
 function renderMermaidElements(elements, config) {
   if (!elements.length) {
     return false;
@@ -69,10 +76,11 @@ function renderMermaidElements(elements, config) {
   // In browser environment, html need to be rendered asynchronously.
   const sync = hasMermaid();
   if (typeof window !== 'undefined') {
-    if (!sync) {
+    if (!sync && !dync) {
+      dync = true;
       cdnjs.loadScript('mermaid').then(name => {
-        Mermaid = cdnjs.interopDefault(window[name]);
-        Mermaid.initialize(config);
+        mermaid = cdnjs.interopDefault(window[name]);
+        mermaid.initialize(config);
       });
     }
   }
@@ -110,7 +118,7 @@ function onRenderMermaid(element) {
       let el = window.document.getElementById(id);
       if (el) {
         const svgId = 'mermaid-' + Date.now() + '-' + Math.floor(Math.random() * 10000);
-        Mermaid.render(svgId, data, svgCode => {
+        mermaid.render(svgId, data, svgCode => {
           el.parentNode.outerHTML = `<div class="${name}">${svgCode}</div>`;
         });
       }
@@ -133,7 +141,7 @@ function showdownMermaid(userConfig) {
       }
     });
   } else {
-    Mermaid.initialize(config);
+    mermaid.initialize(config);
   }
 
   return [

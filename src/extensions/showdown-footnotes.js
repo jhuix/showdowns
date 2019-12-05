@@ -7,25 +7,20 @@
  * Reference website: https://github.com/Kriegslustig/showdown-footnotes
  */
 
-"use strict";
+'use strict';
 
 function showdownFootnotes() {
   return [
     {
-      type: "lang",
+      type: 'lang',
       filter: (text, converter) =>
-        text.replace(
-          /^\[\^([\d\w]+)\]:\s*((\n+(\s{2,4}|\t).+)+)$/gm,
-          (str, name, rawContent, _, padding) => {
-            const content = converter.makeHtml(
-              rawContent.replace(new RegExp(`^${padding}`, "gm"), "")
-            );
-            return `<div class="footnote" id="footnote-${name}"><a href="#footnote-${name}"><sup>[${name}]</sup></a>:${content}</div>`;
-          }
-        )
+        text.replace(/^\[\^([\d\w]+)\]:\s*((\n+(\s{2,4}|\t).+)+)$/gm, (str, name, rawContent, _, padding) => {
+          const content = converter.makeHtml(rawContent.replace(new RegExp(`^${padding}`, 'gm'), ''));
+          return `<div class="footnote" id="footnote-${name}"><a href="#footnote-${name}"><sup>[${name}]</sup></a>:${content}</div>`;
+        })
     },
     {
-      type: "lang",
+      type: 'lang',
       filter: text =>
         text.replace(
           /^\[\^([\d\w]+)\]:( |\n)((.+\n)*.+)$/gm,
@@ -34,12 +29,9 @@ function showdownFootnotes() {
         )
     },
     {
-      type: "lang",
+      type: 'lang',
       filter: text =>
-        text.replace(
-          /\[\^([\d\w]+)\]/m,
-          (str, name) => `<a href="#footnote-${name}"><sup>[${name}]</sup></a>`
-        )
+        text.replace(/\[\^([\d\w]+)\]/m, (str, name) => `<a href="#footnote-${name}"><sup>[${name}]</sup></a>`)
     }
   ];
 }

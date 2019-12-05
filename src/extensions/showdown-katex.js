@@ -1,6 +1,7 @@
 /** !
-Modified by jhuix, 2019 (c) https://github.com/jhuix/showdowns
-Based on showdown-katex.js, Version 0.6.0, Copyright (c) 2016 obedm503 https://github.com/obedm503/showdown-katex.git
+Showdown katex extension for markdown,
+Modified by jhuix, 2019 (c) https://github.com/jhuix/showdowns.
+Based on showdown-katex.js, Version 0.6.0, Copyright (c) 2016 obedm503 https://github.com/obedm503/showdown-katex.git.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the 'Software'), to deal
@@ -21,13 +22,16 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-import katex from 'katex';
 import renderMathInElement from 'katex/dist/contrib/auto-render';
 import asciimathToTex from 'showdown-katex/src/asciimath-to-tex';
 import cdnjs from './cdn';
+// import katex from 'katex';
+// if (typeof Katex === 'undefined') {
+//   var Katex = katex;
+// }
 
-if (typeof Katex === 'undefined') {
-  var Katex = katex;
+if (typeof katex === 'undefined') {
+  var katex = typeof window !== 'undefined' ? window.katex || undefined : require('katex');
 }
 
 if (typeof RenderMathInElement === 'undefined') {
@@ -37,10 +41,7 @@ if (typeof RenderMathInElement === 'undefined') {
 let katexElementCount = 0;
 
 function hasKatex() {
-  return typeof RenderMathInElement !== 'undefined' &&
-    RenderMathInElement &&
-    typeof Katex !== 'undefined' &&
-    Katex
+  return typeof RenderMathInElement !== 'undefined' && RenderMathInElement && typeof katex !== 'undefined' && katex
     ? true
     : false;
 }
@@ -59,7 +60,10 @@ function renderKatex(element, config, isAsciimath, sync) {
       diagramClass = 'diagram-right';
     }
   }
-  const name = element.className + (!element.className || !diagramClass ? '' : ' ') + diagramClass;
+  const name =
+    (element.classList.length > 0 ? element.classList[0] : '') +
+    (!element.className || !diagramClass ? '' : ' ') +
+    diagramClass;
   if (!sync && typeof window !== 'undefined' && window.dispatchEvent) {
     const id = 'katex-' + Date.now() + '-' + Math.floor(Math.random() * 10000);
     element.id = id;
@@ -78,11 +82,12 @@ function renderKatex(element, config, isAsciimath, sync) {
       );
     });
   } else {
-    const html = Katex.renderToString(code, config);
+    const html = katex.renderToString(code, config);
     element.parentNode.outerHTML = `<div title="${latex}" class="${name}">${html}</div>`;
   }
 }
 
+let dync = false;
 function renderBlockElements(latex, asciimath, config) {
   if (!latex.length && !asciimath.length) {
     return;
@@ -91,10 +96,11 @@ function renderBlockElements(latex, asciimath, config) {
   katexElementCount = latex.length + asciimath.length;
   const sync = hasKatex();
   if (typeof window !== 'undefined') {
-    if (!sync) {
+    if (!sync && !dync) {
+      dync = true;
       cdnjs.loadStyleSheet('katexCSS');
       cdnjs.loadScript('katex').then(name => {
-        Katex = cdnjs.interopDefault(window[name]);
+        katex = cdnjs.interopDefault(window[name]);
       });
     }
   }
@@ -117,7 +123,7 @@ function onRenderKatex(element) {
       const config = res.element.options;
       const el = window.document.getElementById(id);
       if (el) {
-        const html = Katex.renderToString(data, config);
+        const html = katex.renderToString(data, config);
         el.parentNode.outerHTML = `<div title="${input}" class="${name}">${html}</div>`;
       }
       --katexElementCount;
@@ -159,10 +165,7 @@ const showdownKatex = userConfig => {
   const asciimathDelimiters = config.delimiters
     .filter(item => item.asciimath)
     .map(({ left, right }) => {
-      const test = new RegExp(
-        `${escapeRegExp(left)}(.*?)${escapeRegExp(right)}`,
-        'g'
-      );
+      const test = new RegExp(`${escapeRegExp(left)}(.*?)${escapeRegExp(right)}`, 'g');
       const replacer = (match, asciimath) => {
         return `${left}${asciimathToTex(asciimath)}${right}`;
       };
@@ -207,9 +210,7 @@ const showdownKatex = userConfig => {
 
         // find the math in code blocks
         const latex = wrapper.querySelectorAll('code.latex.language-latex');
-        const asciimath = wrapper.querySelectorAll(
-          'code.asciimath.language-asciimath'
-        );
+        const asciimath = wrapper.querySelectorAll('code.asciimath.language-asciimath');
 
         renderBlockElements(latex, asciimath, config);
         // return html without the wrapper

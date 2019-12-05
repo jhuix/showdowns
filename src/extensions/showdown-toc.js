@@ -5,18 +5,18 @@
  * @LastEditors: Jhuix (Hui Jin) <jhuix0117@gmail.com>
  * @LastEditTime: 2019-10-27 18:23:00
  */
-"use strict";
+'use strict';
 
 function createHeadingElement(wrapper, element, toc, nexthead) {
   if (nexthead) {
-    toc = toc.appendChild(wrapper.ownerDocument.createElement("ul"));
+    toc = toc.appendChild(wrapper.ownerDocument.createElement('ul'));
   }
 
   const child = toc
-    .appendChild(wrapper.ownerDocument.createElement("li"))
-    .appendChild(wrapper.ownerDocument.createElement("a"));
+    .appendChild(wrapper.ownerDocument.createElement('li'))
+    .appendChild(wrapper.ownerDocument.createElement('a'));
   child.appendChild(wrapper.ownerDocument.createTextNode(element.textContent));
-  child.href = "#" + element.id;
+  child.href = '#' + element.id;
   return toc;
 }
 
@@ -36,8 +36,7 @@ function appendTocElement(wrapper, element, currTocNode, headingLevel) {
       tempTocNode.headingLevel = null;
       tempTocNode.preLevel = null;
     }
-    if (currTocNode)
-      appendTocElement(wrapper, element, currTocNode, headingLevel);
+    if (currTocNode) appendTocElement(wrapper, element, currTocNode, headingLevel);
     return currTocNode;
   }
 
@@ -46,12 +45,7 @@ function appendTocElement(wrapper, element, currTocNode, headingLevel) {
   // you need to create a new level heading with out list.
   // Otherwise add a heading of the same heading level.
   if (headingLevel > currTocNode.preLevel) {
-    currTocNode.toc = createHeadingElement(
-      wrapper,
-      element,
-      currTocNode.toc,
-      true
-    );
+    currTocNode.toc = createHeadingElement(wrapper, element, currTocNode.toc, true);
     currTocNode.preLevel = headingLevel;
   } else {
     while (headingLevel < currTocNode.preLevel) {
@@ -61,8 +55,7 @@ function appendTocElement(wrapper, element, currTocNode, headingLevel) {
     createHeadingElement(wrapper, element, currTocNode.toc, false);
   }
 
-  if (currTocNode.parentNode)
-    appendTocElement(wrapper, element, currTocNode.parentNode, headingLevel);
+  if (currTocNode.parentNode) appendTocElement(wrapper, element, currTocNode.parentNode, headingLevel);
   return currTocNode;
 }
 
@@ -71,16 +64,16 @@ function renderTocElements(wrapper) {
   let headingLevel = 0;
   let currTocNode = null;
   let result = false;
-  const elements = wrapper.querySelectorAll("p,h1,h2,h3,h4,h5,h6");
+  const elements = wrapper.querySelectorAll('p,h1,h2,h3,h4,h5,h6');
   for (let i = 0; i < elements.length; i++) {
     element = elements[i];
 
     // Match the element text is [toc].
     // And replace this element with out list that classname is 'showdown-toc'.
-    if (element.textContent.trim().toLowerCase() == "[toc]") {
+    if (element.textContent.trim().toLowerCase() == '[toc]') {
       // New table of contents container.
-      let toc = wrapper.ownerDocument.createElement("ul");
-      toc.className = "showdown-toc";
+      let toc = wrapper.ownerDocument.createElement('ul');
+      toc.className = 'showdown-toc';
       element.parentNode.replaceChild(toc, element);
       let tocNode = {
         parentNode: null,
@@ -117,26 +110,21 @@ function renderTocElements(wrapper) {
     }
     // That's going to be what we use as contents entries
     // for this table of contents.
-    else if (element["tagName"]) {
-      switch (element["tagName"]) {
-        case "H1":
-        case "H2":
-        case "H3":
-        case "H4":
-        case "H5":
-        case "H6":
-          headingLevel = parseInt(element["tagName"].substr(1));
+    else if (element['tagName']) {
+      switch (element['tagName']) {
+        case 'H1':
+        case 'H2':
+        case 'H3':
+        case 'H4':
+        case 'H5':
+        case 'H6':
+          headingLevel = parseInt(element['tagName'].substr(1));
           if (currTocNode) {
             if (!currTocNode.preLevel) {
               currTocNode.preLevel = headingLevel;
             }
 
-            currTocNode = appendTocElement(
-              wrapper,
-              element,
-              currTocNode,
-              headingLevel
-            );
+            currTocNode = appendTocElement(wrapper, element, currTocNode, headingLevel);
           }
           break;
       }
@@ -160,11 +148,11 @@ function showdownToc() {
   const parser = new DOMParser();
   return [
     {
-      type: "output",
+      type: 'output',
       filter: function(html) {
         // parse html
-        const doc = parser.parseFromString(html, "text/html");
-        const wrapper = typeof doc.body !== "undefined" ? doc.body : doc;
+        const doc = parser.parseFromString(html, 'text/html');
+        const wrapper = typeof doc.body !== 'undefined' ? doc.body : doc;
         if (!renderTocElements(wrapper)) {
           return html;
         }

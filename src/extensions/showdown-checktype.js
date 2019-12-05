@@ -25,7 +25,7 @@ function showdownCheckType(check_csstypes_callback) {
             wrapper.querySelectorAll('code.asciimath.language-asciimath').length;
           // find the network-sequences elements
           const sequences =
-            wrapper.querySelectorAll('div.sequence').length ||
+            wrapper.querySelectorAll('div.js-sequence').length ||
             wrapper.querySelectorAll('code.sequence.language-sequence').length;
           // find the railroad-diagrams elements
           const railroad =

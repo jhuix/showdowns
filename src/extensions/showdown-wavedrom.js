@@ -1,5 +1,5 @@
 /*
- * @Description: js-wavedrom-diagrams showdown extension for markdown
+ * @Description: showdown wavedrom extension for markdown
  * @Author: Jhuix (Hui Jin) <jhuix0117@gmail.com>
  * @Date: 2019-09-01 11:19:37
  * @LastEditors: Jhuix (Hui Jin) <jhuix0117@gmail.com>
@@ -8,17 +8,24 @@
 
 'use strict';
 
-import WaveDrom from 'wavedrom';
-import cdnjs from './cdn';
+if (typeof window === 'undefined') {
+  throw Error('The showdown wavedrom extension can only be used in browser environment!');
+}
 
-if (typeof wavedrom === 'undefined') {
-  var wavedrom = WaveDrom;
+import cdnjs from './cdn';
+// import WaveDrom from 'wavedrom';
+// if (typeof wavedrom === 'undefined') {
+//   var wavedrom = WaveDrom;
+// }
+
+if (typeof WaveDrom === 'undefined') {
+  var WaveDrom = typeof window !== 'undefined' ? window.WaveDrom || undefined : require('wavedrom');
 }
 
 let wdCount = 0;
 let indexWD = 0;
 function hasWavedrom() {
-  return !!wavedrom;
+  return !!WaveDrom;
 }
 
 /**
@@ -37,9 +44,11 @@ function renderWavedrom(element, sync) {
     }
   }
   const code = element.textContent.trim();
-  const name = element.className + (!element.className || !diagramClass ? '' : ' ') + diagramClass;
+  const name =
+    (element.classList.length > 0 ? element.classList[0] : '') +
+    (!element.className || !diagramClass ? '' : ' ') +
+    diagramClass;
   const index = indexWD;
-  const id = 'WaveDrom_Display_' + index;
   ++indexWD;
   // When index of wavwdrom is 0, there will be some special logic in the WaveDrom lib.
   // So the index needs to be cleared after all WavwDrom element are rendered.
@@ -48,7 +57,8 @@ function renderWavedrom(element, sync) {
     indexWD = 0;
   }
   if (!sync && typeof window !== 'undefined' && window.dispatchEvent) {
-    element.id = id;
+    const id = 'wavedrom-' + Date.now() + '-' + Math.floor(Math.random() * 10000) + '-';
+    element.id = id + index;
     Promise.resolve(id).then(elementid => {
       // dispatch wavedrom custom event
       window.dispatchEvent(
@@ -63,9 +73,10 @@ function renderWavedrom(element, sync) {
       );
     });
   } else {
+    const id = 'WaveDrom_Display_' + index;
     element.parentNode.outerHTML = cdnjs.renderCacheElement(element.ownerDocument, id, name, el => {
       const obj = window.eval(`(${code})`);
-      wavedrom.RenderWaveForm(index, obj, 'WaveDrom_Display_');
+      WaveDrom.RenderWaveForm(index, obj, 'WaveDrom_Display_');
       // Replace the created cache element with the original element with the same id.
       const wdel = document.getElementById('WaveDrom_Display_' + index);
       if (el != wdel) {
@@ -78,6 +89,7 @@ function renderWavedrom(element, sync) {
 }
 
 // <div class="wavedrom"></div>
+let dync = false;
 function renderWavedromElements(elements, skin) {
   if (!elements.length) {
     return false;
@@ -86,14 +98,15 @@ function renderWavedromElements(elements, skin) {
   wdCount = elements.length;
   const sync = hasWavedrom();
   if (typeof window !== 'undefined') {
-    if (!sync) {
+    if (!sync && !dync) {
+      dync = true;
       cdnjs
         .loadScript({ WaveDromSkin: skin })
         .then(() => {
           return cdnjs.loadScript('WaveDrom');
         })
         .then(name => {
-          wavedrom = cdnjs.interopDefault(window[name]);
+          WaveDrom = cdnjs.interopDefault(window[name]);
         });
     }
   }
@@ -111,11 +124,11 @@ function onRenderWavedrom(element) {
       const id = res.element.id;
       const name = res.element.className;
       const data = res.element.data;
-      let el = window.document.getElementById(id);
+      let el = window.document.getElementById(id + index);
       if (el) {
-        el.parentNode.outerHTML = `<div id="${id}" class="${name}"></div>`;
+        el.parentNode.outerHTML = `<div id="${id + index}" class="${name}"></div>`;
         const obj = window.eval(`(${data})`);
-        wavedrom.RenderWaveForm(index, obj, 'WaveDrom_Display_');
+        WaveDrom.RenderWaveForm(index, obj, id);
       }
     } else {
       setTimeout(() => {
