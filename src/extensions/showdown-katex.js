@@ -26,20 +26,23 @@ if (typeof window === 'undefined') {
   throw Error('The showdown katex extension can only be used in browser environment!');
 }
 
-import renderMathInElement from 'katex/dist/contrib/auto-render';
 import asciimathToTex from 'showdown-katex/src/asciimath-to-tex';
 import cdnjs from './cdn';
 // import katex from 'katex';
+// import renderMathInElement from 'katex/dist/contrib/auto-render';
 // if (typeof Katex === 'undefined') {
 //   var Katex = katex;
+// }
+// if (typeof RenderMathInElement === 'undefined') {
+//  var RenderMathInElement = renderMathInElement;
 // }
 
 if (typeof katex === 'undefined') {
   var katex = window.katex || undefined;
 }
 
-if (typeof RenderMathInElement === 'undefined') {
-  var RenderMathInElement = renderMathInElement;
+if (typeof renderMathInElement === 'undefined') {
+  var RenderMathInElement = window.renderMathInElement || undefined;
 }
 
 let katexElementCount = 0;
@@ -58,6 +61,9 @@ function dyncLoadScript() {
       cdnjs.loadStyleSheet('katexCSS');
       cdnjs.loadScript('katex').then(name => {
         katex = cdnjs.interopDefault(window[name]);
+        return cdnjs.loadScript('renderMathInElement');
+      }).then(name => {
+        RenderMathInElement = cdnjs.interopDefault(window[name]);
       });
     }
   }
