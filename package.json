@@ -35,10 +35,8 @@
     "toc"
   ],
   "files": [
-    "public",
     "dist",
     "demo",
-    "src",
     "favicon.ico"
   ],
   "author": "Jhuix [Hui Jin] <jhuix0117@gmail.com>",
