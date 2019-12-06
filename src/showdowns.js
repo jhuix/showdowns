@@ -133,6 +133,12 @@ const getExtensions = (options, extensions = {}) => {
   return extnames;
 };
 
+const showdownFlavors = ['github', 'ghost', 'vanilla'];
+const mermaidThemes = ['default', 'forest', 'dark', 'neutral'];
+const vegaThemes = ['excel', 'ggplot2', 'quartz', 'vox', 'dark'];
+const vegaRenderers = ['canvas', 'svg'];
+const plantumlImgFmts = ['svg', 'png', 'jpg'];
+
 // defaultOptions.vega is EmbedOptions of vega-embed;
 // defaultOptions.mermaid is Config of mermaidAPI;
 // defaultOptions.plantuml is {umlWebSite: string, imageFormat: string};
@@ -215,7 +221,7 @@ const showdowns = {
     if (typeof options !== 'object' || !options) options = {};
     this.defaultOptions.showdown = Object.assign(this.defaultOptions.showdown || {}, options);
     const flavor = this.defaultOptions.showdown.flavor;
-    if (flavor && ['github', 'ghost', 'vanilla'].indexOf(flavor) === -1) {
+    if (flavor && showdownFlavors.indexOf(flavor) === -1) {
       this.defaultOptions.showdown.flavor = 'github';
     }
     if (this.converter) {
@@ -228,7 +234,7 @@ const showdowns = {
     if (typeof options !== 'object' || !options) options = {};
     this.defaultOptions.plantuml = Object.assign(this.defaultOptions.plantuml || {}, options);
     const imageFormat = this.defaultOptions.plantuml.imageFormat;
-    if (imageFormat && ['svg', 'png', 'jpg'].indexOf(imageFormat) === -1) {
+    if (imageFormat && plantumlImgFmts.indexOf(imageFormat) === -1) {
       this.defaultOptions.plantuml.imageFormat = 'png';
     }
     if (this.converter) {
@@ -241,7 +247,7 @@ const showdowns = {
     if (typeof options !== 'object' || !options) options = {};
     this.defaultOptions.mermaid = Object.assign(this.defaultOptions.mermaid || {}, options);
     const theme = this.defaultOptions.mermaid.theme;
-    if (theme && ['default', 'forest', 'dark', 'neutral'].indexOf(theme) === -1) {
+    if (theme && mermaidThemes.indexOf(theme) === -1) {
       this.defaultOptions.mermaid.theme = 'default';
     }
     if (this.converter) {
@@ -254,11 +260,11 @@ const showdowns = {
     if (typeof options !== 'object' || !options) options = {};
     this.defaultOptions.vega = Object.assign(this.defaultOptions.vega || {}, options);
     const theme = this.defaultOptions.vega.theme;
-    if (theme && ['excel', 'ggplot2', 'quartz', 'vox', 'dark'].indexOf(theme) === -1) {
+    if (theme && vegaThemes.indexOf(theme) === -1) {
       this.defaultOptions.vega.theme = 'vox';
     }
     const renderer = this.defaultOptions.vega.renderer;
-    if (renderer && ['canvas', 'svg', 'none'].indexOf(renderer) === -1) {
+    if (renderer && vegaRenderers.indexOf(renderer) === -1) {
       this.defaultOptions.vega.renderer = 'canvas';
     }
     if (this.converter) {
