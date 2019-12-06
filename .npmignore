@@ -1,5 +1,7 @@
 .DS_Store
 node_modules
+/public
+/src
 /docs
 /testdemo
 *-lock.json
@@ -25,3 +27,4 @@ yarn-error.log*
 *.njsproj
 *.sln
 *.sw?
+*.mp4
