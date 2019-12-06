@@ -1,9 +1,7 @@
 /*
- * @Description: showdown toc extension for markdown
- * @Author: Jhuix (Hui Jin) <jhuix0117@gmail.com>
- * @Date: 2019-08-27 16:57:06
- * @LastEditors: Jhuix (Hui Jin) <jhuix0117@gmail.com>
- * @LastEditTime: 2019-10-27 18:23:00
+ * Copyright (c) 2019-present, Jhuix (Hui Jin) <jhuix0117@gmail.com>. All rights reserved.
+ * Use of this source code is governed by a MIT license that can be found in the LICENSE file.
+ * Description: showdown toc extension for markdown
  */
 'use strict';
 

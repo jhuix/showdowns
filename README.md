@@ -178,10 +178,10 @@ Default options is described below:
 
   For more plantuml options:
 
-    {
-      umlWebSite: "www.plantuml.com/plantuml",
-      imageFormat: "svg" | "png" | "jpg"
-    };
+  {
+  umlWebSite: "www.plantuml.com/plantuml",
+  imageFormat: "svg" | "png" | "jpg"
+  };
 
 - mermaid: mermaid options object
 
@@ -244,13 +244,19 @@ Output showdown.convertor native object in current showdowns Instance.
 
 Type: {options} => void
 
-A function to add or update options of showdown.convertor.
+A function to add or update options of showdown and showdown.convertor.
 
-#### addExtensions
+#### addExtension
 
-Type: \[extensions] => void
+Type: \[name, extension] => void
 
-A function to add or update extensions of showdown.convertor.
+A function to add or update extension of showdown and showdown.convertor.
+
+#### removeExtension
+
+Type: \[name] => void
+
+A function to remove extension of showdown and showdown.convertor.
 
 #### setCDN
 
@@ -258,21 +264,25 @@ Type: (cdnname: string, defSheme: string, distScheme: string) => void
 
 A function to set cdn source when dynamically load js lib files related to more showdown diagrams extension.
 
-- Parameter cdnname can be selected 'local' or 'cdnjs' or 'jsdelivr' source.
-- Parameter defSheme is default prefix scheme string of source url.
-- Parameter distScheme is dist prefix scheme string of source url that has prefix string is '../dist/'.
+- Parameter `cdnname` can be selected 'local' or 'cdnjs' or 'jsdelivr' source.
+- Parameter `defSheme` is default prefix scheme string of source url.
+- Parameter `distScheme` is dist prefix scheme string of source url that has prefix string is '../dist/'.
 
 #### setShowdownOptions
 
 Type: (options: object) => objecto
 
+A function to set default options of showdown. When showdown.convertor instance be created, it can update options of the showdown and showdown.convertor.
+
 See [showdown options of defaultOptions](#defaultoptions).
 
-- flavor field value: ['github', 'ghost', 'vanilla', 'allOn'],default set to 'github' flavor.
+- flavor field value: ['github', 'ghost', 'vanilla'],default set to 'github' flavor.
 
 #### setPlantumlOptions
 
 Type: (options: object) => object
+
+A function to set default options of plantuml extension. When showdown.convertor instance be created, it can reset plantuml extension using the new default options.
 
 See [plantuml options of defaultOptions](#defaultoptions).
 
@@ -282,6 +292,8 @@ See [plantuml options of defaultOptions](#defaultoptions).
 
 Type: (options: object) => object
 
+A function to set default options of mermaid extension. When showdown.convertor instance be created, it can reset mermaid extension using the new default options.
+
 See [mermaid options of defaultOptions](#defaultoptions).
 
 - mermaid theme field value be selected in ['default', 'forest', 'dark', 'neutral']; When it be set empty, default set to 'default' theme.
@@ -290,19 +302,23 @@ See [mermaid options of defaultOptions](#defaultoptions).
 
 Type: (options: object) => object
 
+A function to set default options of vega extension. When showdown.convertor instance be created, it can reset vega extension using the new default options.
+
 See [vega-embed options of defaultOptions](#defaultoptions).
 
 - vega theme field value be selected in ['excel', 'ggplot2', 'quartz', 'vox', 'dark']; When it be set empty, default set to 'vox' theme.
 
 #### init
 
-Type: (void) => showdonws
+Type: (reset?: boolean | {option: boolean, extension: boolean}) => showdonws
 
-A function to init that be created showdown.convertor instance for showdowns.
+A function to init that be created showdown.convertor instance or update default showdown options of the showdown.convertor and reset the extensions using default extension options(as mermaid options, vega options, plantul options) for showdowns.
+
+- Parameter `reset`: After showdown.convertor instance be created; If `option` of reset object is ture, you update default showdown options; If `extension` of reset object is ture, reset the extensions using default extension options(as mermaid options, vega options, plantul options); If `reset` is true, same as value is `{option: true, extension: true}`.
 
 #### makeHtml
 
-Type: ({type:'zip', content: string} | string, (csstypes: { hasKatex: boolean; hasRailroad: boolean; hasSequence: boolean }) => void) => string
+Type: ({type:'zip', content: string} | string, (csstypes?: { hasKatex: boolean; hasRailroad: boolean; hasSequence: boolean }) => void) => string
 
 A function to make markdown to html that showdown.convertor converte it in current showdowns instance.
 

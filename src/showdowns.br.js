@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2019-present, Jhuix (Hui Jin) <jhuix0117@gmail.com>. All rights reserved.
+ * Use of this source code is governed by a MIT license that can be found in the LICENSE file.
+ */
 import showdowns from './showdowns';
 import * as zlibcodec from './utils/zlib-codec.js';
 import * as wasmBrotli from './utils/wasm-brotli/wasm_brotli_browser.js';
@@ -15,9 +19,7 @@ showdowns.brDecode = function(data) {
     return zlibcodec.brDecode(data);
   }
 
-  return Buffer.from(
-    wasmBrotli.decompress(Buffer.from(data, 'base64'))
-  ).toString();
+  return Buffer.from(wasmBrotli.decompress(Buffer.from(data, 'base64'))).toString();
 };
 
 // Override markdownDecodeFilter and process to decode content with brotli.
@@ -30,7 +32,7 @@ showdowns.markdownDecodeFilter = function(doc) {
 };
 
 if (typeof window !== 'undefined' && window.dispatchEvent) {
-  window.addEventListener("wasm", function (e) {
+  window.addEventListener('wasm', function(e) {
     window.dispatchEvent(
       new CustomEvent('showdownsLoaded', {
         detail: e.detail

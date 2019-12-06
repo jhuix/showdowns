@@ -1,4 +1,8 @@
 /*
+ * Copyright (c) 2019-present, Jhuix (Hui Jin) <jhuix0117@gmail.com>. All rights reserved.
+ * Use of this source code is governed by a MIT license that can be found in the LICENSE file.
+ */
+/*
  * Modified by jhuix, 2019 (c) https://github.com/jhuix/showdowns
  * Based on wasm_brotli_browser.js, Version 2.0.2, Copyright (c) 2019 Dylan Frankland https://github.com/dfrankland/wasm-brotli.git
  *
@@ -59,10 +63,7 @@ wasmBrotliBG({
 
 let cachegetUint8Memory = null;
 function getUint8Memory() {
-  if (
-    cachegetUint8Memory === null ||
-    cachegetUint8Memory.buffer !== wasm.memory.buffer
-  ) {
+  if (cachegetUint8Memory === null || cachegetUint8Memory.buffer !== wasm.memory.buffer) {
     cachegetUint8Memory = new Uint8Array(wasm.memory.buffer);
   }
   return cachegetUint8Memory;
@@ -79,10 +80,7 @@ function passArray8ToWasm(arg) {
 
 let cachegetInt32Memory = null;
 function getInt32Memory() {
-  if (
-    cachegetInt32Memory === null ||
-    cachegetInt32Memory.buffer !== wasm.memory.buffer
-  ) {
+  if (cachegetInt32Memory === null || cachegetInt32Memory.buffer !== wasm.memory.buffer) {
     cachegetInt32Memory = new Int32Array(wasm.memory.buffer);
   }
   return cachegetInt32Memory;
@@ -99,10 +97,7 @@ export function compress(buffer) {
   const retptr = 8;
   const ret = wasm.compress(retptr, passArray8ToWasm(buffer), WASM_VECTOR_LEN);
   const memi32 = getInt32Memory();
-  const v0 = getArrayU8FromWasm(
-    memi32[retptr / 4 + 0],
-    memi32[retptr / 4 + 1]
-  ).slice();
+  const v0 = getArrayU8FromWasm(memi32[retptr / 4 + 0], memi32[retptr / 4 + 1]).slice();
   wasm.__wbindgen_free(memi32[retptr / 4 + 0], memi32[retptr / 4 + 1] * 1);
   return v0;
 }
@@ -113,16 +108,9 @@ export function compress(buffer) {
  */
 export function decompress(buffer) {
   const retptr = 8;
-  const ret = wasm.decompress(
-    retptr,
-    passArray8ToWasm(buffer),
-    WASM_VECTOR_LEN
-  );
+  const ret = wasm.decompress(retptr, passArray8ToWasm(buffer), WASM_VECTOR_LEN);
   const memi32 = getInt32Memory();
-  const v0 = getArrayU8FromWasm(
-    memi32[retptr / 4 + 0],
-    memi32[retptr / 4 + 1]
-  ).slice();
+  const v0 = getArrayU8FromWasm(memi32[retptr / 4 + 0], memi32[retptr / 4 + 1]).slice();
   wasm.__wbindgen_free(memi32[retptr / 4 + 0], memi32[retptr / 4 + 1] * 1);
   return v0;
 }

@@ -1,13 +1,10 @@
 /*
- * @Description: zlib codec for PlantUML website
- * @Author: Jhuix (Hui Jin) <jhuix0117@gmail.com>
- * @Date: 2019-08-30 10:02:40
- * @LastEditors: Jhuix (Hui Jin) <jhuix0117@gmail.com>
- * @LastEditTime: 2019-10-04 10:44:03
+ * Copyright (c) 2019-present, Jhuix (Hui Jin) <jhuix0117@gmail.com>. All rights reserved.
+ * Use of this source code is governed by a MIT license that can be found in the LICENSE file.
+ * Description: zlib codec for PlantUML website
  * Encode/Decode code taken from the PlantUML website:
  * http://plantuml.sourceforge.net/codejavascript2.html
  */
-
 'use strict';
 
 import zlib from 'zlib';

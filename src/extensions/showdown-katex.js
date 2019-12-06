@@ -1,4 +1,8 @@
-/** !
+/*
+ * Copyright (c) 2019-present, Jhuix (Hui Jin) <jhuix0117@gmail.com>. All rights reserved.
+ * Use of this source code is governed by a MIT license that can be found in the LICENSE file.
+ */
+/*
 Showdown katex extension for markdown,
 Modified by jhuix, 2019 (c) https://github.com/jhuix/showdowns.
 Based on showdown-katex.js, Version 0.6.0, Copyright (c) 2016 obedm503 https://github.com/obedm503/showdown-katex.git.
@@ -59,12 +63,15 @@ function dyncLoadScript() {
     if (!sync && !dync) {
       dync = true;
       cdnjs.loadStyleSheet('katexCSS');
-      cdnjs.loadScript('katex').then(name => {
-        katex = cdnjs.interopDefault(window[name]);
-        return cdnjs.loadScript('renderMathInElement');
-      }).then(name => {
-        RenderMathInElement = cdnjs.interopDefault(window[name]);
-      });
+      cdnjs
+        .loadScript('katex')
+        .then(name => {
+          katex = cdnjs.interopDefault(window[name]);
+          return cdnjs.loadScript('renderMathInElement');
+        })
+        .then(name => {
+          RenderMathInElement = cdnjs.interopDefault(window[name]);
+        });
     }
   }
   return sync;

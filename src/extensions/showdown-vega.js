@@ -1,11 +1,8 @@
 /*
- * @Description: showdown vega extension for markdown
- * @Author: Jhuix (Hui Jin) <jhuix0117@gmail.com>
- * @Date: 2019-09-01 11:19:37
- * @LastEditors: Jhuix (Hui Jin) <jhuix0117@gmail.com>
- * @LastEditTime: 2019-10-27 19:02:07
+ * Copyright (c) 2019-present, Jhuix (Hui Jin) <jhuix0117@gmail.com>. All rights reserved.
+ * Use of this source code is governed by a MIT license that can be found in the LICENSE file.
+ * Description: showdown vega extension for markdown
  */
-
 'use strict';
 
 if (typeof window === 'undefined') {

@@ -1,7 +1,9 @@
-// Type definitions for src/showdowns.js
-// Project: https://github.com/jhuix/showdowns.git
-// Definitions by: Jhuix [Hui  Jin] <jhuix0117@gmail.com>
-// Definitions: https://github.com/borisyankov/DefinitelyTyped
+/*
+ * Copyright (c) 2019-present, Jhuix (Hui Jin) <jhuix0117@gmail.com>. All rights reserved.
+ * Use of this source code is governed by a MIT license that can be found in the LICENSE file.
+ * Type definitions for src/showdowns.js
+ * Project: https://github.com/jhuix/showdowns.git
+ */
 
 import { ShowdownExtension, ShowdownOptions } from 'showdown';
 /**
@@ -22,9 +24,7 @@ declare namespace showdowns {
    *
    * @param extensions
    */
-  function addExtensions(
-    extensions: ShowdownExtension[] | ShowdownExtension
-  ): void;
+  function addExtensions(extensions: ShowdownExtension[] | ShowdownExtension): void;
 
   /**
    *
