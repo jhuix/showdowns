@@ -17,12 +17,13 @@ function hasRailroad() {
 }
 
 let dync = false;
+const cssCdnName = 'railroadCSS';
 function dyncLoadScript() {
   const sync = hasRailroad();
   if (typeof window !== 'undefined') {
     if (!sync && !dync) {
       dync = true;
-      cdnjs.loadStyleSheet('railroadCSS');
+      cdnjs.loadStyleSheet(cssCdnName);
       cdnjs.loadScript('railroad').then(() => {
         railroad = true;
       });
@@ -56,6 +57,7 @@ function renderRailroad(element) {
     }
   }
   const sync = dyncLoadScript();
+  const cssLink = cdnjs.getSrc(cssCdnName);
   const code = element.textContent.trim();
   const name =
     (element.classList.length > 0 ? element.classList[0] : '') +
@@ -64,6 +66,10 @@ function renderRailroad(element) {
   const id = 'railroad-' + Date.now() + '-' + Math.floor(Math.random() * 10000);
   if (!sync && typeof window !== 'undefined' && window.dispatchEvent) {
     element.id = id;
+    if (cssLink) {
+      element.className = element.className + (!element.className ? '' : ' ') + 'css-railroad';
+      element.dataset.css = cssLink;
+    }
     Promise.resolve(id).then(elementid => {
       // dispatch railroad custom event
       window.dispatchEvent(
@@ -79,7 +85,9 @@ function renderRailroad(element) {
   } else if (typeof window !== 'undefined' && window.eval) {
     const railroadElement = window.eval(code).format();
     const doc = element.ownerDocument;
-    element.parentNode.outerHTML = `<div id="${id}" class="${name}"></div>`;
+    element.parentNode.outerHTML = obj.css
+      ? `<div id="${id}" class="${name} css-railroad" data-css="${obj.css}"></div>`
+      : `<div id="${id}" class="${name}"></div>`;
     railroadElement.addTo(doc.getElementById(id));
   }
 }

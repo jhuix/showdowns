@@ -34,12 +34,13 @@ function hasSequence() {
 }
 
 let dync = false;
+const cssCdnName = 'sequenceCSS';
 function dyncLoadScript() {
   const sync = hasSequence();
   if (typeof window !== 'undefined') {
     if (!sync && !dync) {
       dync = true;
-      cdnjs.loadStyleSheet('sequenceCSS');
+      cdnjs.loadStyleSheet(cssCdnName);
       cdnjs
         .loadScript('WebFont')
         .then(() => {
@@ -93,10 +94,15 @@ function renderSequence(element) {
     }
   }
   const sync = dyncLoadScript();
+  const cssLink = cdnjs.getSrc(cssCdnName);
   const code = element.textContent.trim();
   const name = 'js-sequence' + (!diagramClass ? '' : ' ') + diagramClass;
   const id = 'sequence-' + Date.now() + '-' + Math.floor(Math.random() * 10000);
   element.id = id;
+  if (cssLink) {
+    element.className = element.className + (!element.className ? '' : ' ') + 'css-sequence';
+    element.dataset.css = cssLink;
+  }
   if (!sync && typeof window !== 'undefined' && window.dispatchEvent) {
     Promise.resolve(id).then(elementid => {
       // dispatch sequence custom event

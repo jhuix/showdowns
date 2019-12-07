@@ -105,6 +105,10 @@ function setCDN(name, scheme_default, scheme_dist) {
   }
 }
 
+function getCDN() {
+  return cdnName;
+}
+
 function getSrc(name, def) {
   if (cdnSrc.hasOwnProperty(cdnName)) {
     const cdn = cdnSrc[cdnName];
@@ -155,7 +159,7 @@ function loadScript(src, name) {
 
 function loadStyleSheet(css, name) {
   if (!css || typeof document === 'undefined') {
-    return;
+    return '';
   }
 
   if (typeof name === 'undefined') {
@@ -168,6 +172,7 @@ function loadStyleSheet(css, name) {
   link.rel = 'stylesheet';
   link.href = css;
   head.appendChild(link);
+  return cdnName === 'local' ? '' : css;
 }
 
 function interopDefault(ex) {
@@ -196,7 +201,9 @@ const cdnjs = {
   loadScript,
   loadStyleSheet,
   renderCacheElement,
-  setCDN
+  setCDN,
+  getCDN,
+  getSrc
 };
 
 export default cdnjs;

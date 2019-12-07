@@ -16,23 +16,19 @@ function showdownCheckType(check_csstypes_callback) {
           const doc = parser.parseFromString(html, 'text/html');
           const wrapper = typeof doc.body !== 'undefined' ? doc.body : doc;
           // find the katex and assciimath elements
-          const katexs =
-            wrapper.querySelectorAll('span.katex-display').length ||
-            wrapper.querySelectorAll('code.latex.language-latex').length ||
-            wrapper.querySelectorAll('code.asciimath.language-asciimath').length;
-          // find the network-sequences elements
-          const sequences =
-            wrapper.querySelectorAll('div.js-sequence').length ||
-            wrapper.querySelectorAll('code.sequence.language-sequence').length;
-          // find the railroad-diagrams elements
-          const railroad =
-            wrapper.querySelectorAll('div.railroad').length ||
-            wrapper.querySelectorAll('code.railroad.language-railroad').length;
+          const katex_css = wrapper.querySelector('.css-katex');
+          const sequence_css = wrapper.querySelector('.css-sequence');
+          const railroad_css = wrapper.querySelector('.css-railroad');
 
           check_csstypes_callback({
-            hasKatex: katexs > 0 ? true : false,
-            hasSequence: sequences > 0 ? true : false,
-            hasRailroad: railroad > 0 ? true : false
+            hasKatex: katex_css ? true : false,
+            hasSequence: sequence_css ? true : false,
+            hasRailroad: sequence_css ? true : false,
+            css: {
+              katex: katex_css ? katex_css.dataset.css : '',
+              sequence: sequence_css ? sequence_css.dataset.css : '',
+              railroad: railroad_css ? railroad_css.dataset.css : ''
+            }
           });
         }
         // return html text content

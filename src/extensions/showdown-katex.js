@@ -4,7 +4,7 @@
  */
 /*
 Showdown katex extension for markdown,
-Modified by jhuix, 2019 (c) https://github.com/jhuix/showdowns.
+Modified by jhuix, Copyright (c) 2019 https://github.com/jhuix/showdowns.
 Based on showdown-katex.js, Version 0.6.0, Copyright (c) 2016 obedm503 https://github.com/obedm503/showdown-katex.git.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -57,12 +57,13 @@ function hasKatex() {
 }
 
 let dync = false;
+const cssCdnName = 'katexCSS';
 function dyncLoadScript() {
   const sync = hasKatex();
   if (typeof window !== 'undefined') {
     if (!sync && !dync) {
       dync = true;
-      cdnjs.loadStyleSheet('katexCSS');
+      cdnjs.loadStyleSheet(cssCdnName);
       cdnjs
         .loadScript('katex')
         .then(name => {
@@ -101,6 +102,7 @@ function renderKatex(element, config, isAsciimath) {
     }
   }
   const sync = dyncLoadScript();
+  const cssLink = cdnjs.getSrc(cssCdnName);
   const name =
     (element.classList.length > 0 ? element.classList[0] : '') +
     (!element.className || !diagramClass ? '' : ' ') +
@@ -108,6 +110,10 @@ function renderKatex(element, config, isAsciimath) {
   if (!sync && typeof window !== 'undefined' && window.dispatchEvent) {
     const id = 'katex-' + Date.now() + '-' + Math.floor(Math.random() * 10000);
     element.id = id;
+    if (cssLink) {
+      element.className = element.className + (!element.className ? '' : ' ') + 'css-katex';
+      element.dataset.css = cssLink;
+    }
     Promise.resolve(id).then(elementid => {
       // dispatch katex custom event
       window.dispatchEvent(
@@ -124,7 +130,9 @@ function renderKatex(element, config, isAsciimath) {
     });
   } else {
     const html = katex.renderToString(code, config);
-    element.parentNode.outerHTML = `<div title="${latex}" class="${name}">${html}</div>`;
+    element.parentNode.outerHTML = obj.css
+      ? `<div title="${latex}" class="${name} css-katex" data-css="${obj.css}">${html}</div>`
+      : `<div title="${latex}" class="${name}">${html}</div>`;
   }
 }
 
