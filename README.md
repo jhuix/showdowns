@@ -6,6 +6,8 @@
 
 **In browser environment, it is implemented to dynamically load js lib files related to more showdown diagrams extension for using [showdowns >= 0.3.0 version](https://github.com/jhuix/showdowns).**
 
+> If you think the showdowns library is excellent or can help you, click on the top right corner to give me a [Star](https://github.com/jhuix/showdowns)⭐️.
+
 ## Markdown To Html
 
 [Showdowns](https://github.com/jhuix/showdowns) can converte markdown content to html that using the [showdown.js](https://github.com/showdownjs/showdown).
@@ -15,6 +17,10 @@
 - [Showdown's Markdown syntax](https://github.com/showdownjs/showdown/wiki/Showdown's-Markdown-syntax)
 - [Showdown Options](https://github.com/showdownjs/showdown/wiki/Showdown-options)
 - [Showdowns Features](https://github.com/jhuix/showdowns/blob/master/public/showdowns-features.md)
+
+### Live Demo Editor —— `showdowns-editor`
+
+Check a live demo editor here https://jhuix.github.io/markdown-showdowns-editor
 
 ### Supporting some markdown extension features
 
