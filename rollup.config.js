@@ -202,6 +202,7 @@ if (!isFormatCJS) {
         targets: [
           { src: 'public/*', dest: 'docs' },
           { src: 'demo', dest: 'docs' },
+          { src: 'logo.png', dest: 'docs' },
           { src: 'favicon.ico', dest: 'docs' }
         ]
       })

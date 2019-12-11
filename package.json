@@ -6,6 +6,7 @@
   "browser": "dist/showdowns.min.js",
   "module": "dist/showdowns.core.min.js",
   "unpkg": "dist/showdowns.min.js",
+  "style": "dist/showdowns.min.css",
   "scripts": {
     "build": "npm run build:release && npm run build:umd && npm run build:cjs && npm run build:demo",
     "build:umd": "rollup -c",
@@ -37,6 +38,7 @@
   "files": [
     "dist",
     "demo",
+    "logo.png",
     "favicon.ico"
   ],
   "author": "Jhuix [Hui Jin] <jhuix0117@gmail.com>",
