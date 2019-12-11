@@ -14,13 +14,13 @@
 
 [Showdown](https://github.com/showdownjs/showdown) is a Javascript Markdown to HTML converter, based on the original works by John Gruber. Showdown can be used client side (in the browser) or server side (with NodeJs). For more information, refer to the following document:
 
-- [Showdown's Markdown syntax](https://github.com/showdownjs/showdown/wiki/Showdown's-Markdown-syntax)
+- [Showdown's Markdown Syntax](https://github.com/showdownjs/showdown/wiki/Showdown's-Markdown-syntax)
 - [Showdown Options](https://github.com/showdownjs/showdown/wiki/Showdown-options)
-- [Showdowns Features](https://github.com/jhuix/showdowns/blob/master/public/showdowns-features.md)
+- [Showdowns Features Syntax](https://github.com/jhuix/showdowns/blob/master/public/showdowns-features.md)
 
 ### Live Demo Editor —— `showdowns-editor`
 
-Check a live demo editor here https://jhuix.github.io/markdown-showdowns-editor
+Check a live demo editor here https://jhuix.github.io/vue-showdowns-editor
 
 ### Supporting some markdown extension features
 
@@ -121,7 +121,7 @@ Put the following line into your HTML page \<header> or \<body>:
         showdowns.init();
         let md = "";
         window
-          .fetch("https://jhuix.github.io/showdowns/showdowns-features")
+          .fetch("https://jhuix.github.io/showdowns/showdowns-features.md")
           .then(function(response) {
             if (response.ok) {
               return response.text();
