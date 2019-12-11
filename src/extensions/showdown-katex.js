@@ -130,8 +130,8 @@ function renderKatex(element, config, isAsciimath) {
     });
   } else {
     const html = katex.renderToString(code, config);
-    element.parentNode.outerHTML = obj.css
-      ? `<div title="${latex}" class="${name} css-katex" data-css="${obj.css}">${html}</div>`
+    element.parentNode.outerHTML = cssLink
+      ? `<div title="${latex}" class="${name} css-katex" data-css="${cssLink}">${html}</div>`
       : `<div title="${latex}" class="${name}">${html}</div>`;
   }
 }

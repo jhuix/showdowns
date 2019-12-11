@@ -85,8 +85,8 @@ function renderRailroad(element) {
   } else if (typeof window !== 'undefined' && window.eval) {
     const railroadElement = window.eval(code).format();
     const doc = element.ownerDocument;
-    element.parentNode.outerHTML = obj.css
-      ? `<div id="${id}" class="${name} css-railroad" data-css="${obj.css}"></div>`
+    element.parentNode.outerHTML = cssLink
+      ? `<div id="${id}" class="${name} css-railroad" data-css="${cssLink}"></div>`
       : `<div id="${id}" class="${name}"></div>`;
     railroadElement.addTo(doc.getElementById(id));
   }
