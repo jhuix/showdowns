@@ -6,7 +6,7 @@
 
 **In browser environment, it is implemented to dynamically load js lib files related to more showdown diagrams extension for using [showdowns >= 0.3.0 version](https://github.com/jhuix/showdowns).**
 
-> If you think the showdowns library is excellent or can help you, click on the top right corner to give me a [Star](https://github.com/jhuix/showdowns)⭐️.
+> If you think the showdowns library can help you or also hope to encourage the author, click on the top right corner to give me a [Star](https://github.com/jhuix/showdowns)⭐️.
 
 ## Markdown To Html
 
