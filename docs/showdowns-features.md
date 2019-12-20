@@ -9,11 +9,11 @@ Showdowns Markdown Syntax, refer to the document -- [Showdown's Markdown Syntax]
 
 - **In browser environment, it is implemented to dynamically load js lib files related to more showdown diagrams extension for using [showdowns >= 0.3.0 version](https://github.com/jhuix/showdowns).**
 
-- **In codeblock of markdown, expanded syntax language attribute from "\```codename" to "\```codename {json}" or "\```codename [json]".**
+- **In codeblock of markdown, expanded syntax language attribute from "\```language" to "\```language {json}" or "\```language [json]".**
 
     - **The common "align" field value of json is "left" or "center" or "right" in syntax language attribute, and it is empty means "left" align.**
 
-    - **The common "codeblock" field value of json is "true" or "false" in syntax language attribute, and it is empty means "false". It is "true" means the codeblock is forced to display as  normal code block, otherwise the codeblock is tried to parse as corresponding diagrams.**
+    - **The common "codeblock" field value of json is "true" or "false" in syntax language attribute, and it is empty means "false". It is "true" means the codeblock is forced to display as normal code block, otherwise the codeblock is tried to parse as corresponding diagrams.**
 
     - For example, see following [Network Sequence](#network-sequence) example.
 
@@ -42,7 +42,11 @@ It's implemented sub-TOC in showdown-toc.js.
 
 ##### sub-TOC examples1
 
+###### sub examples1
+
 ##### sub-TOC examples2
+
+###### sub examples2
 
 ### Footnotes
 
@@ -51,7 +55,6 @@ It's implemented in showdown-footnotes.js, use for reference the [showdown-footn
 For example:
 
 [^1]: The explanation.
-
 
 ### LaTeX math and AsciiMath
 
