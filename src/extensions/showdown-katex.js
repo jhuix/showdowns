@@ -78,102 +78,100 @@ function dyncLoadScript() {
   return sync;
 }
 
-function renderKatex(element, config, isAsciimath) {
-  const latex = element.textContent.trim();
-  const code = isAsciimath ? asciimathToTex(latex) : latex;
-  const langattr = element.dataset.lang;
-  const langobj = langattr ? JSON.parse(langattr) : null;
-  let diagramClass = '';
-  if (langobj) {
-    if (
-      (typeof langobj.codeblock === 'boolean' && langobj.codeblock) ||
-      (typeof langobj.codeblock === 'string' && langobj.codeblock.toLowerCase() === 'true')
-    ) {
-      return;
+function onRenderKatex(resolve, res) {
+  if (hasKatex()) {
+    const id = res.id;
+    const name = res.className;
+    const input = res.input;
+    const data = res.data;
+    const cssLink = res.cssLink;
+    const config = res.options;
+    const document = res.element.ownerDocument;
+    const html = katex.renderToString(data, config);
+    res.element.parentNode.outerHTML = cssLink
+      ? `<div title="${input}" class="${name} css-katex" data-css="${cssLink}">${html}</div>`
+      : `<div title="${input}" class="${name}">${html}</div>`;
+    --katexElementCount;
+    if (!katexElementCount) {
+      RenderMathInElement(document.body, config);
     }
+    resolve(true);
+  } else {
+    setTimeout(() => {
+      onRenderKatex(resolve, res);
+    }, 100);
+  }
+}
 
-    if (langobj.align) {
-      //default left
-      if (langobj.align === 'center') {
-        diagramClass = 'diagram-center';
-      } else if (langobj.align === 'right') {
-        diagramClass = 'diagram-right';
+function renderKatex(element, config, isAsciimath) {
+  return new Promise(resolve => {
+    const latex = element.textContent.trim();
+    const code = isAsciimath ? asciimathToTex(latex) : latex;
+    const langattr = element.dataset.lang;
+    const langobj = langattr ? JSON.parse(langattr) : null;
+    let diagramClass = '';
+    if (langobj) {
+      if (
+        (typeof langobj.codeblock === 'boolean' && langobj.codeblock) ||
+        (typeof langobj.codeblock === 'string' && langobj.codeblock.toLowerCase() === 'true')
+      ) {
+        return resolve(false);
+      }
+
+      if (langobj.align) {
+        //default left
+        if (langobj.align === 'center') {
+          diagramClass = 'diagram-center';
+        } else if (langobj.align === 'right') {
+          diagramClass = 'diagram-right';
+        }
       }
     }
-  }
-  const sync = dyncLoadScript();
-  const cssLink = cdnjs.getSrc(cssCdnName);
-  const name =
-    (element.classList.length > 0 ? element.classList[0] : '') +
-    (!element.className || !diagramClass ? '' : ' ') +
-    diagramClass;
-  if (!sync && typeof window !== 'undefined' && window.dispatchEvent) {
-    const id = 'katex-' + Date.now() + '-' + Math.floor(Math.random() * 10000);
-    element.id = id;
-    if (cssLink) {
-      element.className = element.className + (!element.className ? '' : ' ') + 'css-katex';
-      element.dataset.css = cssLink;
+    const sync = dyncLoadScript();
+    const cssLink = cdnjs.getSrc(cssCdnName);
+    const name =
+      (element.classList.length > 0 ? element.classList[0] : '') +
+      (!element.className || !diagramClass ? '' : ' ') +
+      diagramClass;
+    if (!sync && typeof window !== 'undefined' && window.dispatchEvent) {
+      const id = 'katex-' + Date.now() + '-' + Math.floor(Math.random() * 10000);
+      element.id = id;
+      const res = {
+        element: element,
+        id: id,
+        className: name,
+        input: latex,
+        data: code,
+        cssLink: cssLink,
+        options: config
+      };
+      onRenderKatex(resolve, res);
+    } else {
+      const document = element.ownerDocument;
+      const html = katex.renderToString(code, config);
+      element.parentNode.outerHTML = cssLink
+        ? `<div title="${latex}" class="${name} css-katex" data-css="${cssLink}">${html}</div>`
+        : `<div title="${latex}" class="${name}">${html}</div>`;
+      --katexElementCount;
+      if (!katexElementCount) {
+        RenderMathInElement(document.body, config);
+      }
+      return resolve(true);
     }
-    Promise.resolve(id).then(elementid => {
-      // dispatch katex custom event
-      window.dispatchEvent(
-        new CustomEvent('katex', {
-          detail: {
-            id: elementid,
-            className: name,
-            input: latex,
-            data: code,
-            options: config
-          }
-        })
-      );
-    });
-  } else {
-    const html = katex.renderToString(code, config);
-    element.parentNode.outerHTML = cssLink
-      ? `<div title="${latex}" class="${name} css-katex" data-css="${cssLink}">${html}</div>`
-      : `<div title="${latex}" class="${name}">${html}</div>`;
-  }
+  });
 }
 
 function renderBlockElements(latex, asciimath, config) {
-  if (!latex.length && !asciimath.length) {
-    return;
-  }
-
   katexElementCount = latex.length + asciimath.length;
 
+  const promiseArray = [];
   latex.forEach(element => {
-    renderKatex(element, config, false);
+    promiseArray.push(renderKatex(element, config, false));
   });
   asciimath.forEach(element => {
-    renderKatex(element, config, true);
+    promiseArray.push(renderKatex(element, config, true));
   });
-}
-
-function onRenderKatex(element) {
-  Promise.resolve({ canRender: hasKatex(), element: element }).then(res => {
-    if (res.canRender) {
-      const id = res.element.id;
-      const name = res.element.className;
-      const input = res.element.input;
-      const data = res.element.data;
-      const config = res.element.options;
-      const el = window.document.getElementById(id);
-      if (el) {
-        const html = katex.renderToString(data, config);
-        el.parentNode.outerHTML = `<div title="${input}" class="${name}">${html}</div>`;
-      }
-      --katexElementCount;
-      if (!katexElementCount) {
-        RenderMathInElement(window.document.body, config);
-      }
-    } else {
-      setTimeout(() => {
-        onRenderKatex(res.element);
-      }, 100);
-    }
-  });
+  return Promise.all(promiseArray);
 }
 
 /**
@@ -198,7 +196,6 @@ const getConfig = (config = {}) => ({
 });
 
 const showdownKatex = userConfig => {
-  const parser = new DOMParser();
   const config = getConfig(userConfig);
   const asciimathDelimiters = config.delimiters
     .filter(item => item.asciimath)
@@ -210,57 +207,51 @@ const showdownKatex = userConfig => {
       return { test, replacer };
     });
 
-  if (!hasKatex() && typeof window !== 'undefined' && window.dispatchEvent) {
-    // Listen Viz custom event
-    window.addEventListener('katex', event => {
-      if (event.detail) {
-        onRenderKatex(event.detail);
-      }
-    });
-  }
-
   return [
     {
       type: 'output',
-      filter(html = '') {
-        // parse html
-        const wrapper = parser.parseFromString(html, 'text/html').body;
+      filter: function(obj) {
+        return new Promise(resolve => {
+          const wrapper = obj.wrapper;
+          if (!wrapper) {
+            return resolve(obj);
+          }
 
-        if (asciimathDelimiters.length) {
-          // convert inline asciimath to inline latex
-          // ignore anything in code and pre elements
-          wrapper.querySelectorAll(':not(code):not(pre)').forEach(el => {
-            /** @type Text[] */
-            const textNodes = [...el.childNodes].filter(
-              // skip "empty" text nodes
-              node => node.nodeName === '#text' && node.nodeValue.trim()
-            );
-
-            textNodes.forEach(node => {
-              const newText = asciimathDelimiters.reduce(
-                (acc, { test, replacer }) => acc.replace(test, replacer),
-                node.nodeValue
+          if (asciimathDelimiters.length) {
+            // convert inline asciimath to inline latex
+            // ignore anything in code and pre elements
+            wrapper.querySelectorAll(':not(code):not(pre)').forEach(el => {
+              /** @type Text[] */
+              const textNodes = [...el.childNodes].filter(
+                // skip "empty" text nodes
+                node => node.nodeName === '#text' && node.nodeValue.trim()
               );
-              node.nodeValue = newText;
+
+              textNodes.forEach(node => {
+                const newText = asciimathDelimiters.reduce(
+                  (acc, { test, replacer }) => acc.replace(test, replacer),
+                  node.nodeValue
+                );
+                node.nodeValue = newText;
+              });
             });
+          }
+
+          // find the math in code blocks
+          const latex = wrapper.querySelectorAll('code.latex.language-latex');
+          const asciimath = wrapper.querySelectorAll('code.asciimath.language-asciimath');
+
+          if (!latex.length && !asciimath.length) {
+            return resolve(obj);
+          }
+
+          renderBlockElements(latex, asciimath, config).then(() => {
+            resolve(obj);
           });
-        }
-
-        // find the math in code blocks
-        const latex = wrapper.querySelectorAll('code.latex.language-latex');
-        const asciimath = wrapper.querySelectorAll('code.asciimath.language-asciimath');
-
-        renderBlockElements(latex, asciimath, config);
-        // return html without the wrapper
-        return wrapper.innerHTML;
+        });
       }
     }
   ];
 };
-
-// register extension with default config
-if (typeof window.showdown !== 'undefined') {
-  window.showdown.extension('showdown-katex', showdownKatex());
-}
 
 export default showdownKatex;

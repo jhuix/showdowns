@@ -41,68 +41,80 @@ function dyncLoadScript(config) {
   return sync;
 }
 
+function onRenderMermaid(resolve, res) {
+  if (hasMermaid()) {
+    const id = res.id;
+    const name = res.className;
+    const data = res.data;
+    mermaid.render(id, data, svgCode => {
+      res.element.parentNode.outerHTML = `<div class="${name}">${svgCode}</div>`;
+      resolve(true);
+    });
+  } else {
+    setTimeout(() => {
+      onRenderMermaid(resolve, res);
+    }, 100);
+  }
+}
+
 /**
  * render mermaid graphs
  */
 function renderMermaid(element, config) {
-  const langattr = element.dataset.lang;
-  const langobj = langattr ? JSON.parse(langattr) : null;
-  let diagramClass = '';
-  if (langobj) {
-    if (
-      (typeof langobj.codeblock === 'boolean' && langobj.codeblock) ||
-      (typeof langobj.codeblock === 'string' && langobj.codeblock.toLowerCase() === 'true')
-    ) {
-      return;
-    }
+  return new Promise(resolve => {
+    const langattr = element.dataset.lang;
+    const langobj = langattr ? JSON.parse(langattr) : null;
+    let diagramClass = '';
+    if (langobj) {
+      if (
+        (typeof langobj.codeblock === 'boolean' && langobj.codeblock) ||
+        (typeof langobj.codeblock === 'string' && langobj.codeblock.toLowerCase() === 'true')
+      ) {
+        return resolve(false);
+      }
 
-    if (langobj.align) {
-      //default left
-      if (langobj.align === 'center') {
-        diagramClass = 'diagram-center';
-      } else if (langobj.align === 'right') {
-        diagramClass = 'diagram-right';
+      if (langobj.align) {
+        //default left
+        if (langobj.align === 'center') {
+          diagramClass = 'diagram-center';
+        } else if (langobj.align === 'right') {
+          diagramClass = 'diagram-right';
+        }
       }
     }
-  }
-  const sync = dyncLoadScript(config);
-  const code = element.textContent.trim();
-  const name =
-    (element.classList.length > 0 ? element.classList[0] : '') +
-    (!element.className || !diagramClass ? '' : ' ') +
-    diagramClass;
-  const id = 'mermaid-' + Date.now() + '-' + Math.floor(Math.random() * 10000);
-  if (!sync && typeof window !== 'undefined' && window.dispatchEvent) {
-    element.id = id;
-    Promise.resolve(id).then(elementid => {
-      // dispatch mermaid custom event
-      window.dispatchEvent(
-        new CustomEvent('mermaid', {
-          detail: {
-            id: elementid,
-            className: name,
-            data: code
-          }
-        })
-      );
-    });
-  } else {
-    mermaid.render(id, code, svgCode => {
-      element.parentNode.outerHTML = `<div class="${name}">${svgCode}</div>`;
-    });
-  }
+    const sync = dyncLoadScript(config);
+    const code = element.textContent.trim();
+    const name =
+      (element.classList.length > 0 ? element.classList[0] : '') +
+      (!element.className || !diagramClass ? '' : ' ') +
+      diagramClass;
+    const id = 'mermaid-' + Date.now() + '-' + Math.floor(Math.random() * 10000);
+    if (!sync && typeof window !== 'undefined' && window.dispatchEvent) {
+      element.id = id;
+      const res = {
+        element: element,
+        id: id,
+        className: name,
+        data: code,
+        resolve: resolve
+      };
+      onRenderMermaid(resolve, res);
+    } else {
+      mermaid.render(id, code, svgCode => {
+        element.parentNode.outerHTML = `<div class="${name}">${svgCode}</div>`;
+      });
+      return resolve(true);
+    }
+  });
 }
 
 // <div class="mermaid"></div>
 function renderMermaidElements(elements, config) {
-  if (!elements.length) {
-    return false;
-  }
-
+  const promiseArray = [];
   elements.forEach(element => {
-    renderMermaid(element, config);
+    promiseArray.push(renderMermaid(element, config));
   });
-  return true;
+  return Promise.all(promiseArray);
 }
 
 // mermaid default config
@@ -123,57 +135,27 @@ const getConfig = (config = {}) => ({
   ...config
 });
 
-function onRenderMermaid(element) {
-  Promise.resolve({ canRender: hasMermaid(), element: element }).then(res => {
-    if (res.canRender) {
-      const id = res.element.id;
-      const name = res.element.className;
-      const data = res.element.data;
-      let el = window.document.getElementById(id);
-      if (el) {
-        const svgId = 'mermaid-' + Date.now() + '-' + Math.floor(Math.random() * 10000);
-        mermaid.render(svgId, data, svgCode => {
-          el.parentNode.outerHTML = `<div class="${name}">${svgCode}</div>`;
-        });
-      }
-    } else {
-      setTimeout(() => {
-        onRenderMermaid(res.element);
-      }, 100);
-    }
-  });
-}
-
 function showdownMermaid(userConfig) {
-  const parser = new DOMParser();
   const config = getConfig(userConfig);
-  if (!hasMermaid() && typeof window !== 'undefined' && window.dispatchEvent) {
-    // Listen mermaid custom event
-    window.addEventListener('mermaid', event => {
-      if (event.detail) {
-        onRenderMermaid(event.detail);
-      }
-    });
-  } else {
-    mermaid.initialize(config);
-  }
-
   return [
     {
       type: 'output',
-      filter: function(html) {
-        // parse html
-        const doc = parser.parseFromString(html, 'text/html');
-        const wrapper = typeof doc.body !== 'undefined' ? doc.body : doc;
-
+      filter: function(obj) {
+        const wrapper = obj.wrapper;
+        if (!wrapper) {
+          return false;
+        }
         // find the mermaid in code blocks
         const elements = wrapper.querySelectorAll('code.mermaid.language-mermaid');
-
-        if (!renderMermaidElements(elements, config)) {
-          return html;
+        if (!elements.length) {
+          return false;
         }
-        // return html text content
-        return wrapper.innerHTML;
+
+        return new Promise(resolve => {
+          renderMermaidElements(elements, config).then(() => {
+            resolve(obj);
+          });
+        });
       }
     }
   ];

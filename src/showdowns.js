@@ -88,6 +88,65 @@ showdown.subParser('githubCodeBlocks', function(text, options, globals) {
   return globals.converter._dispatch('githubCodeBlocks.after', text, options, globals);
 });
 
+const _asyncExtensions = {};
+
+/**
+ * Gets or registers an async extension
+ * @static
+ * @param {string} name
+ * @param {object|function=} ext
+ * @returns {*}
+ */
+showdown.asyncExtension = function(name, ext) {
+  'use strict';
+
+  if (!showdown.helper.isString(name)) {
+    throw Error("Extension 'name' must be a string");
+  }
+
+  name = showdown.helper.stdExtName(name);
+
+  // Getter
+  if (showdown.helper.isUndefined(ext)) {
+    if (!_asyncExtensions.hasOwnProperty(name)) {
+      throw Error('Async Extension named ' + name + ' is not registered!');
+    }
+    return _asyncExtensions[name];
+
+    // Setter
+  } else {
+    // Expand extension if it's wrapped in a function
+    if (typeof ext === 'function') {
+      ext = ext();
+    }
+
+    // Ensure extension is an array
+    if (!showdown.helper.isArray(ext)) {
+      ext = [ext];
+    }
+
+    if (showdown.validateExtension(ext)) {
+      _asyncExtensions[name] = ext;
+    }
+  }
+};
+/**
+ * Remove an async extension
+ * @param {string} name
+ */
+showdown.removeAsyncExtension = function(name) {
+  'use strict';
+  delete _asyncExtensions[name];
+};
+
+/**
+ * Removes all async extensions
+ */
+showdown.resetAsyncExtensions = function() {
+  'use strict';
+  _asyncExtensions = {};
+};
+//////////////////////////////////////////////////////////////////////
 const getOptions = (options = {}) => {
   return {
     flavor: 'github',
@@ -102,31 +161,46 @@ const getOptions = (options = {}) => {
   };
 };
 
-const getExtensions = (options, extensions = {}) => {
+const getAsyncExtensions = (options, extensions = {}) => {
   const mermaidOptions = options ? options.mermaid || {} : {};
   const plantumlOptions = options ? options.plantuml || {} : {};
   const vegaOptions = options ? options.vega || {} : {};
 
-  const exts = {
-    'showdown-toc': showdownToc,
-    'showdown-align': showdownAlign,
-    'showdown-footnotes': showdownFootnotes,
+  const asyncExtensions = {
     'showdown-mermaid': showdownMermaid(mermaidOptions),
     'showdown-flowchart': showdownFlowchart,
-    'showdown-railroad': showdownRailroad,
-    'showdown-viz': showdownViz,
-    'showdown-sequence': showdownSequence,
+    // 'showdown-railroad': showdownRailroad,
+    // 'showdown-viz': showdownViz,
+    // 'showdown-sequence': showdownSequence,
     'showdown-katex': showdownKatex,
-    'showdown-vega': showdownVega(vegaOptions),
-    'showdown-wavedrom': showdownWavedrom,
+    // 'showdown-vega': showdownVega(vegaOptions),
+    // 'showdown-wavedrom': showdownWavedrom,
     'showdown-plantuml': showdownPlantuml(plantumlOptions),
     ...extensions
   };
 
   let extnames = [];
-  for (let prop in exts) {
-    if (exts.hasOwnProperty(prop)) {
-      showdown.extension(prop, exts[prop]);
+  for (let prop in asyncExtensions) {
+    if (asyncExtensions.hasOwnProperty(prop)) {
+      showdown.asyncExtension(prop, asyncExtensions[prop]);
+      extnames.push(prop);
+    }
+  }
+  return extnames;
+};
+
+const getExtensions = (options, extensions = {}) => {
+  const nativeExtensions = {
+    'showdown-toc': showdownToc,
+    'showdown-align': showdownAlign,
+    'showdown-footnotes': showdownFootnotes,
+    ...extensions
+  };
+
+  let extnames = [];
+  for (let prop in nativeExtensions) {
+    if (nativeExtensions.hasOwnProperty(prop)) {
+      showdown.extension(prop, nativeExtensions[prop]);
       extnames.push(prop);
     }
   }
@@ -153,6 +227,7 @@ const showdowns = {
     vega: { theme: 'vox' }
   },
   defaultExtensions: {},
+  defaultAsyncExtensions: {},
   markdownDecodeFilter: function(doc) {
     return '';
   },
@@ -211,6 +286,33 @@ const showdowns = {
     }
     showdown.removeExtension(name);
   },
+  addAsyncExtension: function(name, extension) {
+    this.removeAsyncExtension(name);
+    if (typeof name === 'string') {
+      try {
+        showdown.asyncExtension(name, extension);
+        if (this.converter) {
+          this.converter.addAsyncExtension(name);
+        }
+      } catch (err) {
+        console.log(err);
+      }
+    }
+  },
+  removeAsyncExtension: function(name) {
+    if (typeof name !== 'string') return;
+    if (this.converter) {
+      let ext = null;
+      try {
+        ext = showdown.asyncExtension(name);
+      } catch (err) {
+        console.log(err);
+      }
+      if (!ext) return;
+      this.converter.removeAsyncExtension(ext);
+    }
+    showdown.removeAsyncExtension(name);
+  },
   setCDN: function(cdnname, defScheme, distScheme) {
     if (typeof cdnname === 'string' && cdnname) {
       cdnjs.setCDN(cdnname, defScheme, distScheme);
@@ -238,7 +340,7 @@ const showdowns = {
       this.defaultOptions.plantuml.imageFormat = 'png';
     }
     if (this.converter) {
-      this.addExtension('showdown-plantuml', showdownPlantuml(this.defaultOptions.plantuml));
+      this.addAsyncExtension('showdown-plantuml', showdownPlantuml(this.defaultOptions.plantuml));
     }
     return this.defaultOptions.plantuml;
   },
@@ -251,7 +353,7 @@ const showdowns = {
       this.defaultOptions.mermaid.theme = 'default';
     }
     if (this.converter) {
-      this.addExtension('showdown-mermaid', showdownMermaid(this.defaultOptions.mermaid));
+      this.addAsyncExtension('showdown-mermaid', showdownMermaid(this.defaultOptions.mermaid));
     }
     return this.defaultOptions.mermaid;
   },
@@ -268,7 +370,7 @@ const showdowns = {
       this.defaultOptions.vega.renderer = 'canvas';
     }
     if (this.converter) {
-      this.addExtension('showdown-vega', showdownVega(this.defaultOptions.vega));
+      this.addAsyncExtension('showdown-vega', showdownVega(this.defaultOptions.vega));
     }
     return this.defaultOptions.vega;
   },
@@ -277,7 +379,6 @@ const showdowns = {
       const showdownOptions = this.defaultOptions ? this.defaultOptions.showdown || {} : {};
       const options = getOptions(showdownOptions);
       const extensions = getExtensions(this.defaultOptions, this.defaultExtensions);
-
       // converter instance of showdown
       this.converter = new showdown.Converter({
         extensions: extensions
@@ -285,6 +386,68 @@ const showdowns = {
 
       // set options of this instance (include flavor)
       this.addOptions(options);
+      const outputAsyncModifiers = [];
+      this.converter.outputAsyncModifiers = outputAsyncModifiers;
+      const asyncExtensions = getAsyncExtensions(this.defaultOptions, this.defaultAsyncExtensions);
+      /**
+       * Parse sync extension
+       * @param {*} ext
+       * @param {string} [name='']
+       * @private
+       */
+      function _parseAsyncExtension(ext, name) {
+        name = name || null;
+        // If it's a string, the extension was previously loaded
+        if (showdown.helper.isString(ext)) {
+          ext = showdown.helper.stdExtName(ext);
+          name = ext;
+
+          if (!showdown.helper.isUndefined(_asyncExtensions[ext])) {
+            ext = _asyncExtensions[ext];
+          } else {
+            throw Error(
+              'Extension "' + ext + '" could not be loaded. It was either not found or is not a valid aync extension.'
+            );
+          }
+        }
+
+        if (typeof ext === 'function') {
+          ext = ext();
+        }
+
+        if (!showdown.helper.isArray(ext)) {
+          ext = [ext];
+        }
+
+        if (showdown.validateExtension(ext)) {
+          for (var i = 0; i < ext.length; ++i) {
+            switch (ext[i].type) {
+              case 'output':
+                outputAsyncModifiers.push(ext[i]);
+                break;
+            }
+          }
+        }
+      }
+
+      this.converter.addAsyncExtension = function(extension, name) {
+        name = name || null;
+        _parseAsyncExtension(extension, name);
+      };
+
+      this.converter.removeAsyncExtension = function(extension) {
+        if (!showdown.helper.isArray(extension)) {
+          extension = [extension];
+        }
+        for (var a = 0; a < extension.length; ++a) {
+          const ext = extension[a];
+          for (var j = 0; j < this.outputAsyncModifiers.length; ++j) {
+            if (this.outputAsyncModifiers[j] === ext) {
+              this.outputAsyncModifiers.splice(j, 1);
+            }
+          }
+        }
+      };
 
       // Because removeExtension function of converter has bug in showdown.js,
       // it needs to override.
@@ -309,6 +472,8 @@ const showdowns = {
           }
         }
       };
+
+      showdown.helper.forEach(asyncExtensions, _parseAsyncExtension);
     } else {
       let resetOptions = {};
       if (typeof reset === 'boolean' && reset) {
@@ -323,9 +488,9 @@ const showdowns = {
           this.addOptions(options);
         }
         if (resetOptions.hasOwnProperty('extension') && resetOptions.extension) {
-          this.addExtension('showdown-mermaid', showdownMermaid(this.defaultOptions.mermaid));
-          this.addExtension('showdown-vega', showdownVega(this.defaultOptions.vega));
-          this.addExtension('showdown-plantuml', showdownPlantuml(this.defaultOptions.plantuml));
+          this.addAsyncExtension('showdown-mermaid', showdownMermaid(this.defaultOptions.mermaid));
+          this.addAsyncExtension('showdown-vega', showdownVega(this.defaultOptions.vega));
+          this.addAsyncExtension('showdown-plantuml', showdownPlantuml(this.defaultOptions.plantuml));
         }
       }
     }
@@ -351,21 +516,45 @@ const showdowns = {
     } else {
       content = doc;
     }
+
     if (this.converter && content) {
+      content = `<div class='showdowns'>${this.converter.makeHtml(content)}</div>`;
+      var globals = {
+        outputAsyncModifiers: this.converter.outputAsyncModifiers,
+        converter: this
+      };
+      let extCheckType = null;
       if (typeof callback === 'function' && callback) {
-        const ext = showdownCheckType(data => {
+        extCheckType = showdownCheckType(data => {
           callback(data);
         });
-        this.converter.addExtension(ext, 'showdown-checktype');
-        content = this.converter.makeHtml(content);
-        this.converter.removeExtension(ext);
-      } else {
-        content = this.converter.makeHtml(content);
+        this.converter.addAyncExtension(extCheckType, 'showdown-checktype');
       }
-    } else {
-      content = '';
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(content, 'text/html');
+      const wrapper = typeof doc.body !== 'undefined' ? doc.body : doc;
+      const options = this.converter.options;
+      const converter = this.converter;
+      let result = Promise.resolve({ wrapper, options, globals });
+      //forEach写法
+      this.converter.outputAsyncModifiers.forEach(function(ext) {
+        result = result.then(obj => {
+          const filter = ext.filter(obj);
+          if (filter) {
+            return filter;
+          }
+        });
+      });
+      return result.then(obj => {
+        if (extCheckType) {
+          converter.removeAyncExtension(extCheckType);
+        }
+        return obj.wrapper.innerHTML;
+      });
     }
-    return `<div class='showdowns'>${content}</div>`;
+    return new Promise((resolve, reject) => {
+      return reject(!content ? 'Content is empty.' : 'Converter is invaild.');
+    });
   },
   zDecode: function(zContent) {
     return zlibcodec.zDecode(zContent);

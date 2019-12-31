@@ -51,72 +51,84 @@ function dyncLoadScript() {
   return sync;
 }
 
+function onRenderFlowchart(resolve, res) {
+  if (hasFlowchart()) {
+    const id = res.id;
+    const name = res.className;
+    const data = res.data;
+    const document = res.element.ownerDocument;
+    res.element.parentNode.outerHTML = cdnjs.renderCacheElement(document, id, name, el => {
+      flowchart.parse(data).drawSVG(id, res.options);
+    });
+    resolve(true);
+  } else {
+    setTimeout(() => {
+      onRenderFlowchart(resolve, res);
+    }, 100);
+  }
+}
+
 /**
  * render flowchart graphs
  */
 function renderFlowchart(element, options) {
-  const langattr = element.dataset.lang;
-  const langobj = langattr ? JSON.parse(langattr) : null;
-  let diagramClass = '';
-  if (langobj) {
-    if (
-      (typeof langobj.codeblock === 'boolean' && langobj.codeblock) ||
-      (typeof langobj.codeblock === 'string' && langobj.codeblock.toLowerCase() === 'true')
-    ) {
-      return;
-    }
+  return new Promise(resolve => {
+    const langattr = element.dataset.lang;
+    const langobj = langattr ? JSON.parse(langattr) : null;
+    let diagramClass = '';
+    if (langobj) {
+      if (
+        (typeof langobj.codeblock === 'boolean' && langobj.codeblock) ||
+        (typeof langobj.codeblock === 'string' && langobj.codeblock.toLowerCase() === 'true')
+      ) {
+        return resolve(false);
+      }
 
-    if (langobj.align) {
-      //default left
-      if (langobj.align === 'center') {
-        diagramClass = 'diagram-center';
-      } else if (langobj.align === 'right') {
-        diagramClass = 'diagram-right';
+      if (langobj.align) {
+        //default left
+        if (langobj.align === 'center') {
+          diagramClass = 'diagram-center';
+        } else if (langobj.align === 'right') {
+          diagramClass = 'diagram-right';
+        }
       }
     }
-  }
-  const sync = dyncLoadScript();
-  const code = element.textContent.trim();
-  const name =
-    (element.classList.length > 0 ? element.classList[0] : '') +
-    (!element.className || !diagramClass ? '' : ' ') +
-    diagramClass;
-  const id = 'flowchart-' + Date.now() + '-' + Math.floor(Math.random() * 10000);
-  if (!sync && typeof window !== 'undefined' && window.dispatchEvent) {
-    element.id = id;
-    Promise.resolve(id).then(elementid => {
-      // dispatch flowchart custom event
-      window.dispatchEvent(
-        new CustomEvent('flowchart', {
-          detail: {
-            id: elementid,
-            className: name,
-            data: code,
-            options: options
-          }
-        })
-      );
-    });
-  } else {
-    element.parentNode.outerHTML = cdnjs.renderCacheElement(element.ownerDocument, id, name, el => {
-      flowchart.parse(code).drawSVG(el, options);
-    });
-  }
+    const sync = dyncLoadScript();
+    const code = element.textContent.trim();
+    const name =
+      (element.classList.length > 0 ? element.classList[0] : '') +
+      (!element.className || !diagramClass ? '' : ' ') +
+      diagramClass;
+    const id = 'flowchart-' + Date.now() + '-' + Math.floor(Math.random() * 10000);
+    if (!sync && typeof window !== 'undefined' && window.dispatchEvent) {
+      element.id = id;
+      const res = {
+        element: element,
+        id: id,
+        className: name,
+        data: code,
+        options: options
+      };
+      onRenderFlowchart(resolve, res);
+    } else {
+      element.parentNode.outerHTML = cdnjs.renderCacheElement(element.ownerDocument, id, name, el => {
+        flowchart.parse(code).drawSVG(el, options);
+      });
+      return resolve(true);
+    }
+  });
 }
 
 // <div class="flowchart || flow"></div>
 function renderFlowchartElements(flowchartElements, flowElements, options) {
-  if (!flowchartElements.length && !flowElements.length) {
-    return false;
-  }
-
+  const promiseArray = [];
   flowchartElements.forEach(element => {
-    renderFlowchart(element, options);
+    promiseArray.push(renderFlowchart(element, options));
   });
   flowElements.forEach(element => {
-    renderFlowchart(element, options);
+    promiseArray.push(renderFlowchart(element, options));
   });
-  return true;
+  return Promise.all(promiseArray);
 }
 
 // Flowchart default options:
@@ -202,56 +214,30 @@ const getOptions = (userOptions = {}) => ({
   ...userOptions
 });
 
-function onRenderFlowchart(element) {
-  Promise.resolve({ canRender: hasFlowchart(), element: element }).then(res => {
-    if (res.canRender) {
-      const id = res.element.id;
-      const name = res.element.className;
-      const data = res.element.data;
-      let el = window.document.getElementById(id);
-      if (el) {
-        el.parentNode.outerHTML = `<div id="${id}" class="${name}"></div>`;
-        el = window.document.getElementById(id);
-        flowchart.parse(data).drawSVG(el ? el : id, res.element.options);
-      }
-    } else {
-      setTimeout(() => {
-        onRenderFlowchart(res.element);
-      }, 100);
-    }
-  });
-}
-
 function showdownFlowchart(userOptions) {
-  const parser = new DOMParser();
   const options = getOptions(userOptions);
-
-  if (!hasFlowchart() && typeof window !== 'undefined' && window.dispatchEvent) {
-    // Listen flowchart custom event
-    window.addEventListener('flowchart', event => {
-      if (event.detail) {
-        onRenderFlowchart(event.detail);
-      }
-    });
-  }
 
   return [
     {
       type: 'output',
-      filter: function(html) {
-        // parse html
-        const doc = parser.parseFromString(html, 'text/html');
-        const wrapper = typeof doc.body !== 'undefined' ? doc.body : doc;
+      filter: function(obj) {
+        return new Promise(resolve => {
+          const wrapper = obj.wrapper;
+          if (!wrapper) {
+            return resolve(obj);
+          }
 
-        // find the Flowchart in code blocks
-        const flowchartElements = wrapper.querySelectorAll('code.flowchart.language-flowchart');
-        const flowElements = wrapper.querySelectorAll('code.flow.language-flow');
+          // find the Flowchart in code blocks
+          const flowchartElements = wrapper.querySelectorAll('code.flowchart.language-flowchart');
+          const flowElements = wrapper.querySelectorAll('code.flow.language-flow');
+          if (!flowchartElements.length && !flowElements.length) {
+            return resolve(obj);
+          }
 
-        if (!renderFlowchartElements(flowchartElements, flowElements, options)) {
-          return html;
-        }
-        // return html text content
-        return wrapper.innerHTML;
+          renderFlowchartElements(flowchartElements, flowElements, options).then(() => {
+            resolve(obj);
+          });
+        });
       }
     }
   ];
