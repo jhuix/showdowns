@@ -56,15 +56,16 @@ function onRenderFlowchart(resolve, res) {
     const id = res.id;
     const name = res.className;
     const data = res.data;
-    const document = res.element.ownerDocument;
-    res.element.parentNode.outerHTML = cdnjs.renderCacheElement(document, id, name, el => {
-      flowchart.parse(data).drawSVG(id, res.options);
+    const options = res.options;
+    const doc = res.element.ownerDocument;
+    res.element.parentNode.outerHTML = cdnjs.renderCacheElement(doc, id, name, el => {
+      flowchart.parse(data).drawSVG(el, options);
     });
     resolve(true);
   } else {
     setTimeout(() => {
       onRenderFlowchart(resolve, res);
-    }, 100);
+    }, 50);
   }
 }
 
@@ -93,42 +94,39 @@ function renderFlowchart(element, options) {
         }
       }
     }
-    const sync = dyncLoadScript();
     const code = element.textContent.trim();
     const name =
       (element.classList.length > 0 ? element.classList[0] : '') +
       (!element.className || !diagramClass ? '' : ' ') +
       diagramClass;
     const id = 'flowchart-' + Date.now() + '-' + Math.floor(Math.random() * 10000);
-    if (!sync && typeof window !== 'undefined' && window.dispatchEvent) {
-      element.id = id;
-      const res = {
-        element: element,
-        id: id,
-        className: name,
-        data: code,
-        options: options
-      };
-      onRenderFlowchart(resolve, res);
-    } else {
-      element.parentNode.outerHTML = cdnjs.renderCacheElement(element.ownerDocument, id, name, el => {
-        flowchart.parse(code).drawSVG(el, options);
-      });
-      return resolve(true);
-    }
+    element.id = id;
+    const res = {
+      element: element,
+      id: id,
+      className: name,
+      data: code,
+      options: options
+    };
+    onRenderFlowchart(resolve, res);
   });
 }
 
 // <div class="flowchart || flow"></div>
 function renderFlowchartElements(flowchartElements, flowElements, options) {
-  const promiseArray = [];
-  flowchartElements.forEach(element => {
-    promiseArray.push(renderFlowchart(element, options));
+  dyncLoadScript();
+  return new Promise(resolve => {
+    const promiseArray = [];
+    flowchartElements.forEach(element => {
+      promiseArray.push(renderFlowchart(element, options));
+    });
+    flowElements.forEach(element => {
+      promiseArray.push(renderFlowchart(element, options));
+    });
+    Promise.all(promiseArray).then(() => {
+      resolve(true);
+    });
   });
-  flowElements.forEach(element => {
-    promiseArray.push(renderFlowchart(element, options));
-  });
-  return Promise.all(promiseArray);
 }
 
 // Flowchart default options:
@@ -221,22 +219,21 @@ function showdownFlowchart(userOptions) {
     {
       type: 'output',
       filter: function(obj) {
-        return new Promise(resolve => {
-          const wrapper = obj.wrapper;
-          if (!wrapper) {
-            return resolve(obj);
-          }
+        const wrapper = obj.wrapper;
+        if (!wrapper) {
+          return false;
+        }
 
-          // find the Flowchart in code blocks
-          const flowchartElements = wrapper.querySelectorAll('code.flowchart.language-flowchart');
-          const flowElements = wrapper.querySelectorAll('code.flow.language-flow');
-          if (!flowchartElements.length && !flowElements.length) {
-            return resolve(obj);
-          }
-
-          renderFlowchartElements(flowchartElements, flowElements, options).then(() => {
-            resolve(obj);
-          });
+        // find the Flowchart in code blocks
+        const flowchartElements = wrapper.querySelectorAll('code.flowchart.language-flowchart');
+        const flowElements = wrapper.querySelectorAll('code.flow.language-flow');
+        if (!flowchartElements.length && !flowElements.length) {
+          return false;
+        }
+        console.log(`${new Date().Format('yyyy-MM-dd HH:mm:ss.S')} Begin render flowchart elements.`);
+        return renderFlowchartElements(flowchartElements, flowElements, options).then(() => {
+          console.log(`${new Date().Format('yyyy-MM-dd HH:mm:ss.S')} End render flowchart elements.`);
+          return obj;
         });
       }
     }

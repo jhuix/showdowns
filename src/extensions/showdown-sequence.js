@@ -69,139 +69,137 @@ function dyncLoadScript() {
   return sync;
 }
 
+function onRenderSequence(resolve, res) {
+  if (hasSequence()) {
+    const id = res.id;
+    const name = res.className;
+    const data = res.data;
+    const cssLink = res.cssLink;
+    let theme = 'hand';
+    const langattr = res.langattr;
+    if (langattr) {
+      const obj = JSON.parse(langattr);
+      if (obj && obj.theme && themes.indexOf(obj.theme) != -1) {
+        theme = obj.theme;
+      }
+    }
+    let element = res.element;
+    const doc = element.ownerDocument;
+    cdnjs.renderCacheElement(doc, id, name, el => {
+      el.style.left = '-50%';
+      el.style.top = '-50%';
+      el.style.position = 'absolute';
+      el.style.display = '';
+      if (cssLink) {
+        el.className = el.className + (!el.className ? '' : ' ') + 'css-sequence';
+        el.dataset.css = cssLink;
+      }
+      const d = sequence.parse(data);
+      const options = { theme: theme };
+      d.drawSVG(el, options);
+      return new Promise(solve => {
+        //Async draw svg, need to check whether the drawing is completed regularly.
+        function checkDraw() {
+          if (el.childNodes.length > 0) {
+            element.parentNode.outerHTML = el.outerHTML;
+            //Replace display element
+            element = doc.getElementById(id);
+            if (element) {
+              element.style.left = '';
+              element.style.top = '';
+              element.style.position = '';
+              element.style.display = '';
+            }
+            resolve(true);
+            solve(el);
+          } else {
+            setTimeout(checkDraw, 50);
+          }
+        }
+        checkDraw();
+      });
+    });
+  } else {
+    setTimeout(() => {
+      onRenderSequence(resolve, res);
+    }, 50);
+  }
+}
 /**
  * render sequence graphs
  */
 function renderSequence(element) {
-  const langattr = element.dataset.lang;
-  const langobj = langattr ? JSON.parse(langattr) : null;
-  let diagramClass = '';
-  if (langobj) {
-    if (
-      (typeof langobj.codeblock === 'boolean' && langobj.codeblock) ||
-      (typeof langobj.codeblock === 'string' && langobj.codeblock.toLowerCase() === 'true')
-    ) {
-      return;
-    }
+  return new Promise(resolve => {
+    const langattr = element.dataset.lang;
+    const langobj = langattr ? JSON.parse(langattr) : null;
+    let diagramClass = '';
+    if (langobj) {
+      if (
+        (typeof langobj.codeblock === 'boolean' && langobj.codeblock) ||
+        (typeof langobj.codeblock === 'string' && langobj.codeblock.toLowerCase() === 'true')
+      ) {
+        return resolve(false);
+      }
 
-    if (langobj.align) {
-      //default left
-      if (langobj.align === 'center') {
-        diagramClass = 'diagram-center';
-      } else if (langobj.align === 'right') {
-        diagramClass = 'diagram-right';
+      if (langobj.align) {
+        //default left
+        if (langobj.align === 'center') {
+          diagramClass = 'diagram-center';
+        } else if (langobj.align === 'right') {
+          diagramClass = 'diagram-right';
+        }
       }
     }
-  }
-  const sync = dyncLoadScript();
-  const cssLink = cdnjs.getSrc(cssCdnName);
-  const code = element.textContent.trim();
-  const name = 'js-sequence' + (!diagramClass ? '' : ' ') + diagramClass;
-  const id = 'sequence-' + Date.now() + '-' + Math.floor(Math.random() * 10000);
-  element.id = id;
-  if (cssLink) {
-    element.className = element.className + (!element.className ? '' : ' ') + 'css-sequence';
-    element.dataset.css = cssLink;
-  }
-  if (!sync && typeof window !== 'undefined' && window.dispatchEvent) {
-    Promise.resolve(id).then(elementid => {
-      // dispatch sequence custom event
-      window.dispatchEvent(
-        new CustomEvent('sequence', {
-          detail: {
-            id: elementid,
-            className: name,
-            data: code,
-            langattr: langattr
-          }
-        })
-      );
-    });
-  } else {
-    if (typeof window !== 'undefined' && window.dispatchEvent) {
-      // dispatch sequence custom event
-      window.dispatchEvent(
-        new CustomEvent('sequence', {
-          detail: {
-            id: id,
-            className: name,
-            data: code,
-            langattr: langattr
-          }
-        })
-      );
-    }
-  }
+    const cssLink = cdnjs.getSrc(cssCdnName);
+    const code = element.textContent.trim();
+    const name = 'js-sequence' + (!diagramClass ? '' : ' ') + diagramClass;
+    const id = 'sequence-' + Date.now() + '-' + Math.floor(Math.random() * 10000);
+    element.id = id;
+    const res = {
+      element: element,
+      id: id,
+      className: name,
+      data: code,
+      cssLink: cssLink,
+      langattr: langattr
+    };
+    onRenderSequence(resolve, res);
+  });
 }
 
 // <div class="sequence"></div>
 function renderSequenceElements(elements) {
-  if (!elements.length) {
-    return false;
-  }
-  elements.forEach(element => {
-    renderSequence(element);
-  });
-  return true;
-}
-
-function onRenderSequence(element) {
-  Promise.resolve({ canRender: hasSequence(), element: element }).then(res => {
-    if (res.canRender) {
-      const id = res.element.id;
-      const name = res.element.className;
-      const data = res.element.data;
-      let theme = 'hand';
-      const langattr = res.element.langattr;
-      if (langattr) {
-        const obj = JSON.parse(langattr);
-        if (obj && obj.theme && themes.indexOf(obj.theme) != -1) {
-          theme = obj.theme;
-        }
-      }
-      let el = window.document.getElementById(id);
-      if (el) {
-        el.parentNode.outerHTML = `<div id="${id}" class="${name}"></div>`;
-        el = window.document.getElementById(id);
-        const d = sequence.parse(data);
-        const options = { theme: theme };
-        d.drawSVG(el ? el : id, options);
-      }
-    } else {
-      setTimeout(() => {
-        onRenderSequence(res.element);
-      }, 100);
-    }
+  dyncLoadScript();
+  return new Promise(resolve => {
+    const promiseArray = [];
+    elements.forEach(element => {
+      promiseArray.push(renderSequence(element));
+    });
+    Promise.all(promiseArray).then(() => {
+      resolve(true);
+    });
   });
 }
 
 function showdownSequence() {
-  const parser = new DOMParser();
-
-  if (typeof window !== 'undefined' && window.dispatchEvent) {
-    // Listen sequence custom event
-    window.addEventListener('sequence', event => {
-      if (event.detail) {
-        onRenderSequence(event.detail);
-      }
-    });
-  }
-
   return [
     {
       type: 'output',
-      filter: function(html) {
-        // parse html
-        const doc = parser.parseFromString(html, 'text/html');
-        const wrapper = typeof doc.body !== 'undefined' ? doc.body : doc;
-
+      filter: function(obj) {
+        const wrapper = obj.wrapper;
+        if (!wrapper) {
+          return false;
+        }
         // find the sequence in code blocks
         const elements = wrapper.querySelectorAll('code.sequence.language-sequence');
-        if (!renderSequenceElements(elements)) {
-          return html;
+        if (!elements.length) {
+          return false;
         }
-        // return html text content
-        return wrapper.innerHTML;
+        console.log(`${new Date().Format('yyyy-MM-dd HH:mm:ss.S')} Begin render sequence elements.`);
+        return renderSequenceElements(elements).then(() => {
+          console.log(`${new Date().Format('yyyy-MM-dd HH:mm:ss.S')} End render sequence elements.`);
+          return obj;
+        });
       }
     }
   ];

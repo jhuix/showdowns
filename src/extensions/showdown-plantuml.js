@@ -77,11 +77,15 @@ function renderPlantumlElement(element, config) {
 
 // <div class="plantuml"></div>
 function renderPlantumlElements(elements, config) {
-  const promiseArray = [];
-  elements.forEach(element => {
-    promiseArray.push(renderPlantumlElement(element, config));
+  return new Promise(resolve => {
+    const promiseArray = [];
+    elements.forEach(element => {
+      promiseArray.push(renderPlantumlElement(element, config));
+    });
+    Promise.all(promiseArray).then(() => {
+      resolve(true);
+    });
   });
-  return Promise.all(promiseArray);
 }
 
 // Plantuml default config
@@ -109,7 +113,9 @@ function showdownPlantuml(userConfig) {
           return false;
         }
 
+        console.log(`${new Date().Format('yyyy-MM-dd HH:mm:ss.S')} Begin render plantuml elements.`);
         return renderPlantumlElements(elements, config).then(() => {
+          console.log(`${new Date().Format('yyyy-MM-dd HH:mm:ss.S')} End render plantuml elements.`);
           return obj;
         });
       }

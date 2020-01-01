@@ -169,12 +169,12 @@ const getAsyncExtensions = (options, extensions = {}) => {
   const asyncExtensions = {
     'showdown-mermaid': showdownMermaid(mermaidOptions),
     'showdown-flowchart': showdownFlowchart,
-    // 'showdown-railroad': showdownRailroad,
-    // 'showdown-viz': showdownViz,
-    // 'showdown-sequence': showdownSequence,
+    'showdown-railroad': showdownRailroad,
+    'showdown-viz': showdownViz,
+    'showdown-sequence': showdownSequence,
     'showdown-katex': showdownKatex,
-    // 'showdown-vega': showdownVega(vegaOptions),
-    // 'showdown-wavedrom': showdownWavedrom,
+    'showdown-vega': showdownVega(vegaOptions),
+    'showdown-wavedrom': showdownWavedrom,
     'showdown-plantuml': showdownPlantuml(plantumlOptions),
     ...extensions
   };

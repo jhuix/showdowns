@@ -86,20 +86,20 @@ function onRenderKatex(resolve, res) {
     const data = res.data;
     const cssLink = res.cssLink;
     const config = res.options;
-    const document = res.element.ownerDocument;
+    const doc = res.element.ownerDocument;
     const html = katex.renderToString(data, config);
     res.element.parentNode.outerHTML = cssLink
       ? `<div title="${input}" class="${name} css-katex" data-css="${cssLink}">${html}</div>`
       : `<div title="${input}" class="${name}">${html}</div>`;
     --katexElementCount;
     if (!katexElementCount) {
-      RenderMathInElement(document.body, config);
+      RenderMathInElement(doc.body, config);
     }
     resolve(true);
   } else {
     setTimeout(() => {
       onRenderKatex(resolve, res);
-    }, 100);
+    }, 50);
   }
 }
 
@@ -127,51 +127,41 @@ function renderKatex(element, config, isAsciimath) {
         }
       }
     }
-    const sync = dyncLoadScript();
     const cssLink = cdnjs.getSrc(cssCdnName);
     const name =
       (element.classList.length > 0 ? element.classList[0] : '') +
       (!element.className || !diagramClass ? '' : ' ') +
       diagramClass;
-    if (!sync && typeof window !== 'undefined' && window.dispatchEvent) {
-      const id = 'katex-' + Date.now() + '-' + Math.floor(Math.random() * 10000);
-      element.id = id;
-      const res = {
-        element: element,
-        id: id,
-        className: name,
-        input: latex,
-        data: code,
-        cssLink: cssLink,
-        options: config
-      };
-      onRenderKatex(resolve, res);
-    } else {
-      const document = element.ownerDocument;
-      const html = katex.renderToString(code, config);
-      element.parentNode.outerHTML = cssLink
-        ? `<div title="${latex}" class="${name} css-katex" data-css="${cssLink}">${html}</div>`
-        : `<div title="${latex}" class="${name}">${html}</div>`;
-      --katexElementCount;
-      if (!katexElementCount) {
-        RenderMathInElement(document.body, config);
-      }
-      return resolve(true);
-    }
+    const id = 'katex-' + Date.now() + '-' + Math.floor(Math.random() * 10000);
+    element.id = id;
+    const res = {
+      element: element,
+      id: id,
+      className: name,
+      input: latex,
+      data: code,
+      cssLink: cssLink,
+      options: config
+    };
+    onRenderKatex(resolve, res);
   });
 }
 
 function renderBlockElements(latex, asciimath, config) {
   katexElementCount = latex.length + asciimath.length;
-
-  const promiseArray = [];
-  latex.forEach(element => {
-    promiseArray.push(renderKatex(element, config, false));
+  dyncLoadScript();
+  return new Promise(resolve => {
+    const promiseArray = [];
+    latex.forEach(element => {
+      promiseArray.push(renderKatex(element, config, false));
+    });
+    asciimath.forEach(element => {
+      promiseArray.push(renderKatex(element, config, true));
+    });
+    Promise.all(promiseArray).then(() => {
+      resolve(true);
+    });
   });
-  asciimath.forEach(element => {
-    promiseArray.push(renderKatex(element, config, true));
-  });
-  return Promise.all(promiseArray);
 }
 
 /**
@@ -211,43 +201,43 @@ const showdownKatex = userConfig => {
     {
       type: 'output',
       filter: function(obj) {
-        return new Promise(resolve => {
-          const wrapper = obj.wrapper;
-          if (!wrapper) {
-            return resolve(obj);
-          }
+        const wrapper = obj.wrapper;
+        if (!wrapper) {
+          return false;
+        }
 
-          if (asciimathDelimiters.length) {
-            // convert inline asciimath to inline latex
-            // ignore anything in code and pre elements
-            wrapper.querySelectorAll(':not(code):not(pre)').forEach(el => {
-              /** @type Text[] */
-              const textNodes = [...el.childNodes].filter(
-                // skip "empty" text nodes
-                node => node.nodeName === '#text' && node.nodeValue.trim()
+        if (asciimathDelimiters.length) {
+          // convert inline asciimath to inline latex
+          // ignore anything in code and pre elements
+          wrapper.querySelectorAll(':not(code):not(pre)').forEach(el => {
+            /** @type Text[] */
+            const textNodes = [...el.childNodes].filter(
+              // skip "empty" text nodes
+              node => node.nodeName === '#text' && node.nodeValue.trim()
+            );
+
+            textNodes.forEach(node => {
+              const newText = asciimathDelimiters.reduce(
+                (acc, { test, replacer }) => acc.replace(test, replacer),
+                node.nodeValue
               );
-
-              textNodes.forEach(node => {
-                const newText = asciimathDelimiters.reduce(
-                  (acc, { test, replacer }) => acc.replace(test, replacer),
-                  node.nodeValue
-                );
-                node.nodeValue = newText;
-              });
+              node.nodeValue = newText;
             });
-          }
-
-          // find the math in code blocks
-          const latex = wrapper.querySelectorAll('code.latex.language-latex');
-          const asciimath = wrapper.querySelectorAll('code.asciimath.language-asciimath');
-
-          if (!latex.length && !asciimath.length) {
-            return resolve(obj);
-          }
-
-          renderBlockElements(latex, asciimath, config).then(() => {
-            resolve(obj);
           });
+        }
+
+        // find the math in code blocks
+        const latex = wrapper.querySelectorAll('code.latex.language-latex');
+        const asciimath = wrapper.querySelectorAll('code.asciimath.language-asciimath');
+
+        if (!latex.length && !asciimath.length) {
+          return false;
+        }
+
+        console.log(`${new Date().Format('yyyy-MM-dd HH:mm:ss.S')} Begin render katex elements.`);
+        return renderBlockElements(latex, asciimath, config).then(() => {
+          console.log(`${new Date().Format('yyyy-MM-dd HH:mm:ss.S')} End render katex elements.`);
+          return obj;
         });
       }
     }

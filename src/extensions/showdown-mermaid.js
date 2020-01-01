@@ -53,14 +53,14 @@ function onRenderMermaid(resolve, res) {
   } else {
     setTimeout(() => {
       onRenderMermaid(resolve, res);
-    }, 100);
+    }, 50);
   }
 }
 
 /**
  * render mermaid graphs
  */
-function renderMermaid(element, config) {
+function renderMermaid(element) {
   return new Promise(resolve => {
     const langattr = element.dataset.lang;
     const langobj = langattr ? JSON.parse(langattr) : null;
@@ -82,39 +82,37 @@ function renderMermaid(element, config) {
         }
       }
     }
-    const sync = dyncLoadScript(config);
+
     const code = element.textContent.trim();
     const name =
       (element.classList.length > 0 ? element.classList[0] : '') +
       (!element.className || !diagramClass ? '' : ' ') +
       diagramClass;
     const id = 'mermaid-' + Date.now() + '-' + Math.floor(Math.random() * 10000);
-    if (!sync && typeof window !== 'undefined' && window.dispatchEvent) {
-      element.id = id;
-      const res = {
-        element: element,
-        id: id,
-        className: name,
-        data: code,
-        resolve: resolve
-      };
-      onRenderMermaid(resolve, res);
-    } else {
-      mermaid.render(id, code, svgCode => {
-        element.parentNode.outerHTML = `<div class="${name}">${svgCode}</div>`;
-      });
-      return resolve(true);
-    }
+    element.id = id;
+    const res = {
+      element: element,
+      id: id,
+      className: name,
+      data: code,
+      resolve: resolve
+    };
+    onRenderMermaid(resolve, res);
   });
 }
 
 // <div class="mermaid"></div>
 function renderMermaidElements(elements, config) {
-  const promiseArray = [];
-  elements.forEach(element => {
-    promiseArray.push(renderMermaid(element, config));
+  dyncLoadScript(config);
+  return new Promise(resolve => {
+    const promiseArray = [];
+    elements.forEach(element => {
+      promiseArray.push(renderMermaid(element));
+    });
+    Promise.all(promiseArray).then(() => {
+      resolve(true);
+    });
   });
-  return Promise.all(promiseArray);
 }
 
 // mermaid default config
@@ -151,10 +149,10 @@ function showdownMermaid(userConfig) {
           return false;
         }
 
-        return new Promise(resolve => {
-          renderMermaidElements(elements, config).then(() => {
-            resolve(obj);
-          });
+        console.log(`${new Date().Format('yyyy-MM-dd HH:mm:ss.S')} Begin render mermaid elements.`);
+        return renderMermaidElements(elements, config).then(() => {
+          console.log(`${new Date().Format('yyyy-MM-dd HH:mm:ss.S')} End render mermaid elements.`);
+          return obj;
         });
       }
     }

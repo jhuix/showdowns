@@ -49,85 +49,62 @@ function dyncLoadScript() {
  * render VegaEmbed graphs
  */
 function renderVega(element, options, isVegaLite) {
-  const langattr = element.dataset.lang;
-  const langobj = langattr ? JSON.parse(langattr) : null;
-  let diagramClass = '';
-  if (langobj) {
-    if (
-      (typeof langobj.codeblock === 'boolean' && langobj.codeblock) ||
-      (typeof langobj.codeblock === 'string' && langobj.codeblock.toLowerCase() === 'true')
-    ) {
-      return;
-    }
+  return new Promise(resolve => {
+    const langattr = element.dataset.lang;
+    const langobj = langattr ? JSON.parse(langattr) : null;
+    let diagramClass = '';
+    if (langobj) {
+      if (
+        (typeof langobj.codeblock === 'boolean' && langobj.codeblock) ||
+        (typeof langobj.codeblock === 'string' && langobj.codeblock.toLowerCase() === 'true')
+      ) {
+        return resolve(false);
+      }
 
-    if (langobj.align) {
-      //default left
-      if (langobj.align === 'center') {
-        diagramClass = 'diagram-center';
-      } else if (langobj.align === 'right') {
-        diagramClass = 'diagram-right';
+      if (langobj.align) {
+        //default left
+        if (langobj.align === 'center') {
+          diagramClass = 'diagram-center';
+        } else if (langobj.align === 'right') {
+          diagramClass = 'diagram-right';
+        }
       }
     }
-  }
-  const sync = dyncLoadScript();
-  const code = element.textContent.trim();
-  const name =
-    (element.classList.length > 0 ? element.classList[0] : '') +
-    (!element.className || !diagramClass ? '' : ' ') +
-    diagramClass;
-  const id = 'vega-' + Date.now() + '-' + Math.floor(Math.random() * 10000);
-  element.id = id;
-  if (typeof window !== 'undefined' && window.dispatchEvent) {
-    if (!sync) {
-      Promise.resolve(id).then(elementid => {
-        // dispatch vegaembed custom event
-        window.dispatchEvent(
-          new CustomEvent('vega', {
-            detail: {
-              id: elementid,
-              className: name,
-              data: code,
-              options: options,
-              isVegaLite: isVegaLite
-            }
-          })
-        );
-      });
-    } else {
-      // dispatch vegaembed custom event
-      window.dispatchEvent(
-        new CustomEvent('vega', {
-          detail: {
-            id: id,
-            className: name,
-            data: code,
-            options: options,
-            isVegaLite: isVegaLite
-          }
-        })
-      );
-    }
-  }
-  // else {
-  //   element.parentNode.outerHTML = cdnjs.renderCacheElement(element.ownerDocument, id, name, el => {
-  //     vegaEmbed(el, JSON.parse(code), options);
-  //   });
-  // }
+
+    const code = element.textContent.trim();
+    const name =
+      (element.classList.length > 0 ? element.classList[0] : '') +
+      (!element.className || !diagramClass ? '' : ' ') +
+      diagramClass;
+    const id = 'vega-' + Date.now() + '-' + Math.floor(Math.random() * 10000);
+    element.id = id;
+    const res = {
+      element: element,
+      id: id,
+      className: name,
+      data: code,
+      options: options,
+      isVegaLite: isVegaLite
+    };
+    onRenderVega(resolve, res);
+  });
 }
 
 // <div class="vegaembed || flow"></div>
 function renderVegaElements(vegaElements, vegaLiteElements, options) {
-  if (!vegaElements.length && !vegaLiteElements.length) {
-    return false;
-  }
-
-  vegaElements.forEach(element => {
-    renderVega(element, options, false);
+  dyncLoadScript();
+  return new Promise(resolve => {
+    const promiseArray = [];
+    vegaElements.forEach(element => {
+      promiseArray.push(renderVega(element, options, false));
+    });
+    vegaLiteElements.forEach(element => {
+      promiseArray.push(renderVega(element, options, true));
+    });
+    Promise.all(promiseArray).then(() => {
+      resolve(true);
+    });
   });
-  vegaLiteElements.forEach(element => {
-    renderVega(element, options, true);
-  });
-  return true;
 }
 
 // theme: 'excel' | 'ggplot2' | 'quartz' | 'vox' | 'dark'
@@ -138,56 +115,72 @@ const getOptions = (userOptions = {}) => ({
   ...userOptions
 });
 
-function onRenderVega(element) {
-  Promise.resolve({ canRender: hasVegaEmbed(), element: element }).then(res => {
-    if (res.canRender) {
-      const id = res.element.id;
-      const name = res.element.className;
-      const data = res.element.data;
-      let el = window.document.getElementById(id);
-      if (el) {
-        el.parentNode.outerHTML = `<div id="${id}" class="${name}"></div>`;
-        el = window.document.getElementById(id);
-        vegaEmbed(el, JSON.parse(data), res.element.options);
-      }
-    } else {
-      setTimeout(() => {
-        onRenderVega(res.element);
-      }, 100);
-    }
-  });
+async function renderVegaEmbed(nr, r, element, el, data, options) {
+  await vegaEmbed.embed(el, JSON.parse(data), options);
+  element.parentNode.outerHTML = el.outerHTML;
+  nr(true);
+  r(el);
+}
+
+function onRenderVega(resolve, res) {
+  if (hasVegaEmbed()) {
+    const id = res.id;
+    const name = res.className;
+    const data = res.data;
+    const options = res.options;
+    let element = res.element;
+    const doc = element.ownerDocument;
+    cdnjs.renderCacheElement(doc, id, name, el => {
+      vegaEmbed(el, JSON.parse(data), options);
+      return new Promise(solve => {
+        //Async draw svg, need to check whether the drawing is completed regularly.
+        function checkDraw() {
+          if (el.childNodes.length > 0) {
+            element.parentNode.outerHTML = el.outerHTML;
+            //Replace display element
+            element = doc.getElementById(id);
+            if (element) {
+              element.style.display = '';
+            }
+            resolve(true);
+            solve(el);
+          } else {
+            setTimeout(checkDraw, 50);
+          }
+        }
+        checkDraw();
+      });
+    });
+  } else {
+    setTimeout(() => {
+      onRenderVega(resolve, res);
+    }, 50);
+  }
 }
 
 function showdownVega(userOptions) {
-  const parser = new DOMParser();
   const options = getOptions(userOptions);
-
-  if (!hasVegaEmbed() && typeof window !== 'undefined' && window.dispatchEvent) {
-    // Listen vegaembed custom event
-    window.addEventListener('vega', event => {
-      if (event.detail) {
-        onRenderVega(event.detail);
-      }
-    });
-  }
 
   return [
     {
       type: 'output',
-      filter: function(html) {
-        // parse html
-        const doc = parser.parseFromString(html, 'text/html');
-        const wrapper = typeof doc.body !== 'undefined' ? doc.body : doc;
+      filter: function(obj) {
+        const wrapper = obj.wrapper;
+        if (!wrapper) {
+          return false;
+        }
 
         // find the VegaEmbed in code blocks
         const vegaElements = wrapper.querySelectorAll('code.vega.language-vega');
         const vegaLiteElements = wrapper.querySelectorAll('code.vega-lite.language-vega-lite');
-
-        if (!renderVegaElements(vegaElements, vegaLiteElements, options)) {
-          return html;
+        if (!vegaElements.length && !vegaLiteElements.length) {
+          return false;
         }
-        // return html text content
-        return wrapper.innerHTML;
+        console.log(`${new Date().Format('yyyy-MM-dd HH:mm:ss.S')} Begin render vega elements.`);
+        return renderVegaElements(vegaElements, vegaLiteElements, options).then(() => {
+          console.log(`${new Date().Format('yyyy-MM-dd HH:mm:ss.S')} End render vega elements.`);
+          return obj;
+        });
       }
     }
   ];
