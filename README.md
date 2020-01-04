@@ -140,12 +140,16 @@ Put the following line into your HTML page \<header> or \<body>:
           })
           .then(function(text) {
             md = md + `\n\n## Showdown's Markdown syntax\n\n` + text;
-            element.innerHTML = showdowns.makeHtml(md);
+            showdowns.makeHtml(md).then(html=>{
+              element.innerHTML = html;
+            });
           })
           .catch(function(error) {
             console.log(error);
             if (md) {
-              element.innerHTML = showdowns.makeHtml(md);
+              showdowns.makeHtml(md).then(html=>{
+                element.innerHTML = html;
+              });
             }
           });
       })(document.getElementById("main"));
