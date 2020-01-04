@@ -5,22 +5,23 @@
  */
 'use strict';
 
-function showdownCheckType(check_csstypes_callback) {
-  const parser = new DOMParser();
+function showdownCheckType() {
   return [
     {
       type: 'output',
-      filter: function(html) {
-        if (typeof check_csstypes_callback === 'function') {
-          // parse html
-          const doc = parser.parseFromString(html, 'text/html');
-          const wrapper = typeof doc.body !== 'undefined' ? doc.body : doc;
+      filter: function(obj) {
+        const wrapper = obj.wrapper;
+        if (!wrapper) {
+          return false;
+        }
+
+        return new Promise(resolve => {
           // find the katex and assciimath elements
           const katex_css = wrapper.querySelector('.css-katex');
           const sequence_css = wrapper.querySelector('.css-sequence');
           const railroad_css = wrapper.querySelector('.css-railroad');
 
-          check_csstypes_callback({
+          obj.cssTypes = {
             hasKatex: katex_css ? true : false,
             hasSequence: sequence_css ? true : false,
             hasRailroad: sequence_css ? true : false,
@@ -29,10 +30,9 @@ function showdownCheckType(check_csstypes_callback) {
               sequence: sequence_css ? sequence_css.dataset.css : '',
               railroad: railroad_css ? railroad_css.dataset.css : ''
             }
-          });
-        }
-        // return html text content
-        return html;
+          };
+          return resolve(obj);
+        });
       }
     }
   ];

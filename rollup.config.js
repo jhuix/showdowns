@@ -188,7 +188,8 @@ if (isMinBuild) {
       compress: {
         pure_getters: true,
         unsafe: true,
-        unsafe_comps: true
+        unsafe_comps: true,
+        drop_console: !isDemoBuild
       }
     })
   );

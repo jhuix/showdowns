@@ -30,7 +30,7 @@ declare namespace showdowns {
    *
    * @return
    */
-  function init(): /* !this */ any;
+  function init(reset?: boolean | {option: boolean, extension: boolean}): /* !this */ any;
 
   /**
    *
@@ -39,8 +39,8 @@ declare namespace showdowns {
    */
   function makeHtml(
     doc: { type: string; content: string } | string,
-    callback: (type: object) => void | undefined
-  ): string;
+    callback?: (cssTypes: object) => void
+  ): Promise<string>;
 
   /**
    *

@@ -208,24 +208,33 @@ Type: Array of showdown extensions
 
 Default extensions is described below:
 
-    defaultExtensions = [
-      showdownToc,
-      showdownAlign,
-      showdownFootnotes,
-      showdownMermaid(mermaidOptions),
-      showdownFlowchart,
-      showdownRailroad,
-      showdownViz,
-      showdownSequence,
-      showdownKatex,
-      showdownVega(vegaOptions),
-      showdownWavedrom,
-      showdownPlantuml(plantumlOptions)
-    ];
+    defaultExtensions = {
+      'showdown-toc': showdownToc,
+      'showdown-align': showdownAlign,
+      'showdown-footnotes': showdownFootnotes,
+      'showdown-sequence': showdownSequence
+    }
 
 For more showdown extensions, refer to the following document:
 
 [Showdown Extensions](https://github.com/showdownjs/showdown/blob/master/README.md#extensions)
+
+#### defaultAsyncExtensions
+
+Type: Array of showdown async extensions
+
+Default async extensions is described below:
+
+    defaultAsyncExtensions = {
+      'showdown-plantuml': showdownPlantuml(plantumlOptions),
+      'showdown-mermaid': showdownMermaid(mermaidOptions),
+      'showdown-katex': showdownKatex,
+      'showdown-flowchart': showdownFlowchart,
+      'showdown-viz': showdownViz,
+      'showdown-vega': showdownVega(vegaOptions),
+      'showdown-wavedrom': showdownWavedrom,
+      'showdown-railroad': showdownRailroad,
+    }
 
 ### Properties
 
@@ -264,6 +273,18 @@ A function to add or update extension of showdown and showdown.convertor.
 Type: \[name] => void
 
 A function to remove extension of showdown and showdown.convertor.
+
+#### addAyncExtension
+
+Type: \[name, extension] => void
+
+A function to add or update aync extension of showdowns.
+
+#### removeAyncExtension
+
+Type: \[name] => void
+
+A function to remove aync extension of showdowns.
 
 #### setCDN
 
@@ -325,9 +346,14 @@ A function to init that be created showdown.convertor instance or update default
 
 #### makeHtml
 
-Type: ({type:'zip', content: string} | string, (csstypes?: { hasKatex: boolean; hasRailroad: boolean; hasSequence: boolean }) => void) => string
+Type: ({type:'zip', content: string} | string,
+       (csstypes?: {
+          hasKatex: boolean;
+          hasRailroad: boolean;
+          hasSequence: boolean
+       }) => void) => Promise<string>
 
-A function to make markdown to html that showdown.convertor converte it in current showdowns instance.
+A async function to make markdown to html that showdown.convertor converte it in current showdowns instance.
 
 #### zDecode
 

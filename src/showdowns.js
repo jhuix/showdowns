@@ -167,15 +167,14 @@ const getAsyncExtensions = (options, extensions = {}) => {
   const vegaOptions = options ? options.vega || {} : {};
 
   const asyncExtensions = {
+    'showdown-plantuml': showdownPlantuml(plantumlOptions),
     'showdown-mermaid': showdownMermaid(mermaidOptions),
-    'showdown-flowchart': showdownFlowchart,
-    'showdown-railroad': showdownRailroad,
-    'showdown-viz': showdownViz,
-    'showdown-sequence': showdownSequence,
     'showdown-katex': showdownKatex,
+    'showdown-flowchart': showdownFlowchart,
+    'showdown-viz': showdownViz,
     'showdown-vega': showdownVega(vegaOptions),
     'showdown-wavedrom': showdownWavedrom,
-    'showdown-plantuml': showdownPlantuml(plantumlOptions),
+    'showdown-railroad': showdownRailroad,
     ...extensions
   };
 
@@ -194,6 +193,7 @@ const getExtensions = (options, extensions = {}) => {
     'showdown-toc': showdownToc,
     'showdown-align': showdownAlign,
     'showdown-footnotes': showdownFootnotes,
+    'showdown-sequence': showdownSequence,
     ...extensions
   };
 
@@ -390,7 +390,7 @@ const showdowns = {
       this.converter.outputAsyncModifiers = outputAsyncModifiers;
       const asyncExtensions = getAsyncExtensions(this.defaultOptions, this.defaultAsyncExtensions);
       /**
-       * Parse sync extension
+       * Parse async extension
        * @param {*} ext
        * @param {string} [name='']
        * @private
@@ -488,9 +488,9 @@ const showdowns = {
           this.addOptions(options);
         }
         if (resetOptions.hasOwnProperty('extension') && resetOptions.extension) {
+          this.addAsyncExtension('showdown-plantuml', showdownPlantuml(this.defaultOptions.plantuml));
           this.addAsyncExtension('showdown-mermaid', showdownMermaid(this.defaultOptions.mermaid));
           this.addAsyncExtension('showdown-vega', showdownVega(this.defaultOptions.vega));
-          this.addAsyncExtension('showdown-plantuml', showdownPlantuml(this.defaultOptions.plantuml));
         }
       }
     }
@@ -519,42 +519,44 @@ const showdowns = {
 
     if (this.converter && content) {
       content = `<div class='showdowns'>${this.converter.makeHtml(content)}</div>`;
+      if (!this.converter.outputAsyncModifiers.length) {
+        return Promise.resolve(content);
+      }
+
       var globals = {
         outputAsyncModifiers: this.converter.outputAsyncModifiers,
         converter: this
       };
       let extCheckType = null;
       if (typeof callback === 'function' && callback) {
-        extCheckType = showdownCheckType(data => {
-          callback(data);
-        });
-        this.converter.addAyncExtension(extCheckType, 'showdown-checktype');
+        extCheckType = showdownCheckType();
+        this.converter.addAsyncExtension(extCheckType, 'showdown-checktype');
       }
+
       const parser = new DOMParser();
       const doc = parser.parseFromString(content, 'text/html');
       const wrapper = typeof doc.body !== 'undefined' ? doc.body : doc;
-      const options = this.converter.options;
+      const options = this.converter.getOptions();
       const converter = this.converter;
       let result = Promise.resolve({ wrapper, options, globals });
       //forEach写法
       this.converter.outputAsyncModifiers.forEach(function(ext) {
         result = result.then(obj => {
           const filter = ext.filter(obj);
-          if (filter) {
-            return filter;
-          }
+          return filter ? filter : obj;
         });
       });
       return result.then(obj => {
         if (extCheckType) {
-          converter.removeAyncExtension(extCheckType);
+          converter.removeAsyncExtension(extCheckType);
+          if (obj.hasOwnProperty('cssTypes')) {
+            callback(obj.cssTypes);
+          }
         }
         return obj.wrapper.innerHTML;
       });
     }
-    return new Promise((resolve, reject) => {
-      return reject(!content ? 'Content is empty.' : 'Converter is invaild.');
-    });
+    return Promise.reject(!content ? 'Content is empty.' : 'Converter is invaild.');
   },
   zDecode: function(zContent) {
     return zlibcodec.zDecode(zContent);

@@ -252,38 +252,6 @@ cond(yes)->io->e
 cond(no)->sub1(right)->op1
 ```
 
-### Network Sequence
-
-It's implemented in showdown-sequence.js, render diagrams of sequence using [js-sequence-diagrams](https://github.com/bramp/js-sequence-diagrams).
-
-#### Markdown Syntax
-
-The \<theme name> of json's "theme" field value is "hand" or "simple" in syntax language attribute;
-
-    ```sequence {"theme": "<theme name>", "align": "<align>"}
-    <code content>
-    ```
-
-#### Network Sequence example
-
-- Sequence example with hand theme:
-
-```sequence {"theme":"hand", "align":"center"}
-Alice->Bob: Hello Bob, how are you?
-Note right of Bob: Bob thinks
-Bob-->Alice: I am good thanks!
-```
-
-<br>
-
-- Sequence example with simple theme:
-
-```sequence {"theme":"simple", "align":"right"}
-Alice->Bob: Hello Bob, how are you?
-Note right of Bob: Bob thinks
-Bob-->Alice: I am good thanks!
-```
-
 ### Graphviz's dot
 
 It's implemented in showdown-viz.js, render diagrams of graphviz's dot using [viz.js](https://github.com/mdaines/viz.js).
@@ -549,4 +517,36 @@ OR
     }
   }
 }
+```
+
+### Network Sequence
+
+It's implemented in showdown-sequence.js, render diagrams of sequence using [js-sequence-diagrams](https://github.com/bramp/js-sequence-diagrams).
+
+#### Markdown Syntax
+
+The \<theme name> of json's "theme" field value is "hand" or "simple" in syntax language attribute;
+
+    ```sequence {"theme": "<theme name>", "align": "<align>"}
+    <code content>
+    ```
+
+#### Network Sequence example
+
+- Sequence example with hand theme:
+
+```sequence {"theme":"hand", "align":"center"}
+Alice->Bob: Hello Bob, how are you?
+Note right of Bob: Bob thinks
+Bob-->Alice: I am good thanks!
+```
+
+<br>
+
+- Sequence example with simple theme:
+
+```sequence {"theme":"simple", "align":"right"}
+Alice->Bob: Hello Bob, how are you?
+Note right of Bob: Bob thinks
+Bob-->Alice: I am good thanks!
 ```

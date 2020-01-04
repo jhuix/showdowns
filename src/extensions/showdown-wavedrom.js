@@ -55,6 +55,13 @@ function onRenderWavedrom(resolve, res) {
     element.parentNode.outerHTML = cdnjs.renderCacheElement(doc, id + index, name, el => {
       const obj = window.eval(`(${data})`);
       WaveDrom.RenderWaveForm(index, obj, id);
+      // Replace the created cache element with the original element with the same id.
+      const wdel = document.getElementById('WaveDrom_Display_' + index);
+      if (el != wdel) {
+        while (wdel.childNodes.length) {
+          el.appendChild(wdel.removeChild(wdel.childNodes[0]));
+        }
+      }
     });
     resolve(true);
   } else {
@@ -166,9 +173,9 @@ function showdownWavedrom(config) {
           return false;
         }
 
-        console.log(`${new Date().Format('yyyy-MM-dd HH:mm:ss.S')} Begin render wavedrom elements.`);
+        console.log(`${new Date().Format('yyyy-MM-dd hh:mm:ss.S')} Begin render wavedrom elements.`);
         return renderWavedromElements(elements, skin).then(() => {
-          console.log(`${new Date().Format('yyyy-MM-dd HH:mm:ss.S')} End render wavedrom elements.`);
+          console.log(`${new Date().Format('yyyy-MM-dd hh:mm:ss.S')} End render wavedrom elements.`);
           return obj;
         });
       }
