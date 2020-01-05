@@ -103,10 +103,12 @@ See more information, refer to the following document:
 
 #### Node
 
-    var showdowns  = require('showdowns'),
+    var showdowns = require('showdowns'),
     showdowns.init()
-    var text      = '# hello, markdown!',
-    var html      = showdowns.makeHtml(text);
+    var text = '# hello, markdown!',
+    showdowns.makeHtml(text).then(html => {
+      //Do something for 'html'
+    });
 
 #### Browser
 
@@ -140,14 +142,14 @@ Put the following line into your HTML page \<header> or \<body>:
           })
           .then(function(text) {
             md = md + `\n\n## Showdown's Markdown syntax\n\n` + text;
-            showdowns.makeHtml(md).then(html=>{
+            showdowns.makeHtml(md).then(html => {
               element.innerHTML = html;
             });
           })
           .catch(function(error) {
             console.log(error);
             if (md) {
-              showdowns.makeHtml(md).then(html=>{
+              showdowns.makeHtml(md).then(html => {
                 element.innerHTML = html;
               });
             }
