@@ -73,7 +73,7 @@ Which will be rendered as:
 
 For example:
 
-::: tip title {"textColor":"#222222"}
+::: tip title [color: #155724;background-color: #d4edda;border-color: #c3e6cb;padding: .75rem 1.25rem;margin-bottom: 1rem;border: 1px solid transparent;border-radius: .25rem;]
 *Some text*
 :::
 
