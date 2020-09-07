@@ -56,6 +56,27 @@ For example:
 
 [^1]: The explanation.
 
+### Container
+
+It's implemented in showdown-container.js, allows you to create block level containers:
+
+    ::: classname titlecontent {attrib}
+    *Some text*
+    :::
+
+Which will be rendered as:
+
+    <div class="showdown-container classname">
+    <p class="showdown-container title">titlecontent</p>
+    Some text
+    </div>
+
+For example:
+
+::: tip title {"textColor":"#222222"}
+*Some text*
+:::
+
 ### LaTeX math and AsciiMath
 
 It's supported by [showdown-katex](https://github.com/obedm503/showdown-katex.git), that render [LaTeX](https://www.latex-project.org/) math and [AsciiMath](http://asciimath.org/) using [KaTeX](https://github.com/Khan/KaTeX), You can check [KaTeX supported functions/symbols](https://khan.github.io/KaTeX/function-support.html).
