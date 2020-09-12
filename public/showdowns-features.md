@@ -206,7 +206,7 @@ Which will be rendered as:
 :::
 
 ::: alert-success-tip Alert Success Tip!
-<style>.alert-success-tip:after {content: "\\00a0";width: 0;height: 0;display: block;border-style: solid;border-width: 15px;border-color: #f3961c transparent transparent transparent;position: absolute;z-index: -1;bottom: -30px;left: 50px;}</style>
+<style>.alert-success-tip:after {content: "\00a0";width: 0;height: 0;display: block;border-style: solid;border-width: 15px;border-color: #f3961c transparent transparent transparent;position: absolute;z-index: -1;bottom: -30px;left: 50px;}</style>
 *A simple success alert text!*
 :::
 

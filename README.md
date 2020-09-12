@@ -22,9 +22,215 @@
 
 Check a live demo editor here https://jhuix.github.io/vue-showdowns-editor
 
+### Table Extension
+
+- The following features are extended based on the showdown's table:
+
+  - Cell spans over columns
+  - Cell spans over rows (optional)
+  - Omitted table header (optional)
+
+- Showdown's table
+
+cell style syntax has "-{2,}",":-{2,}",":-{2,}:","-{2,}:", means default (align left), align left, align center, and align right style
+
+    | Return Code | Style | Value | DESC      |
+    | ----------- | :-----: | :----- | ---------: |
+    | OK          | int   | 1     | Succeeded |
+    | ERROR       | int   | 0     | Failed '\|'    |
+
+| Return Code | Style | Value | DESC      |
+| ----------- | :-----: | :----- | ---------: |
+| OK          | int   | 1     | Succeeded |
+| ERROR       | int   | 0     | Failed    |
+
+- Colspan table
+
+"||" indicates cells being merged left.
+
+    | Return Code | Style | Value | DESC      |
+    | ====== | :-----: | ===== | ===== |
+    | **OK**          | int   | 1     | [Succeeded](https://www.baidu.com) |
+    | ERROR       | int   | 0     ||
+    | ERROR       || 0     ||
+
+<table>
+<thead>
+<tr>
+<th id="return_code">Return Code</th>
+<th id="style" style="text-align:center;">Style</th>
+<th id="value">Value</th>
+<th id="desc">DESC</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>OK</strong></td>
+<td style="text-align:center;">int</td>
+<td>1</td>
+<td><a href="https://www.baidu.com">Succeeded</a></td>
+</tr>
+<tr>
+<td>ERROR</td>
+<td style="text-align:center;">int</td>
+<td colspan="2">0</td>
+</tr>
+<tr>
+<td colspan="2">ERROR</td>
+<td colspan="2">0</td>
+</tr>
+</tbody>
+</table>
+
+- Rowspan table (optional: tablesRowspan)
+
+"^^" indicates cells being merged above.
+
+    | Return Code | Style | Value | DESC      |
+    | ====== | :-----: | ===== | ===== |
+    | ^^         || 1     | [Succeeded](https://www.baidu.com) |
+    | ^^       || 0     ||
+    | ERROR       | int   | 0     ||
+    | ERROR       || 0     ||
+    | ^^       || 0     ||
+
+<table>
+<thead>
+<tr>
+<th id="return_code">Return Code</th>
+<th id="style" style="text-align:center;">Style</th>
+<th id="value">Value</th>
+<th id="desc">DESC</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td rowspan="2" colspan="2">^^</td>
+<td>1</td>
+<td><a href="https://www.baidu.com">Succeeded</a></td>
+</tr>
+<tr>
+<td colspan="2">0</td>
+</tr>
+<tr>
+<td>ERROR</td>
+<td style="text-align:center;">int</td>
+<td colspan="2">0</td>
+</tr>
+<tr>
+<td rowspan="2" colspan="2">ERROR</td>
+<td colspan="2">0</td>
+</tr>
+<tr>
+<td colspan="2">0</td>
+</tr>
+</tbody>
+</table>
+
+- Headerless table (optional: tablesHeaderless)
+
+Table header can be eliminated.
+
+    |--|--|--|--|--|--|--|--|
+    |♜|  |♝|♛|♚|♝|♞|♜|
+    |  |♟|♟|♟|  |♟|♟|♟|
+    |♟|  |♞|  |  |  |  |  |
+    |  |♗|  |  |♟|  |  |  |
+    |  |  |  |  |♙|  |  |  |
+    |  |  |  |  |  |♘|  |  |
+    |♙|♙|♙|♙|  |♙|♙|♙|
+    |♖|♘|♗|♕|♔|  |  |♖|
+
+<table>
+<tbody>
+<tr>
+<td>♜</td>
+<td></td>
+<td>♝</td>
+<td>♛</td>
+<td>♚</td>
+<td>♝</td>
+<td>♞</td>
+<td>♜</td>
+</tr>
+<tr>
+<td></td>
+<td>♟</td>
+<td>♟</td>
+<td>♟</td>
+<td></td>
+<td>♟</td>
+<td>♟</td>
+<td>♟</td>
+</tr>
+<tr>
+<td>♟</td>
+<td></td>
+<td>♞</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>♗</td>
+<td></td>
+<td></td>
+<td>♟</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>♙</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>♘</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>♙</td>
+<td>♙</td>
+<td>♙</td>
+<td>♙</td>
+<td></td>
+<td>♙</td>
+<td>♙</td>
+<td>♙</td>
+</tr>
+<tr>
+<td>♖</td>
+<td>♘</td>
+<td>♗</td>
+<td>♕</td>
+<td>♔</td>
+<td></td>
+<td></td>
+<td>♖</td>
+</tr>
+</tbody>
+</table>
+
 ### Supporting some markdown extension features
 
 [Footnotes](https://github.com/jhuix/showdowns/blob/master/docs/showdowns-features.md#footnotes)
+
+[Container](https://github.com/jhuix/showdowns/blob/master/docs/showdowns-features.md#container)
 
 [Table of Contents](https://github.com/jhuix/showdowns/blob/master/docs/showdowns-features.md#table-of-contents)
 
@@ -95,9 +301,7 @@ See more information, refer to the following document:
         import 'showdowns/dist/showdowns.min.css';
         import showdowns from 'showdowns/dist/showdowns.min.js';
 
-4.  Support compress markdown content with [wasm-brotli](https://github.com/dfrankland/wasm-brotli) for [google brotli](https://github.com/google/brotli), use the following file:
-
-        showdowns/dist/showdowns.br.min.js
+4.  Support compress markdown content with zip.
 
 ### Quick Example
 
@@ -174,7 +378,10 @@ Default options is described below:
         underline: true,
         emoji: true,
         ghCompatibleHeaderId: false,
-        rawHeaderId: true
+        rawHeaderId: true,
+        tablesHeaderless: true,
+        tablesMerge: true,
+        tablesRowspan: true
       },
       plantuml: { imageFormat: 'svg' },
       mermaid: { theme: 'default' },
@@ -218,6 +425,7 @@ Default extensions is described below:
       'showdown-toc': showdownToc,
       'showdown-align': showdownAlign,
       'showdown-footnotes': showdownFootnotes,
+      'showdown-container': showdownContainer,
       'showdown-sequence': showdownSequence
     }
 
