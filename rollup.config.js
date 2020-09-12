@@ -2,13 +2,12 @@
  * Copyright (c) 2019-present, Jhuix (Hui Jin) <jhuix0117@gmail.com>. All rights reserved.
  * Use of this source code is governed by a MIT license that can be found in the LICENSE file.
  */
-import fs from 'fs';
 import path from 'path';
 
 // 帮助寻找node_modules里的包
 import resolve from 'rollup-plugin-node-resolve';
 // rollup 的 babel 插件，ES6转ES5
-import babel from 'rollup-plugin-babel';
+import babel from '@rollup/plugin-babel';
 // 将非ES6语法的包转为ES6可用
 import commonjs from 'rollup-plugin-commonjs';
 // 混淆JS文件
@@ -30,12 +29,11 @@ import banner from 'postcss-banner';
 const isMinBuild = process.env.MIN === 'true';
 const isFormatCJS = process.env.TARGET === 'cjs';
 const isDemoBuild = process.env.DEMO === 'true';
-const isWithBrotli = process.env.BROTLI === 'true';
 const version = process.env.VERSION || pkg.version;
 
 const out_file = (isFormatCJS ? pkg.module : pkg.main).replace(
   '.min.js',
-  (isWithBrotli ? '.br' : '') + (isMinBuild ? '.min.js' : '.js')
+  isMinBuild ? '.min.js' : '.js'
 );
 const filename = path.basename(out_file);
 
@@ -50,39 +48,8 @@ const cssbanner =
   'Copyright (c) 2019-present, Jhuix (Hui Jin) <jhuix0117@gmail.com>\n' +
   'Released under the MIT License.';
 
-// 处理import '.wasm'文件的rollup plugin
-const wasm = function() {
-  return {
-    name: 'wasm',
-    load(id) {
-      if (/\.wasm$/.test(id)) {
-        return new Promise((res, reject) => {
-          fs.readFile(id, (error, buffer) => {
-            if (error != null) {
-              reject(error);
-            }
-            res(buffer.toString('binary'));
-          });
-        });
-      }
-      return null;
-    },
-    transform(code, id) {
-      if (code && /\.wasm$/.test(id)) {
-        const src = Buffer.from(code, 'binary').toString('base64');
-        const wasm_module_dir = path.relative(path.dirname(id), path.join(__dirname, 'src/utils')) || '.';
-        return {
-          code: `import wasmModule from '${wasm_module_dir}/wasm-module.js'
-                export default function(imports){ return wasmModule(false, '${src}', imports) }`,
-          map: null
-        };
-      }
-    }
-  };
-};
-
 const config = {
-  input: isWithBrotli ? 'src/showdowns.br.js' : 'src/showdowns.js',
+  input: 'src/showdowns.js',
   output: {
     file: out_file,
     // 输出CJS格式，NODE.js模块规范通用;
@@ -127,6 +94,7 @@ const config = {
   ],
   plugins: [
     json(),
+    babel({ babelHelpers: 'bundled' }),
     postcss({
       use: isFormatCJS ? ['nmcss', 'less'] : ['less'],
       extract: true,
@@ -153,8 +121,7 @@ const config = {
           }
         }
       ]
-    }),
-    isWithBrotli && wasm()
+    })
   ]
 };
 

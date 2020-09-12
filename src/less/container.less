@@ -1,0 +1,66 @@
+/*
+ * Copyright (c) 2019-present, Jhuix (Hui Jin) <jhuix0117@gmail.com>. All rights reserved.
+ * Use of this source code is governed by a MIT license that can be found in the LICENSE file.
+ */
+.showdowns {
+  .showdown-container {
+    position: relative;
+    padding: 0.75rem 1.25rem;
+    margin-bottom: 1rem;
+    border: 1px solid #eee;
+    border-radius: 0.25rem;
+
+    &.container {
+      border-left-width: 0.25rem;
+      border-right-width: 0.25rem;
+
+      &.tip {
+        border-left-color: #5bc0de;
+        border-right-color: #5bc0de;
+      }
+      &.info {
+        border-left-color: #cce5ff;
+        border-right-color: #cce5ff;
+      }
+      &.warning {
+        border-left-color: #f0ad4e;
+        border-right-color: #f0ad4e;
+      }
+      &.error {
+        border-left-color: #d9534f;
+        border-right-color: #d9534f;
+      }
+      &.success {
+        border-left-color: #67c23a;
+        border-right-color: #67c23a;
+      }
+    }
+
+    &.alert {
+      border: 1px solid transparent;
+      transition: opacity 0.2s;
+
+      &.alert-tip {
+        background-color: #5bc0de;
+      }
+      &.alert-info {
+        background-color: #cce5ff;
+      }
+      &.alert-warning {
+        background-color: #f0ad4e;
+      }
+      &.alert-error {
+        background-color: #d9534f;
+      }
+      &.alert-success {
+        background-color: #67c23a;
+      }
+    }
+
+    .container-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      line-height: 1.2;
+    }
+  }
+}

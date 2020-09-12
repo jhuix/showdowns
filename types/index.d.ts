@@ -55,20 +55,6 @@ declare namespace showdowns {
    * @return string
    */
   function zEncode(data: string): string;
-
-  /**
-   *
-   * @param data
-   * @return string
-   */
-  function brDecode(data: string): string;
-
-  /**
-   *
-   * @param data
-   * @return string
-   */
-  function brEncode(data: string): string;
 }
 
 export default showdowns;

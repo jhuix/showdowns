@@ -19,10 +19,85 @@ Showdowns Markdown Syntax, refer to the document -- [Showdown's Markdown Syntax]
 
 ## Table
 
+- The following features are extended based on the showdown's table:
+
+  - Cell spans over columns
+  - Cell spans over rows (optional)
+  - Omitted table header (optional)
+
+- Showdown's table
+
+cell style syntax has "-{2,}",":-{2,}",":-{2,}:","-{2,}:", means default (align left), align left, align center, and align right style
+
+    | Return Code | Style | Value | DESC      |
+    | ----------- | :-----: | :----- | ---------: |
+    | OK          | int   | 1     | Succeeded |
+    | ERROR       | int   | 0     | Failed '\|'    |
+
 | Return Code | Style | Value | DESC      |
-| ----------- | ----- | ----- | --------- |
+| ----------- | :-----: | :----- | ---------: |
 | OK          | int   | 1     | Succeeded |
 | ERROR       | int   | 0     | Failed    |
+
+- Colspan table
+
+"||" indicates cells being merged left.
+
+    | Return Code | Style | Value | DESC      |
+    | ====== | :-----: | ===== | ===== |
+    | **OK**          | int   | 1     | [Succeeded](https://www.baidu.com) |
+    | ERROR       | int   | 0     ||
+    | ERROR       || 0     ||
+
+| Return Code | Style | Value | DESC      |
+| ====== | :-----: | ===== | ===== |
+| **OK**          | int   | 1     | [Succeeded](https://www.baidu.com) |
+| ERROR       | int   | 0     ||
+| ERROR       || 0     ||
+
+- Rowspan table (optional: tablesRowspan)
+
+"^^" indicates cells being merged above.
+
+    | Return Code | Style | Value | DESC      |
+    | ====== | :-----: | ===== | ===== |
+    | ^^         || 1     | [Succeeded](https://www.baidu.com) |
+    | ^^       || 0     ||
+    | ERROR       | int   | 0     ||
+    | ERROR       || 0     ||
+    | ^^       || 0     ||
+
+| Return Code | Style | Value | DESC      |
+| ====== | :-----: | ===== | ===== |
+| ^^         || 1     | [Succeeded](https://www.baidu.com) |
+| ^^       || 0     ||
+| ERROR       | int   | 0     ||
+| ERROR       || 0     ||
+| ^^       || 0     ||
+
+- Headerless table (optional: tablesHeaderless)
+
+Table header can be eliminated.
+
+    |--|--|--|--|--|--|--|--|
+    |♜|  |♝|♛|♚|♝|♞|♜|
+    |  |♟|♟|♟|  |♟|♟|♟|
+    |♟|  |♞|  |  |  |  |  |
+    |  |♗|  |  |♟|  |  |  |
+    |  |  |  |  |♙|  |  |  |
+    |  |  |  |  |  |♘|  |  |
+    |♙|♙|♙|♙|  |♙|♙|♙|
+    |♖|♘|♗|♕|♔|  |  |♖|
+
+|--|--|--|--|--|--|--|--|
+|♜|  |♝|♛|♚|♝|♞|♜|
+|  |♟|♟|♟|  |♟|♟|♟|
+|♟|  |♞|  |  |  |  |  |
+|  |♗|  |  |♟|  |  |  |
+|  |  |  |  |♙|  |  |  |
+|  |  |  |  |  |♘|  |  |
+|♙|♙|♙|♙|  |♙|♙|♙|
+|♖|♘|♗|♕|♔|  |  |♖|
 
 ## Markdown extension features
 
@@ -36,7 +111,7 @@ It's implemented sub-TOC in showdown-toc.js.
 
     [TOC]
 
-#### sub-TOC example
+#### sub-TOC examples
 
 [TOC]
 
@@ -52,29 +127,87 @@ It's implemented sub-TOC in showdown-toc.js.
 
 It's implemented in showdown-footnotes.js, use for reference the [showdown-footnotes](https://github.com/Kriegslustig/showdown-footnotes).
 
-For example:
+#### Markdown Syntax
+
+    [^1]: The explanation.
+
+#### Footnotes examples
 
 [^1]: The explanation.
 
 ### Container
 
-It's implemented in showdown-container.js, allows you to create block level containers:
+It's implemented in showdown-container.js, allows you to create block level containers.
+By default, The CSS effect with class name tip|info|warning|error|success|alert-tip|alert-info|alert-warning|alert-error|alert-success is implemented. And you can also customize the class name.
 
-    ::: classname titlecontent {attrib}
+#### Markdown Syntax
+
+    ::: <classname | parentclass-childclass> <title content>
     *Some text*
     :::
 
 Which will be rendered as:
 
-    <div class="showdown-container classname">
-    <p class="showdown-container title">titlecontent</p>
-    Some text
+    <div class="showdown-container [container classname | parentclass parentclass-childclass]">
+      <p class="container-title">title content</p>
+      <p>
+        <em>Some text</em>
+      </p>
     </div>
 
-For example:
+#### Container examples
 
-::: tip title [color: #155724;background-color: #d4edda;border-color: #c3e6cb;padding: .75rem 1.25rem;margin-bottom: 1rem;border: 1px solid transparent;border-radius: .25rem;]
-*Some text*
+::: tip
+*A simple tip text!*
+:::
+
+::: tip Tip!
+*A simple tip text!*
+:::
+
+::: info Info!
+*A simple info text!*
+:::
+
+::: warning Warning!
+*A simple warning text!*
+:::
+
+::: error Error!
+*A simple error text!*
+:::
+
+::: success Success!
+*A simple success text!*
+:::
+
+::: alert-tip
+*A simple tip alert text!*
+:::
+
+::: alert-tip Alert Tip!
+*A simple tip alert text!*
+:::
+
+::: alert-info Alert Info!
+*A simple info alert text!*
+:::
+
+::: alert-warning Alert Warning!
+*A simple warning alert text!*
+:::
+
+::: alert-error Alert Error!
+*A simple error alert text!*
+:::
+
+::: alert-success Alert Success!
+*A simple success alert text!*
+:::
+
+::: alert-success-tip Alert Success Tip!
+<style>.alert-success-tip:after {content: "\\00a0";width: 0;height: 0;display: block;border-style: solid;border-width: 15px;border-color: #f3961c transparent transparent transparent;position: absolute;z-index: -1;bottom: -30px;left: 50px;}</style>
+*A simple success alert text!*
 :::
 
 ### LaTeX math and AsciiMath
