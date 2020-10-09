@@ -1,17 +1,17 @@
 /*
  * Copyright (c) 2019-present, Jhuix (Hui Jin) <jhuix0117@gmail.com>. All rights reserved.
  * Use of this source code is governed by a MIT license that can be found in the LICENSE file.
+ * Override githubCodeBlocks parser;
+ * Support language attribute, see the following format:
+ * ```lang {"theme": "github", "align": "center"}
+ *    code block
+ * ```
+ * OR
+ * ```lang ["theme": "vox", "align": "right"]
+ *    code block
+ * ```
  */
-
-// Override githubCodeBlocks parser;
-// Support language attribute, see the following format:
-// ```lang {"theme": "github", "align": "center"}
-//    code block
-// ```
-// OR
-// ```lang ["theme": "vox", "align": "right"]
-//    code block
-// ```
+'use strict';
 
 import showdown from 'showdown';
 
