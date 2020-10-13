@@ -232,9 +232,9 @@ It's supported by [showdown-katex](https://github.com/obedm503/showdown-katex.gi
 
   * Inline math
 
-      `\\(...\\)` is delimiters of inline latex math
-      `\\[...\\]` is delimiters of inline block latex math
-      `$$...$$` is delimiters of inline block latex math
+      * `\\(...\\)` is delimiters of inline latex math
+      * `\\[...\\]` is delimiters of inline block latex math
+      * `$$...$$` is delimiters of inline block latex math
 
 - LaTex syntax:
 
@@ -252,8 +252,8 @@ It's supported by [showdown-katex](https://github.com/obedm503/showdown-katex.gi
 
   * Inline math
 
-      `@@...@@` is delimiters of inline ascii math
-      `\\~...\\~` is delimiters of inline block ascii math
+      * `@@...@@` is delimiters of inline ascii math
+      * `\\~...\\~` is delimiters of inline block ascii math
 
 #### LaTex examples
 
