@@ -51,6 +51,15 @@ showdown.asyncExtension = function(name, ext) {
     }
   }
 };
+
+/**
+ * Get an async extension
+ * @param {string} name
+ */
+showdown.getAsyncExtension = function(name) {
+  'use strict';
+  return _asyncExtensions[name];
+};
 /**
  * Remove an async extension
  * @param {string} name
