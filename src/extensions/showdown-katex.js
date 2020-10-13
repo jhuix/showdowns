@@ -1,45 +1,15 @@
 /*
  * Copyright (c) 2019-present, Jhuix (Hui Jin) <jhuix0117@gmail.com>. All rights reserved.
  * Use of this source code is governed by a MIT license that can be found in the LICENSE file.
+ * Description: showdown katex extension for markdown
  */
-/*
-Showdown katex extension for markdown,
-Modified by jhuix, Copyright (c) 2019 https://github.com/jhuix/showdowns.
-Based on showdown-katex.js, Version 0.6.0, Copyright (c) 2016 obedm503 https://github.com/obedm503/showdown-katex.git.
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the 'Software'), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
-*/
 
 if (typeof window === 'undefined') {
   throw Error('The showdown katex extension can only be used in browser environment!');
 }
 
-import asciimathToTex from 'showdown-katex/src/asciimath-to-tex';
+import asciimathToTex from './asciimath2tex';
 import cdnjs from './cdn';
-// import katex from 'katex';
-// import renderMathInElement from 'katex/dist/contrib/auto-render';
-// if (typeof Katex === 'undefined') {
-//   var Katex = katex;
-// }
-// if (typeof RenderMathInElement === 'undefined') {
-//  var RenderMathInElement = renderMathInElement;
-// }
 
 if (typeof katex === 'undefined') {
   var katex = window.katex || undefined;
@@ -87,10 +57,25 @@ function onRenderKatex(resolve, res) {
     const cssLink = res.cssLink;
     const config = res.options;
     const doc = res.element.ownerDocument;
-    const html = katex.renderToString(data, config);
-    res.element.parentNode.outerHTML = cssLink
-      ? `<div title="${input}" class="${name} css-katex" data-css="${cssLink}">${html}</div>`
-      : `<div title="${input}" class="${name}">${html}</div>`;
+    let html = '';
+    if (data instanceof Array) {
+      data.forEach(code => {
+        if (code === '') {
+          html += '<br>';
+        } else {
+          const math = katex.renderToString(code, config);
+          html += cssLink
+            ? `<div title="${input}" class="${name} css-katex" data-css="${cssLink}">${math}</div>`
+            : `<div title="${input}" class="${name}">${math}</div>`;
+        }
+      });
+    } else {
+      const math = katex.renderToString(data, config);
+      html = cssLink
+        ? `<div title="${input}" class="${name} css-katex" data-css="${cssLink}">${math}</div>`
+        : `<div title="${input}" class="${name}">${math}</div>`;
+    }
+    res.element.parentNode.outerHTML = html;
     --katexElementCount;
     if (!katexElementCount) {
       RenderMathInElement(doc.body, config);
@@ -106,7 +91,21 @@ function onRenderKatex(resolve, res) {
 function renderKatex(element, config, isAsciimath) {
   return new Promise(resolve => {
     const latex = element.textContent.trim();
-    const code = isAsciimath ? asciimathToTex(latex) : latex;
+    let data;
+    const codes = latex.split(/\n[ \f\r\t\v]*\n/);
+    if (codes.length > 1) {
+      data = new Array();
+      codes.forEach(code => {
+        code = code.trim();
+        if (code !== '') {
+          code = isAsciimath ? asciimathToTex(code) : code;
+        }
+        data.push(code);
+      });
+    } else {
+      data = isAsciimath ? asciimathToTex(latex) : latex;
+    }
+
     const langattr = element.dataset.lang;
     const langobj = langattr ? JSON.parse(langattr) : null;
     let diagramClass = '';
@@ -139,7 +138,7 @@ function renderKatex(element, config, isAsciimath) {
       id: id,
       className: name,
       input: latex,
-      data: code,
+      data: data,
       cssLink: cssLink,
       options: config
     };
@@ -180,8 +179,11 @@ const getConfig = (config = {}) => ({
   errorColor: '#ff0000',
   ...config,
   delimiters: [
-    { left: '$$', right: '$$', display: false },
-    { left: '~', right: '~', display: false, asciimath: true }
+    { left: '$$', right: '$$', display: true },
+    { left: '\\[', right: '\\]', display: true },
+    { left: '\\(', right: '\\)', display: false },
+    { left: '@@', right: '@@', display: false, asciimath: true },
+    { left: '\\~', right: '\\~', display: true, asciimath: true }
   ].concat(config.delimiters || [])
 });
 
