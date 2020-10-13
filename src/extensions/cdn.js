@@ -44,7 +44,7 @@ const cdnSrc = {
     VizRender: scheme + 'cdnjs.cloudflare.com/ajax/libs/viz.js/2.1.2/full.render.js',
     Raphael: scheme + 'cdnjs.cloudflare.com/ajax/libs/raphael/2.3.0/raphael.min.js',
     flowchart: scheme + 'cdnjs.cloudflare.com/ajax/libs/flowchart/1.14.1/flowchart.min.js',
-    mermaid: scheme + 'cdnjs.cloudflare.com/ajax/libs/mermaid/8.8.0/mermaid.min.js',
+    mermaid: scheme + 'cdnjs.cloudflare.com/ajax/libs/mermaid/8.8.2/mermaid.min.js',
     katex: scheme + 'cdnjs.cloudflare.com/ajax/libs/KaTeX/0.12.0/katex.min.js',
     katexCSS: scheme + 'cdnjs.cloudflare.com/ajax/libs/KaTeX/0.12.0/katex.min.css',
     renderMathInElement: scheme + 'cdnjs.cloudflare.com/ajax/libs/KaTeX/0.12.0/contrib/auto-render.js',

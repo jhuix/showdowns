@@ -94,7 +94,6 @@ const config = {
   ],
   plugins: [
     json(),
-    babel({ babelHelpers: 'bundled' }),
     postcss({
       use: isFormatCJS ? ['nmcss', 'less'] : ['less'],
       extract: true,
@@ -130,7 +129,8 @@ if (isFormatCJS) {
 } else {
   config.plugins.push(
     babel({
-      exclude: '**/node_modules/**'
+      exclude: '**/node_modules/**',
+      babelHelpers: 'bundled'
     }),
     resolve({
       browser: true,
