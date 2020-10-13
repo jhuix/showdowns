@@ -286,8 +286,8 @@ const showdowns = {
           ext = showdown.helper.stdExtName(ext);
           name = ext;
 
-          if (!showdown.helper.isUndefined(_asyncExtensions[ext])) {
-            ext = _asyncExtensions[ext];
+          if (!showdown.helper.isUndefined(showdown.getAsyncExtension(ext))) {
+            ext = showdown.getAsyncExtension(ext);
           } else {
             throw Error(
               'Extension "' + ext + '" could not be loaded. It was either not found or is not a valid aync extension.'
