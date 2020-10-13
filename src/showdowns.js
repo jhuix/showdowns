@@ -168,6 +168,7 @@ const showdowns = {
       if (!ext) return;
       this.converter.removeExtension(ext);
     }
+    name = showdown.helper.stdExtName(name);
     showdown.removeExtension(name);
   },
   addAsyncExtension: function(name, extension) {
@@ -195,6 +196,7 @@ const showdowns = {
       if (!ext) return;
       this.converter.removeAsyncExtension(ext);
     }
+    name = showdown.helper.stdExtName(name);
     showdown.removeAsyncExtension(name);
   },
   setCDN: function(cdnname, defScheme, distScheme) {
@@ -283,14 +285,11 @@ const showdowns = {
         name = name || null;
         // If it's a string, the extension was previously loaded
         if (showdown.helper.isString(ext)) {
-          ext = showdown.helper.stdExtName(ext);
-          name = ext;
-
-          if (!showdown.helper.isUndefined(showdown.getAsyncExtension(ext))) {
-            ext = showdown.getAsyncExtension(ext);
-          } else {
+          name = showdown.helper.stdExtName(ext);
+          ext = showdown.asyncExtension(name);
+          if (showdown.helper.isUndefined(ext)) {
             throw Error(
-              'Extension "' + ext + '" could not be loaded. It was either not found or is not a valid aync extension.'
+              'Extension "' + name + '" could not be loaded. It was either not found or is not a valid aync extension.'
             );
           }
         }

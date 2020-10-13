@@ -10,6 +10,7 @@ import plantumlcodec from '../utils/plantuml-codec.js';
 const defaultUmlWebsite = 'www.plantuml.com/plantuml';
 const defaultImageFormat = 'img';
 
+let umlElementCount = 0;
 function renderPlantumlElement(element, config) {
   return new Promise(resolve => {
     const langattr = element.dataset.lang;
@@ -41,7 +42,7 @@ function renderPlantumlElement(element, config) {
     if (imageFormat === 'svg') {
       const id = 'plantuml-' + Date.now() + '-' + Math.floor(Math.random() * 10000);
       if (typeof config.svgRender === 'function' && config.svgRender) {
-        config.svgRender(id, name, code).then(svgData => {
+        config.svgRender(id, name, code, umlElementCount).then(svgData => {
           element.parentNode.outerHTML = `<div id="${id}" class="${name}">${svgData}</div>`;
           resolve(true);
         });
@@ -77,6 +78,7 @@ function renderPlantumlElement(element, config) {
 
 // <div class="plantuml"></div>
 function renderPlantumlElements(elements, config) {
+  umlElementCount = elements.length;
   return new Promise(resolve => {
     const promiseArray = [];
     elements.forEach(element => {
@@ -102,6 +104,7 @@ function showdownPlantuml(userConfig) {
   return [
     {
       type: 'output',
+      config: config,
       filter: function(obj) {
         const wrapper = obj.wrapper;
         if (!wrapper) {

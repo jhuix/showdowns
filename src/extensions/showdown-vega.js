@@ -164,6 +164,7 @@ function showdownVega(userOptions) {
   return [
     {
       type: 'output',
+      config: options,
       filter: function(obj) {
         const wrapper = obj.wrapper;
         if (!wrapper) {

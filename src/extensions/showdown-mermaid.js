@@ -36,8 +36,11 @@ function dyncLoadScript(config) {
         mermaid = cdnjs.interopDefault(window[name]);
         mermaid.initialize(config);
       });
+      return sync
     }
   }
+
+  mermaid.initialize(config);
   return sync;
 }
 
@@ -138,6 +141,7 @@ function showdownMermaid(userConfig) {
   return [
     {
       type: 'output',
+      config: config,
       filter: function(obj) {
         const wrapper = obj.wrapper;
         if (!wrapper) {

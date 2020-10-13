@@ -202,6 +202,7 @@ const showdownKatex = userConfig => {
   return [
     {
       type: 'output',
+      config: config,
       filter: function(obj) {
         const wrapper = obj.wrapper;
         if (!wrapper) {
