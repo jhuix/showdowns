@@ -372,16 +372,6 @@ Default options is described below:
     defaultOptions = {
       showdown: {
         flavor: 'github',
-        strikethrough: true,
-        tables: true,
-        tasklists: true,
-        underline: true,
-        emoji: true,
-        ghCompatibleHeaderId: false,
-        rawHeaderId: true,
-        tablesHeaderless: true,
-        tablesMerge: true,
-        tablesRowspan: true
       },
       plantuml: { imageFormat: 'svg' },
       mermaid: { theme: 'default' },
@@ -470,9 +460,15 @@ Output showdown.convertor native object in current showdowns Instance.
 
 ### Methods
 
+#### setFlavor
+
+Type: {name: string} => void
+
+A function to add or update flavor of showdown and showdown.convertor.
+
 #### addOptions
 
-Type: {options} => void
+Type: {options: object} => void
 
 A function to add or update options of showdown and showdown.convertor.
 
@@ -510,15 +506,23 @@ A function to set cdn source when dynamically load js lib files related to more 
 - Parameter `defSheme` is default prefix scheme string of source url.
 - Parameter `distScheme` is dist prefix scheme string of source url that has prefix string is '../dist/'.
 
-#### setShowdownOptions
+#### setShowdownFlavor
 
-Type: (options: object) => objecto
+Type: (name: string) => void
 
-A function to set default options of showdown. When showdown.convertor instance be created, it can update options of the showdown and showdown.convertor.
+A function to set default flavor of showdown. When showdown.convertor instance be created, it can update flavor of the showdown and convertor.convertor.
 
 See [showdown options of defaultOptions](#defaultoptions).
 
-- flavor field value: ['github', 'ghost', 'vanilla'],default set to 'github' flavor.
+- flavor field value: ['github', 'ghost', 'vanilla', 'original', 'allon'], default set to 'github' flavor.
+
+#### setShowdownOptions
+
+Type: (options: object) => object
+
+A function to set default options of showdown. When showdown.convertor instance be created, it can update options of the showdown and convertor.convertor.
+
+See [showdown options of defaultOptions](#defaultoptions).
 
 #### setPlantumlOptions
 
