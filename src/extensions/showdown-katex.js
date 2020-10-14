@@ -28,7 +28,7 @@ function hasKatex() {
 
 let dync = false;
 const cssCdnName = 'katexCSS';
-function dyncLoadScript() {
+function dyncLoadScript(callback) {
   const sync = hasKatex();
   if (typeof window !== 'undefined') {
     if (!sync && !dync) {
@@ -42,8 +42,16 @@ function dyncLoadScript() {
         })
         .then(name => {
           RenderMathInElement = cdnjs.interopDefault(window[name]);
+          if (typeof callback === 'function' && callback) {
+            callback(RenderMathInElement);
+          }
         });
+      return sync;
     }
+  }
+
+  if (typeof callback === 'function' && callback) {
+    callback(RenderMathInElement);
   }
   return sync;
 }
@@ -188,13 +196,14 @@ const getConfig = (config = {}) => ({
 });
 
 const showdownKatex = userConfig => {
+  let inlineMathCount = 0;
   const config = getConfig(userConfig);
-  const asciimathDelimiters = config.delimiters
-    .filter(item => item.asciimath)
-    .map(({ left, right }) => {
+  const mathDelimiters = config.delimiters
+    .map(({ left, right, display, asciimath }) => {
       const test = new RegExp(`${escapeRegExp(left)}(.*?)${escapeRegExp(right)}`, 'g');
-      const replacer = (match, asciimath) => {
-        return `${left}${asciimathToTex(asciimath)}${right}`;
+      const replacer = (match, math) => {
+        ++inlineMathCount;
+        return `${left}${asciimath ? asciimathToTex(math) : math}${right}`;
       };
       return { test, replacer };
     });
@@ -209,8 +218,8 @@ const showdownKatex = userConfig => {
           return false;
         }
 
-        if (asciimathDelimiters.length) {
-          // convert inline asciimath to inline latex
+        if (mathDelimiters.length) {
+          // convert inline math to inline latex
           // ignore anything in code and pre elements
           wrapper.querySelectorAll(':not(code):not(pre)').forEach(el => {
             /** @type Text[] */
@@ -220,7 +229,7 @@ const showdownKatex = userConfig => {
             );
 
             textNodes.forEach(node => {
-              const newText = asciimathDelimiters.reduce(
+              const newText = mathDelimiters.reduce(
                 (acc, { test, replacer }) => acc.replace(test, replacer),
                 node.nodeValue
               );
@@ -234,6 +243,28 @@ const showdownKatex = userConfig => {
         const asciimath = wrapper.querySelectorAll('code.asciimath.language-asciimath');
 
         if (!latex.length && !asciimath.length) {
+          if (inlineMathCount > 0) {
+            function asyncRenderKatex(resolve, render) {
+              if (hasKatex()) {
+                render(wrapper.ownerDocument.body, config);
+                resolve(true);
+              } else {
+                setTimeout(() => {
+                  asyncRenderKatex(resolve, render);
+                }, 50);
+              }
+            }
+            console.log(`${new Date().Format('yyyy-MM-dd HH:mm:ss.S')} Begin render inline katex elements.`);
+            return new Promise(resolve => {
+              dyncLoadScript(render => {
+                asyncRenderKatex(resolve, render);
+              });
+            }).then(() => {
+              console.log(`${new Date().Format('yyyy-MM-dd HH:mm:ss.S')} End render inline katex elements.`);
+              return obj;
+            });
+          }
+
           return false;
         }
 
