@@ -375,6 +375,13 @@ Default options is described below:
       },
       plantuml: { imageFormat: 'svg' },
       mermaid: { theme: 'default' },
+      katex: { delimiters: [
+        { left: '$$', right: '$$', display: true },
+        { left: '\\[', right: '\\]', display: true },
+        { left: '\\(', right: '\\)', display: false },
+        { left: '@@', right: '@@', display: false, asciimath: true },
+        { left: '\\~', right: '\\~', display: true, asciimath: true }
+      ]},
       vega: { theme: 'vox' }
     };
 
@@ -398,6 +405,13 @@ Default options is described below:
   For more mermaid options, refer to the following document:
 
   [Mermaid Options](http://mermaid-js.github.io/mermaid/#/mermaidAPI)
+
+- katex: katex options object
+
+  For more katex options, refer to the following document:
+
+  [Katex AutoRender Options](https://katex.org/docs/autorender.html#api)
+  [Katex Render Options](https://katex.org/docs/options.html)
 
 - vega: vega-embed options object
 
@@ -543,6 +557,14 @@ A function to set default options of mermaid extension. When showdown.convertor 
 See [mermaid options of defaultOptions](#defaultoptions).
 
 - mermaid theme field value be selected in ['default', 'forest', 'dark', 'neutral']; When it be set empty, default set to 'default' theme.
+
+### setKatexOptions
+
+Type: (options: object) => object
+
+A function to set default options of katex extension. When showdown.convertor instance be created, it can reset katex extension using the new default options.
+
+See [katex options of defaultOptions](#defaultoptions).
 
 #### setVegaOptions
 
