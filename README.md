@@ -395,10 +395,10 @@ Default options is described below:
 
   For more plantuml options:
 
-    {
-      umlWebSite: "www.plantuml.com/plantuml",
-      imageFormat: "svg" | "png" | "jpg"
-    }
+      {
+        umlWebSite: "www.plantuml.com/plantuml",
+        imageFormat: "svg" | "png" | "jpg"
+      }
 
 - mermaid: mermaid options object
 
@@ -415,18 +415,18 @@ Default options is described below:
 
   In addition, delimiters is another format:
 
-    {
-      delimiters: {
-        texmath: {
-          display: [ left: "$$", right: "$$"],
-          inline:  [ left: "\\$", right: "\\$"]
-        },
-        asciimath: {
-          display: [ left: "@@", right: "@@"],
-          inline:  [ left: "\\@", right: "\\@"]
+      {
+        delimiters: {
+          texmath: {
+            display: [ left: "$$", right: "$$"],
+            inline:  [ left: "\\$", right: "\\$"]
+          },
+          asciimath: {
+            display: [ left: "@@", right: "@@"],
+            inline:  [ left: "\\@", right: "\\@"]
+          }
         }
       }
-    }
 
 - vega: vega-embed options object
 
