@@ -181,32 +181,85 @@ function escapeRegExp(str) {
 }
 
 // katex config
-const getConfig = (config = {}) => ({
-  displayMode: true,
-  throwOnError: false, // fail silently
-  errorColor: '#ff0000',
-  ...config,
-  delimiters: [
-    { left: '$$', right: '$$', display: true },
-    { left: '\\[', right: '\\]', display: true },
-    { left: '\\(', right: '\\)', display: false },
-    { left: '@@', right: '@@', display: false, asciimath: true },
-    { left: '\\~', right: '\\~', display: true, asciimath: true }
-  ].concat(config.delimiters || [])
-});
+const getConfig = (userConfig = {}) => {
+  let config = {
+    displayMode: true,
+    throwOnError: false, // fail silently
+    errorColor: '#ff0000',
+    ...userConfig
+  };
 
-const showdownKatex = userConfig => {
+  function _isEmptyArray(a) {
+    if (!Array.isArray(a) || !a.length) {
+      return false;
+    }
+
+    return true;
+  }
+
+  function _isObjectProperty(obj, prop) {
+    if (typeof obj !== 'object' || !obj.hasOwnProperty(prop)) {
+      return false;
+    }
+    return true;
+  }
+
+  function _getDelimiter(obj, style, type) {
+    if (!_isObjectProperty(obj, style) || !_isObjectProperty(obj[style], type) || !_isEmptyArray(obj[style][type])) {
+      return false;
+    }
+
+    obj[style][type].forEach(delimiter => {
+      delimiter.display = type === 'inline' ? false : true;
+      if (style === 'asciimath') {
+        delimiter.asciimath = true;
+      }
+    });
+    return obj[style][type];
+  }
+
+  if (!Array.isArray(config.delimiters)) {
+    config.delimiters = []
+      .concat(_getDelimiter(config.delimiters, 'texmath', 'inline') || [{ left: '\\(', right: '\\)', display: false }])
+      .concat(
+        _getDelimiter(config.delimiters, 'texmath', 'display') || [
+          { left: '$$', right: '$$', display: true },
+          { left: '\\[', right: '\\]', display: true }
+        ]
+      )
+      .concat(
+        _getDelimiter(config.delimiters, 'asciimath', 'inline') || [
+          { left: '@@', right: '@@', display: false, asciimath: true }
+        ]
+      )
+      .concat(
+        _getDelimiter(config.delimiters, 'asciimath', 'display') || [
+          { left: '\\~', right: '\\~', display: true, asciimath: true }
+        ]
+      );
+  } else if (!config.delimiters.length) {
+    config.delimiters = [
+      { left: '$$', right: '$$', display: true },
+      { left: '\\[', right: '\\]', display: true },
+      { left: '\\(', right: '\\)', display: false },
+      { left: '@@', right: '@@', display: false, asciimath: true },
+      { left: '\\~', right: '\\~', display: true, asciimath: true }
+    ];
+  }
+  return config;
+};
+
+function showdownKatex(userConfig) {
   let inlineMathCount = 0;
   const config = getConfig(userConfig);
-  const mathDelimiters = config.delimiters
-    .map(({ left, right, display, asciimath }) => {
-      const test = new RegExp(`${escapeRegExp(left)}(.*?)${escapeRegExp(right)}`, 'g');
-      const replacer = (match, math) => {
-        ++inlineMathCount;
-        return `${left}${asciimath ? asciimathToTex(math) : math}${right}`;
-      };
-      return { test, replacer };
-    });
+  const mathDelimiters = config.delimiters.map(({ left, right, display, asciimath }) => {
+    const test = new RegExp(`${escapeRegExp(left)}(.*?)${escapeRegExp(right)}`, 'g');
+    const replacer = (match, math) => {
+      ++inlineMathCount;
+      return asciimath ? `${left}${asciimathToTex(math)}${right}` : match;
+    };
+    return { test, replacer };
+  });
 
   return [
     {

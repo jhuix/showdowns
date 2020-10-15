@@ -395,10 +395,10 @@ Default options is described below:
 
   For more plantuml options:
 
-  {
-  umlWebSite: "www.plantuml.com/plantuml",
-  imageFormat: "svg" | "png" | "jpg"
-  };
+    {
+      umlWebSite: "www.plantuml.com/plantuml",
+      imageFormat: "svg" | "png" | "jpg"
+    }
 
 - mermaid: mermaid options object
 
@@ -412,6 +412,21 @@ Default options is described below:
 
   [Katex AutoRender Options](https://katex.org/docs/autorender.html#api)
   [Katex Render Options](https://katex.org/docs/options.html)
+
+  In addition, delimiters is another format:
+
+    {
+      delimiters: {
+        texmath: {
+          display: [ left: "$$", right: "$$"],
+          inline:  [ left: "\\$", right: "\\$"]
+        },
+        asciimath: {
+          display: [ left: "@@", right: "@@"],
+          inline:  [ left: "\\@", right: "\\@"]
+        }
+      }
+    }
 
 - vega: vega-embed options object
 
@@ -446,7 +461,7 @@ Default async extensions is described below:
     defaultAsyncExtensions = {
       'showdown-plantuml': showdownPlantuml(plantumlOptions),
       'showdown-mermaid': showdownMermaid(mermaidOptions),
-      'showdown-katex': showdownKatex,
+      'showdown-katex': showdownKatex(katexOptions),
       'showdown-flowchart': showdownFlowchart,
       'showdown-viz': showdownViz,
       'showdown-vega': showdownVega(vegaOptions),

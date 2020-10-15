@@ -36,12 +36,13 @@ const getOptions = (options = {}) => {
 const getAsyncExtensions = (options, extensions = {}) => {
   const mermaidOptions = options ? options.mermaid || {} : {};
   const plantumlOptions = options ? options.plantuml || {} : {};
+  const katexOptions = options ? options.katex || {} : {};
   const vegaOptions = options ? options.vega || {} : {};
 
   const asyncExtensions = {
     'showdown-plantuml': showdownPlantuml(plantumlOptions),
     'showdown-mermaid': showdownMermaid(mermaidOptions),
-    'showdown-katex': showdownKatex,
+    'showdown-katex': showdownKatex(katexOptions),
     'showdown-flowchart': showdownFlowchart,
     'showdown-viz': showdownViz,
     'showdown-vega': showdownVega(vegaOptions),
@@ -99,7 +100,7 @@ const showdowns = {
     showdown: getOptions(),
     plantuml: { imageFormat: 'svg' },
     mermaid: { theme: 'default' },
-    katex: { delimiters: [] },
+    katex: {},
     vega: { theme: 'vox' }
   },
   defaultExtensions: {},

@@ -114,13 +114,13 @@ showdown.setFlavor = function(name) {
   try {
     orgSetFlavor(name);
     currFlavor = name;
+    if (!flavors.hasOwnProperty(name)) return;
   } catch {
     if (!flavors.hasOwnProperty(name)) return;
-
     showdown.resetOptions();
+    currFlavor = name;
   }
   var preset = flavors[name];
-  currFlavor = name;
   for (var option in preset) {
     if (preset.hasOwnProperty(option)) {
       showdown.getOptions()[option] = preset[option];
