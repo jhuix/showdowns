@@ -178,7 +178,7 @@ function showdownVega(userOptions) {
           return false;
         }
         console.log(`${new Date().Format('yyyy-MM-dd HH:mm:ss.S')} Begin render vega elements.`);
-        return renderVegaElements(vegaElements, vegaLiteElements, options).then(() => {
+        return renderVegaElements(vegaElements, vegaLiteElements, this.config).then(() => {
           console.log(`${new Date().Format('yyyy-MM-dd HH:mm:ss.S')} End render vega elements.`);
           return obj;
         });

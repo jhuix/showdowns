@@ -200,6 +200,11 @@ function showdownSequence() {
 
         // find the sequence in code blocks
         const elements = wrapper.querySelectorAll('code.sequence.language-sequence');
+        if (elements.length) {
+          this.config = {
+            cssLink: cdnjs.getSrc(cssCdnName)
+          };
+        }
         if (!renderSequenceElements(elements)) {
           return html;
         }

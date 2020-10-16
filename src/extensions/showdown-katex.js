@@ -297,9 +297,11 @@ function showdownKatex(userConfig) {
 
         if (!latex.length && !asciimath.length) {
           if (inlineMathCount > 0) {
+            this.config.cssLink = cdnjs.getSrc(cssCdnName);
+            const that = this
             function asyncRenderKatex(resolve, render) {
               if (hasKatex()) {
-                render(wrapper.ownerDocument.body, config);
+                render(wrapper.ownerDocument.body, that.config);
                 resolve(true);
               } else {
                 setTimeout(() => {
@@ -321,8 +323,9 @@ function showdownKatex(userConfig) {
           return false;
         }
 
+        config.cssLink = cdnjs.getSrc(cssCdnName);
         console.log(`${new Date().Format('yyyy-MM-dd HH:mm:ss.S')} Begin render katex elements.`);
-        return renderBlockElements(latex, asciimath, config).then(() => {
+        return renderBlockElements(latex, asciimath, this.config).then(() => {
           console.log(`${new Date().Format('yyyy-MM-dd HH:mm:ss.S')} End render katex elements.`);
           return obj;
         });

@@ -5,6 +5,42 @@
  */
 'use strict';
 
+function _getCssLink(wrapper, className, extName) {
+  // find elements that has csslink
+  const element = wrapper.querySelector(className);
+  let cssLink = '';
+  if (element) {
+    cssLink = element.dataset.css;
+  } else {
+    let ext;
+    try {
+      ext = showdown.extension(extName);
+    } catch {}
+
+    if (!ext) {
+      try {
+        ext = showdown.asyncExtension(extName);
+      } catch {}
+    }
+
+    if (ext) {
+      if (Array.isArray(ext)) {
+        for (var i = 0; i < ext.length; ++i) {
+          if (ext[i].hasOwnProperty('config') && ext[i].config.hasOwnProperty('cssLink')) {
+            cssLink = ext[i].config.cssLink;
+            break;
+          }
+        }
+      } else if (typeof ext === 'object') {
+        if (ext.hasOwnProperty('config') && ext.config.hasOwnProperty('cssLink')) {
+          cssLink = ext.config.cssLink;
+        }
+      }
+    }
+  }
+  return cssLink;
+}
+
 function showdownCheckType() {
   return [
     {
@@ -16,19 +52,18 @@ function showdownCheckType() {
         }
 
         return new Promise(resolve => {
-          // find the katex and assciimath elements
-          const katex_css = wrapper.querySelector('.css-katex');
-          const sequence_css = wrapper.querySelector('.css-sequence');
-          const railroad_css = wrapper.querySelector('.css-railroad');
+          const katexCssLink = _getCssLink(wrapper, '.css-katex', 'showdown-katex');
+          const sequenceCssLink = _getCssLink(wrapper, '.css-sequence', 'showdown-sequence');
+          const railroadCssLink = _getCssLink(wrapper, '.css-railroad', 'showdown-railroad');
 
           obj.cssTypes = {
-            hasKatex: katex_css ? true : false,
-            hasSequence: sequence_css ? true : false,
-            hasRailroad: sequence_css ? true : false,
+            hasKatex: katexCssLink ? true : false,
+            hasSequence: sequenceCssLink ? true : false,
+            hasRailroad: railroadCssLink ? true : false,
             css: {
-              katex: katex_css ? katex_css.dataset.css : '',
-              sequence: sequence_css ? sequence_css.dataset.css : '',
-              railroad: railroad_css ? railroad_css.dataset.css : ''
+              katex: katexCssLink,
+              sequence: sequenceCssLink,
+              railroad: railroadCssLink
             }
           };
           return resolve(obj);

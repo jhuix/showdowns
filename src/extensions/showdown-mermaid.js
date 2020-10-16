@@ -154,7 +154,7 @@ function showdownMermaid(userConfig) {
         }
 
         console.log(`${new Date().Format('yyyy-MM-dd HH:mm:ss.S')} Begin render mermaid elements.`);
-        return renderMermaidElements(elements, config).then(() => {
+        return renderMermaidElements(elements, this.config).then(() => {
           console.log(`${new Date().Format('yyyy-MM-dd HH:mm:ss.S')} End render mermaid elements.`);
           return obj;
         });

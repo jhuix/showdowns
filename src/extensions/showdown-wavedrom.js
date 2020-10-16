@@ -175,7 +175,7 @@ function showdownWavedrom(skinConfig) {
         }
 
         console.log(`${new Date().Format('yyyy-MM-dd hh:mm:ss.S')} Begin render wavedrom elements.`);
-        return renderWavedromElements(elements, config.skin).then(() => {
+        return renderWavedromElements(elements, this.config.skin).then(() => {
           console.log(`${new Date().Format('yyyy-MM-dd hh:mm:ss.S')} End render wavedrom elements.`);
           return obj;
         });

@@ -117,7 +117,7 @@ function showdownPlantuml(userConfig) {
         }
 
         console.log(`${new Date().Format('yyyy-MM-dd HH:mm:ss.S')} Begin render plantuml elements.`);
-        return renderPlantumlElements(elements, config).then(() => {
+        return renderPlantumlElements(elements, this.config).then(() => {
           console.log(`${new Date().Format('yyyy-MM-dd HH:mm:ss.S')} End render plantuml elements.`);
           return obj;
         });

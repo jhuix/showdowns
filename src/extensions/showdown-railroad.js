@@ -124,6 +124,10 @@ function showdownRailroad() {
         if (!elements.length) {
           return false;
         }
+
+        this.config = {
+          cssLink: cdnjs.getSrc(cssCdnName)
+        };
         console.log(`${new Date().Format('yyyy-MM-dd HH:mm:ss.S')} Begin render railroad elements.`);
         return renderRailroadElements(elements).then(() => {
           console.log(`${new Date().Format('yyyy-MM-dd HH:mm:ss.S')} End render railroad elements.`);

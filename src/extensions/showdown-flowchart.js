@@ -232,7 +232,7 @@ function showdownFlowchart(userOptions) {
           return false;
         }
         console.log(`${new Date().Format('yyyy-MM-dd HH:mm:ss.S')} Begin render flowchart elements.`);
-        return renderFlowchartElements(flowchartElements, flowElements, options).then(() => {
+        return renderFlowchartElements(flowchartElements, flowElements, this.config).then(() => {
           console.log(`${new Date().Format('yyyy-MM-dd HH:mm:ss.S')} End render flowchart elements.`);
           return obj;
         });
