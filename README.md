@@ -573,7 +573,7 @@ See [mermaid options of defaultOptions](#defaultoptions).
 
 - mermaid theme field value be selected in ['default', 'forest', 'dark', 'neutral']; When it be set empty, default set to 'default' theme.
 
-### setKatexOptions
+#### setKatexOptions
 
 Type: (options: object) => object
 
