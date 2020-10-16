@@ -1,6 +1,6 @@
 {
   "name": "@jhuix/showdowns",
-  "version": "0.5.4",
+  "version": "0.5.5",
   "description": "A lib that make markdown to html with some extensions of showdown.js.",
   "main": "dist/showdowns.min.js",
   "browser": "dist/showdowns.min.js",
