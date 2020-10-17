@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<!--test demo for live server-->
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <link rel="icon" href="../favicon.ico" />
+    <title>showdowns demo</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        border: none;
+      }
+
+      html {
+        box-sizing: border-box;
+        text-size-adjust: 100%;
+        font-size: 14px;
+        line-height: 1.15;
+        height: 100%;
+      }
+
+      *,
+      :after,
+      :before {
+        box-sizing: inherit;
+      }
+
+      body {
+        background: #f9f9f9;
+        font-size: 14px;
+        line-height: 19px;
+        min-height: 100%;
+        position: relative;
+        font-family: Helvetica Neue, NotoSansHans-Regular, AvenirNext-Regular, arial, Hiragino Sans GB, Microsoft Yahei,
+          WenQuanYi Micro Hei, Arial, Helvetica, sans-serif;
+        -webkit-font-smoothing: antialiased;
+        height: 100%;
+      }
+
+      a {
+        color: rgb(0, 122, 204);
+      }
+
+      a:hover,
+      a:focus {
+        color: rgb(0, 137, 255);
+      }
+
+      code {
+        background-color: #f8f8f8;
+        border-color: #dfdfdf;
+        color: #333;
+      }
+
+      .workspace-container {
+        overflow: hidden;
+        margin: 8px 15px 8px 15px;
+      }
+
+      ::-webkit-scrollbar {
+        -webkit-appearance: none;
+        width: 10px;
+        height: 10px;
+      }
+
+      ::-webkit-scrollbar-track {
+        background: rgb(241, 241, 241);
+        border-radius: 0;
+      }
+
+      ::-webkit-scrollbar-thumb {
+        cursor: pointer;
+        border-radius: 5px;
+        background: rgba(0, 0, 0, 0.25);
+        transition: color 0.2s ease;
+      }
+
+      ::-webkit-scrollbar-thumb:window-inactive {
+        background: rgba(0, 0, 0, 0.15);
+      }
+
+      ::-webkit-scrollbar-thumb:hover {
+        background: rgba(128, 135, 139, 0.8);
+      }
+    </style>
+    <link rel="stylesheet" href="../dist/showdowns.css" />
+  </head>
+
+  <body style="display:none;" onload="document.body.style.display = 'block'">
+    <div id="main" class="workspace-container"></div>
+    <script src="../dist/showdowns.js"></script>
+    <script>
+      (function(element) {
+        showdowns.setCDN("local");
+        showdowns.init();
+        // showdowns.setShowdownFlavor("original");
+        showdowns.setMermaidOptions({theme:"forest"});
+        showdowns.setKatexOptions({delimiters:{
+          texmath: {
+            inline: [{ left: "\\@", right: "\\@"},{ left: "$@", right: "@$"}]
+          },
+          asciimath: {
+            inline: [{ left: "\\`@", right: "@\\`"}]
+          }
+        }});
+        let md = "";
+        let cssTypes;
+        window
+          .fetch("http://127.0.0.1:5500/docs/showdowns-features.md")
+          .then(function(response) {
+            if (response.ok) {
+              return response.text();
+            }
+          })
+          .then(function(text) {
+            md = text;
+            return window.fetch("http://127.0.0.1:5500/docs/Showdown's-Markdown-syntax.md");
+          })
+          .then(function(response) {
+            if (response.ok) {
+              return response.text();
+            }
+          })
+          .then(function(text) {
+            md = md + `\n\n## Showdown's Markdown syntax\n\n` + text;
+            showdowns
+              .makeHtml(md, csstypes => {
+                cssTypes = csstypes;
+              })
+              .then(content => {
+                element.innerHTML = content;
+              });
+          })
+          .catch(function(error) {
+            console.log(error);
+            if (md) {
+              showdowns
+                .makeHtml(md, csstypes => {
+                  cssTypes = csstypes;
+                })
+                .then(content => {
+                  element.innerHTML = content;
+                });
+            }
+          });
+      })(document.getElementById("main"));
+    </script>
+  </body>
+</html>
