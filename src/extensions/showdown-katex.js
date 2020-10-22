@@ -186,6 +186,10 @@ const getConfig = (userConfig = {}) => {
     displayMode: true,
     throwOnError: false, // fail silently
     errorColor: '#ff0000',
+    delimiters: [
+      { left: '\\[', right: '\\]', display: true },
+      { left: '\\(', right: '\\)', display: false }
+    ],
     ...userConfig
   };
 
@@ -218,32 +222,40 @@ const getConfig = (userConfig = {}) => {
     return obj[style][type];
   }
 
-  if (!Array.isArray(config.delimiters)) {
-    config.delimiters = []
-      .concat(_getDelimiter(config.delimiters, 'texmath', 'inline') || [{ left: '\\(', right: '\\)', display: false }])
+  if (!Array.isArray(config.mathDelimiters)) {
+    config.mathDelimiters = []
       .concat(
-        _getDelimiter(config.delimiters, 'texmath', 'display') || [
+        _getDelimiter(config.mathDelimiters, 'texmath', 'display') || [
           { left: '$$', right: '$$', display: true },
           { left: '\\[', right: '\\]', display: true }
         ]
       )
       .concat(
-        _getDelimiter(config.delimiters, 'asciimath', 'inline') || [
-          { left: '@@', right: '@@', display: false, asciimath: true }
+        _getDelimiter(config.mathDelimiters, 'texmath', 'inline') || [
+          { left: '$', right: '$', display: false },
+          { left: '\\(', right: '\\)', display: false }
         ]
       )
       .concat(
-        _getDelimiter(config.delimiters, 'asciimath', 'display') || [
-          { left: '\\~', right: '\\~', display: true, asciimath: true }
+        _getDelimiter(config.mathDelimiters, 'asciimath', 'display') || [
+          { left: '@@', right: '@@', display: true, asciimath: true }
+        ]
+      )
+      .concat(
+        _getDelimiter(config.mathDelimiters, 'asciimath', 'inline') || [
+          { left: '@ ', right: ' @', display: false, asciimath: true },
+          { left: '~ ', right: ' ~', display: false, asciimath: true }
         ]
       );
-  } else if (!config.delimiters.length) {
-    config.delimiters = [
+  } else if (!config.mathDelimiters.length) {
+    config.mathDelimiters = [
       { left: '$$', right: '$$', display: true },
       { left: '\\[', right: '\\]', display: true },
+      { left: '$', right: '$)', display: false },
       { left: '\\(', right: '\\)', display: false },
-      { left: '@@', right: '@@', display: false, asciimath: true },
-      { left: '\\~', right: '\\~', display: true, asciimath: true }
+      { left: '@@', right: '@@', display: true, asciimath: true },
+      { left: '@ ', right: ' @', display: false, asciimath: true },
+      { left: '~ ', right: ' ~', display: false, asciimath: true }
     ];
   }
   return config;
@@ -252,11 +264,17 @@ const getConfig = (userConfig = {}) => {
 function showdownKatex(userConfig) {
   let inlineMathCount = 0;
   const config = getConfig(userConfig);
-  const mathDelimiters = config.delimiters.map(({ left, right, display, asciimath }) => {
-    const test = new RegExp(`${escapeRegExp(left)}(.*?)${escapeRegExp(right)}`, 'g');
+  const mathDelimiters = config.mathDelimiters.map(({ left, right, display, asciimath }) => {
+    const test = new RegExp(`${escapeRegExp(left)}(.+?)${escapeRegExp(right)}`, 'g');
     const replacer = (match, math) => {
       ++inlineMathCount;
-      return asciimath ? `${left}${asciimathToTex(math)}${right}` : match;
+      if (asciimath) {
+        math = asciimathToTex(math);
+      }
+      if (display) {
+        return `\\[${math}\\]`;
+      }
+      return `\\(${math}\\)`;
     };
     return { test, replacer };
   });
@@ -298,7 +316,7 @@ function showdownKatex(userConfig) {
         if (!latex.length && !asciimath.length) {
           if (inlineMathCount > 0) {
             this.config.cssLink = cdnjs.getSrc(cssCdnName);
-            const that = this
+            const that = this;
             function asyncRenderKatex(resolve, render) {
               if (hasKatex()) {
                 render(wrapper.ownerDocument.body, that.config);
@@ -332,6 +350,6 @@ function showdownKatex(userConfig) {
       }
     }
   ];
-};
+}
 
 export default showdownKatex;

@@ -375,12 +375,14 @@ Default options is described below:
       },
       plantuml: { imageFormat: 'svg' },
       mermaid: { theme: 'default' },
-      katex: { delimiters: [
+      katex: { mathDelimiters: [
         { left: '$$', right: '$$', display: true },
         { left: '\\[', right: '\\]', display: true },
+        { left: '$', right: '$', display: false },
         { left: '\\(', right: '\\)', display: false },
-        { left: '@@', right: '@@', display: false, asciimath: true },
-        { left: '\\~', right: '\\~', display: true, asciimath: true }
+        { left: '@@', right: '@@', display: true, asciimath: true },
+        { left: '@ ', right: ' @', display: false, asciimath: true },
+        { left: '~ ', right: ' ~', display: false, asciimath: true }
       ]},
       vega: { theme: 'vox' }
     };
@@ -413,17 +415,26 @@ Default options is described below:
   [Katex AutoRender Options](https://katex.org/docs/autorender.html#api)
   [Katex Render Options](https://katex.org/docs/options.html)
 
-  In addition, delimiters is another format:
+  In addition, mathDelimiters is another format::
 
       {
-        delimiters: {
+        mathDelimiters: {
           texmath: {
-            display: [ left: "$$", right: "$$"],
-            inline:  [ left: "\\$", right: "\\$"]
+            display: [
+               {left: "$$", right: "$$"},
+               {left: '\\[', right: '\\]'}
+            ],
+            inline:  [
+              {left: "$", right: "$"},
+              {left: '\\(', right: '\\)'}
+            ]
           },
           asciimath: {
-            display: [ left: "@@", right: "@@"],
-            inline:  [ left: "\\@", right: "\\@"]
+            display: [ {left: "@@", right: "@@"}],
+            inline:  [
+              {left: "@ ", right: " @"},
+              {left: "~ ", right: " ~"},
+            ]
           }
         }
       }
