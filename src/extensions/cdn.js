@@ -70,10 +70,10 @@ const cdnSrc = {
     VizRender: scheme + 'cdn.jsdelivr.net/npm/viz.js/full.render.js',
     Raphael: scheme + 'cdn.jsdelivr.net/npm/raphael/raphael.min.js',
     flowchart: scheme + 'cdnjs.cloudflare.com/ajax/libs/flowchart/1.14.1/flowchart.min.js',
-    mermaid: scheme + 'cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js',
-    katex: scheme + 'cdn.jsdelivr.net/npm/katex/dist/katex.min.js',
-    katexCSS: scheme + 'cdn.jsdelivr.net/npm/katex/dist/katex.min.css',
-    renderMathInElement: scheme + 'cdn.jsdelivr.net/npm/katex/dist/contrib/auto-render.js',
+    mermaid: scheme + 'cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js',
+    katex: scheme + 'cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.js',
+    katexCSS: scheme + 'cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css',
+    renderMathInElement: scheme + 'cdn.jsdelivr.net/npm/katex@0.12.0/dist/contrib/auto-render.js',
     railroad: scheme + 'cdn.jsdelivr.net/npm/railroad-diagrams',
     railroadCSS: scheme + 'cdn.jsdelivr.net/npm/railroad-diagrams/railroad-diagrams.css',
     Snap: scheme + 'cdn.jsdelivr.net/npm/snapsvg',
@@ -87,9 +87,9 @@ const cdnSrc = {
       lowkey: scheme + 'cdn.jsdelivr.net/npm/wavedrom/skins/lowkey.js',
       narrow: scheme + 'cdn.jsdelivr.net/npm/wavedrom/skins/narrow.js'
     },
-    vega: scheme + 'cdn.jsdelivr.net/npm/vega/build/vega.js',
-    vegaLite: scheme + 'cdn.jsdelivr.net/npm/vega-lite/build/vega-lite.js',
-    vegaEmbed: scheme + 'cdn.jsdelivr.net/npm/vega-embed/build/vega-embed.js'
+    vega: scheme + 'cdn.jsdelivr.net/npm/vega@5/build/vega.js',
+    vegaLite: scheme + 'cdn.jsdelivr.net/npm/vega-lite@4/build/vega-lite.js',
+    vegaEmbed: scheme + 'cdn.jsdelivr.net/npm/vega-embed@6/build/vega-embed.js'
   }
 };
 

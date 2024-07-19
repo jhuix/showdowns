@@ -6,15 +6,20 @@
 'use strict';
 
 function createHeadingElement(wrapper, element, toc, nexthead) {
-  if (nexthead) {
-    toc = toc.appendChild(wrapper.ownerDocument.createElement('ul'));
+  try {
+    if (nexthead) {
+      toc = toc.appendChild(wrapper.ownerDocument.createElement('ul'));
+    }
+    const child = toc
+      .appendChild(wrapper.ownerDocument.createElement('li'))
+      .appendChild(wrapper.ownerDocument.createElement('a'));
+    if (element) {
+      child.appendChild(wrapper.ownerDocument.createTextNode(element.textContent));
+      child.href = '#' + element.id;
+    }
+  } catch {
+    console.log("append child error:" + wrapper);
   }
-
-  const child = toc
-    .appendChild(wrapper.ownerDocument.createElement('li'))
-    .appendChild(wrapper.ownerDocument.createElement('a'));
-  child.appendChild(wrapper.ownerDocument.createTextNode(element.textContent));
-  child.href = '#' + element.id;
   return toc;
 }
 
@@ -43,8 +48,12 @@ function appendTocElement(wrapper, element, currTocNode, headingLevel) {
   // you need to create a new level heading with out list.
   // Otherwise add a heading of the same heading level.
   if (headingLevel > currTocNode.preLevel) {
+    currTocNode.preLevel ++;
+    while (headingLevel > currTocNode.preLevel) {
+      currTocNode.toc = createHeadingElement(wrapper, null, currTocNode.toc, true);
+      currTocNode.preLevel ++;
+    }
     currTocNode.toc = createHeadingElement(wrapper, element, currTocNode.toc, true);
-    currTocNode.preLevel = headingLevel;
   } else {
     while (headingLevel < currTocNode.preLevel) {
       currTocNode.toc = currTocNode.toc.parentNode;
