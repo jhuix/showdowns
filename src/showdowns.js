@@ -8,6 +8,7 @@ import './less/preview.less';
 import './less/container.less';
 
 import showdown from './parser/showdown.js';
+import showdownAbc from './extensions/showdown-abc.js';
 import showdownToc from './extensions/showdown-toc.js';
 import showdownViz from './extensions/showdown-viz.js';
 import showdownVega from './extensions/showdown-vega.js';
@@ -48,6 +49,7 @@ const getAsyncExtensions = (options, extensions = {}) => {
     'showdown-vega': showdownVega(vegaOptions),
     'showdown-wavedrom': showdownWavedrom,
     'showdown-railroad': showdownRailroad,
+    'showdown-abc': showdownAbc,
     ...extensions
   };
 

@@ -5,13 +5,13 @@
 import path from 'path';
 
 // 帮助寻找node_modules里的包
-import resolve from 'rollup-plugin-node-resolve';
+import resolve from '@rollup/plugin-node-resolve';
 // rollup 的 babel 插件，ES6转ES5
 import babel from '@rollup/plugin-babel';
 // 将非ES6语法的包转为ES6可用
-import commonjs from 'rollup-plugin-commonjs';
+import commonjs from '@rollup/plugin-commonjs';
 // 混淆JS文件
-import { terser } from 'rollup-plugin-terser';
+import { terser } from '@rollup/plugin-terser';
 // 集成zlib crypto等库
 import builtins from 'rollup-plugin-node-builtins';
 import globals from 'rollup-plugin-node-globals';
@@ -60,9 +60,10 @@ const config = {
     sourcemap: true,
     banner: jsbanner,
     globals: {
+      ABCJS: 'ABCJS',
       raphael: 'Raphael',
       'flowchart.js': 'flowchart',
-      'viz.js': 'Viz',
+      '@viz-js/viz': 'Viz',
       mermaid: 'mermaid',
       katex: 'katex',
       wavedrom: 'WaveDrom',
@@ -80,11 +81,12 @@ const config = {
   },
   // 作用：指出应将哪些模块视为外部模块，否则会被打包进最终的代码里
   external: [
+    'abcjs',
     'mermaid',
     'katex',
     'raphael',
     'flowchart.js',
-    'viz.js',
+    '@viz-js/viz',
     'wavedrom',
     'vega',
     'vega-lite',
@@ -135,10 +137,8 @@ if (isFormatCJS) {
     resolve({
       browser: true,
       preferBuiltins: true,
-      customResolveOptions: {
-        // 将自定义选项传递给解析插件
-        moduleDirectory: 'node_modules'
-      }
+      // 选择module目录传递给解析插件
+      moduleDirectories: ['node_modules']
     }),
     commonjs({
       include: ['node_modules/**']

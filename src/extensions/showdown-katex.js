@@ -186,10 +186,7 @@ const getConfig = (userConfig = {}) => {
     displayMode: true,
     throwOnError: false, // fail silently
     errorColor: '#ff0000',
-    delimiters: [
-      { left: '\\[', right: '\\]', display: true },
-      { left: '\\(', right: '\\)', display: false }
-    ],
+    delimiters: null,
     ...userConfig
   };
 
@@ -202,7 +199,7 @@ const getConfig = (userConfig = {}) => {
   }
 
   function _isObjectProperty(obj, prop) {
-    if (typeof obj !== 'object' || !obj.hasOwnProperty(prop)) {
+    if (!obj || typeof obj !== 'object' || !obj.hasOwnProperty(prop)) {
       return false;
     }
     return true;
@@ -222,40 +219,48 @@ const getConfig = (userConfig = {}) => {
     return obj[style][type];
   }
 
-  if (!Array.isArray(config.mathDelimiters)) {
-    config.mathDelimiters = []
+  if (!Array.isArray(config.delimiters)) {
+    config.delimiters = []
       .concat(
-        _getDelimiter(config.mathDelimiters, 'texmath', 'display') || [
+        _getDelimiter(config.delimiters, 'texmath', 'display') || [
           { left: '$$', right: '$$', display: true },
-          { left: '\\[', right: '\\]', display: true }
+          { left: '\\[', right: '\\]', display: true },
+          { left: "\\begin{equation}", right: "\\end{equation}", display: true },
+          { left: "\\begin{align}", right: "\\end{align}", display: true },
+          { left: "\\begin{alignat}", right: "\\end{alignat}", display: true },
+          { left: "\\begin{gather}", right: "\\end{gather}", display: true },
+          { left: "\\begin{CD}", right: "\\end{CD}", display: true }          
         ]
       )
       .concat(
-        _getDelimiter(config.mathDelimiters, 'texmath', 'inline') || [
-          { left: '$', right: '$', display: false },
+        _getDelimiter(config.delimiters, 'texmath', 'inline') || [
           { left: '\\(', right: '\\)', display: false }
         ]
       )
       .concat(
-        _getDelimiter(config.mathDelimiters, 'asciimath', 'display') || [
+        _getDelimiter(config.delimiters, 'asciimath', 'display') || [
           { left: '@@', right: '@@', display: true, asciimath: true }
         ]
       )
       .concat(
-        _getDelimiter(config.mathDelimiters, 'asciimath', 'inline') || [
+        _getDelimiter(config.delimiters, 'asciimath', 'inline') || [
           { left: '@ ', right: ' @', display: false, asciimath: true },
-          { left: '~ ', right: ' ~', display: false, asciimath: true }
+          { left: "\\~", right: "\\~", display: false, asciimath: true }
         ]
       );
-  } else if (!config.mathDelimiters.length) {
-    config.mathDelimiters = [
+  } else if (!config.delimiters.length) {
+    config.delimiters = [
       { left: '$$', right: '$$', display: true },
       { left: '\\[', right: '\\]', display: true },
-      { left: '$', right: '$)', display: false },
+      { left: "\\begin{equation}", right: "\\end{equation}", display: true },
+      { left: "\\begin{align}", right: "\\end{align}", display: true },
+      { left: "\\begin{alignat}", right: "\\end{alignat}", display: true },
+      { left: "\\begin{gather}", right: "\\end{gather}", display: true },
+      { left: "\\begin{CD}", right: "\\end{CD}", display: true },      
       { left: '\\(', right: '\\)', display: false },
       { left: '@@', right: '@@', display: true, asciimath: true },
       { left: '@ ', right: ' @', display: false, asciimath: true },
-      { left: '~ ', right: ' ~', display: false, asciimath: true }
+      { left: "\\~", right: "\\~", display: false, asciimath: true }
     ];
   }
   return config;
@@ -264,7 +269,7 @@ const getConfig = (userConfig = {}) => {
 function showdownKatex(userConfig) {
   let inlineMathCount = 0;
   const config = getConfig(userConfig);
-  const mathDelimiters = config.mathDelimiters.map(({ left, right, display, asciimath }) => {
+  const mathDelimiters = config.delimiters.map(({ left, right, display, asciimath }) => {
     const test = new RegExp(`${escapeRegExp(left)}(.+?)${escapeRegExp(right)}`, 'g');
     const replacer = (match, math) => {
       ++inlineMathCount;

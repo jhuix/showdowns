@@ -49,8 +49,10 @@ function onRenderMermaid(resolve, res) {
     const id = res.id;
     const name = res.className;
     const data = res.data;
-    mermaid.render(id, data, svgCode => {
-      res.element.parentNode.outerHTML = `<div class="${name}">${svgCode}</div>`;
+    const doc = res.element.ownerDocument;
+    const node = res.element.parentNode;
+    mermaid.render(id, data).then(m =>{
+      node.outerHTML = `<div class="${name}">${m.svg}</div>`;
       resolve(true);
     });
   } else {
@@ -121,7 +123,7 @@ function renderMermaidElements(elements, config) {
 // mermaid default config
 const getConfig = (config = {}) => ({
   theme: 'forest',
-  logLevel: 3,
+  logLevel: 4,
   startOnLoad: false,
   arrowMarkerAbsolute: false,
   flowchart: {

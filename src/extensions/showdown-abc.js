@@ -1,76 +1,64 @@
 /*
- * Copyright (c) 2019-present, Jhuix (Hui Jin) <jhuix0117@gmail.com>. All rights reserved.
+ * Copyright (c) 2024-present, Jhuix (Hui Jin) <jhuix0117@gmail.com>. All rights reserved.
  * Use of this source code is governed by a MIT license that can be found in the LICENSE file.
- * Description: showdown viz extension for markdown
+ * Description: showdown railroad extension for markdown
  */
 'use strict';
 
 if (typeof window === 'undefined') {
-  throw Error('The showdown viz extension can only be used in browser environment!');
+  throw Error('The showdown railroad extension can only be used in browser environment!');
 }
 
 import cdnjs from './cdn';
-// import viz from 'viz.js';
-// if (typeof Viz === 'undefined') {
-//   var Viz = viz;
-// }
 
-if (typeof Viz === 'undefined') {
-  var Viz = window.Viz || undefined;
-}
+if (typeof ABCJS === 'undefined') {
+    var ABCJS = window.ABCJS || undefined;
+}  
 
-const engines = ['circo', 'dot', 'neato', 'osage', 'twopi'];
-
-function hasViz() {
-  return typeof Viz !== 'undefined' && Viz && typeof Viz.instance !== 'undefined'
-    ? true
-    : false;
+function hasAbc() {
+    return !!ABCJS;
 }
 
 let dync = false;
+const cssCdnName = 'ABCJSCSS';
 function dyncLoadScript() {
-  const sync = hasViz();
+  const sync = hasAbc();
   if (typeof window !== 'undefined') {
     if (!sync && !dync) {
       dync = true;
-      cdnjs.loadScript('Viz').then(name => {
-        Viz = cdnjs.interopDefault(window[name]);
+      cdnjs.loadStyleSheet(cssCdnName);
+      cdnjs.loadScript('ABCJS').then(name => {
+        ABCJS = cdnjs.interopDefault(window[name]);
       });
     }
   }
   return sync;
 }
 
-function onRenderViz(resolve, res) {
-  if (hasViz()) {
+function onRenderAbc(resolve, res) {
+  if (hasAbc()) {
     const id = res.id;
     const name = res.className;
     const data = res.data;
-    const el = res.element;
-    const langattr = res.langattr;
-    let engine = 'dot';
-    if (langattr) {
-      const obj = JSON.parse(langattr);
-      if (obj && obj.engine && engines.indexOf(obj.engine) != -1) {
-        engine = obj.engine;
-      }
-    }
-    Viz.instance().then(viz => {
-      const svg = viz.renderString(data, { format: 'svg', engine: engine });
-      el.parentNode.outerHTML = `<div id="${id}" class="${name}">${svg}</div>`;
-      resolve(true)
-    });
+    const cssLink = res.cssLink;
+    const doc = res.element.ownerDocument;
+    res.element.parentNode.outerHTML = cssLink
+      ? `<div id="${id}" class="${name} css-abc" data-css="${cssLink}"></div>`
+      : `<div id="${id}" class="${name}"></div>`;
+    const element = doc.getElementById(id);
+    ABCJS.renderAbc(element, data);
+    resolve(true);
   } else {
     setTimeout(() => {
-      onRenderViz(resolve, res);
+      onRenderAbc(resolve, res);
     }, 50);
   }
 }
 
 /**
- * render Viz graphs
+ * render abc graphs
  */
-function renderViz(element) {
+function renderAbc(element) {
   return new Promise(resolve => {
     const langattr = element.dataset.lang;
     const langobj = langattr ? JSON.parse(langattr) : null;
@@ -92,32 +80,32 @@ function renderViz(element) {
         }
       }
     }
-
+    const cssLink = cdnjs.getSrc(cssCdnName);
     const code = element.textContent.trim();
     const name =
       (element.classList.length > 0 ? element.classList[0] : '') +
       (!element.className || !diagramClass ? '' : ' ') +
       diagramClass;
-    const id = 'viz-' + Date.now() + '-' + Math.floor(Math.random() * 10000);
+    const id = 'abc-' + Date.now() + '-' + Math.floor(Math.random() * 10000);
     element.id = id;
     const res = {
       element: element,
       id: id,
       className: name,
       data: code,
-      langattr: langattr
+      cssLink: cssLink
     };
-    onRenderViz(resolve, res);
+    onRenderAbc(resolve, res);
   });
 }
 
-// <div class="dot"></div>
-function renderVizElements(elements) {
+// <div class="abc"></div>
+function renderAbcElements(elements) {
   dyncLoadScript();
   return new Promise(resolve => {
     const promiseArray = [];
     elements.forEach(element => {
-      promiseArray.push(renderViz(element));
+      promiseArray.push(renderAbc(element));
     });
     Promise.all(promiseArray).then(() => {
       resolve(true);
@@ -125,7 +113,8 @@ function renderVizElements(elements) {
   });
 }
 
-function showdownViz() {
+const extName = 'abc';
+function showdownAbc() {
   return [
     {
       type: 'output',
@@ -134,14 +123,18 @@ function showdownViz() {
         if (!wrapper) {
           return false;
         }
-        // find the Viz in code blocks
-        const elements = wrapper.querySelectorAll('code.dot.language-dot');
+        // find the railroad in code blocks
+        const elements = wrapper.querySelectorAll(`code.${extName}.language-${extName}`);
         if (!elements.length) {
           return false;
         }
-        console.log(`${new Date().Format('yyyy-MM-dd HH:mm:ss.S')} Begin render dot elements.`);
-        return renderVizElements(elements).then(() => {
-          console.log(`${new Date().Format('yyyy-MM-dd HH:mm:ss.S')} End render dot elements.`);
+
+        this.config = {
+          cssLink: cdnjs.getSrc(cssCdnName)
+        };
+        console.log(`${new Date().Format('yyyy-MM-dd HH:mm:ss.S')} Begin render ${extName} elements.`);
+        return renderAbcElements(elements).then(() => {
+          console.log(`${new Date().Format('yyyy-MM-dd HH:mm:ss.S')} End render ${extName} elements.`);
           return obj;
         });
       }
@@ -149,4 +142,4 @@ function showdownViz() {
   ];
 }
 
-export default showdownViz;
+export default showdownAbc;

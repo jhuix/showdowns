@@ -112,6 +112,7 @@ const getOptions = (userOptions = {}) => ({
   actions: { editor: false },
   theme: 'vox',
   tooltip: false,
+  renderer: 'svg',
   ...userOptions
 });
 
@@ -131,25 +132,35 @@ function onRenderVega(resolve, res) {
     let element = res.element;
     const doc = element.ownerDocument;
     cdnjs.renderCacheElement(doc, id, name, el => {
-      vegaEmbed(el, JSON.parse(data), options);
-      return new Promise(solve => {
-        //Async draw svg, need to check whether the drawing is completed regularly.
-        function checkDraw() {
-          if (el.childNodes.length > 0) {
-            element.parentNode.outerHTML = el.outerHTML;
-            //Replace display element
-            element = doc.getElementById(id);
-            if (element) {
-              element.style.display = '';
-            }
-            resolve(true);
-            solve(el);
-          } else {
-            setTimeout(checkDraw, 50);
-          }
-        }
-        checkDraw();
+      return new Promise(solve =>{
+        vegaEmbed(el, JSON.parse(data), options).then(() => {
+          element.parentNode.outerHTML = el.outerHTML;
+          element = doc.getElementById(id);
+          if (element) {
+            element.style.display = '';
+          }          
+          resolve(true);
+          solve(el);
+        });
       });
+      // return new Promise(solve => {
+      //   //Async draw svg, need to check whether the drawing is completed regularly.
+      //   function checkDraw() {
+      //     if (el.childNodes.length > 0) {
+      //       element.parentNode.outerHTML = el.outerHTML;
+      //       //Replace display element
+      //       element = doc.getElementById(id);
+      //       if (element) {
+      //         element.style.display = '';
+      //       }
+      //       resolve(true);
+      //       solve(el);
+      //     } else {
+      //       setTimeout(checkDraw, 50);
+      //     }
+      //   }
+      //   checkDraw();
+      // });
     });
   } else {
     setTimeout(() => {
