@@ -7,47 +7,51 @@ Click the link to preview the [showdowns features](https://jhuix.github.io/showd
 
 Showdowns Markdown Syntax, refer to the document -- [Showdown's Markdown Syntax](https://github.com/showdownjs/showdown/wiki/Showdown's-Markdown-syntax).
 
-- **In browser environment, it is implemented to dynamically load js lib files related to more showdown diagrams extension for using [showdowns >= 0.3.0 version](https://github.com/jhuix/showdowns).**
+* **In browser environment, it is implemented to dynamically load js lib files related to more showdown diagrams extension for using [showdowns >= 0.3.0 version](https://github.com/jhuix/showdowns).**
 
-- **In codeblock of markdown, expanded syntax language attribute from "\```language" to "\```language {json}" or "\```language [json]".**
+* **In codeblock of markdown, expanded syntax language attribute from "\`\`\`language" to "\`\`\`language {json}" or "\`\`\`language \[json]".**
 
-    - **The common "align" field value of json is "left" or "center" or "right" in syntax language attribute, and it is empty means "left" align.**
+  * **The common "align" field value of json is "left" or "center" or "right" in syntax language attribute, and it is empty means "left" align.**
 
-    - **The common "codeblock" field value of json is "true" or "false" in syntax language attribute, and it is empty means "false". It is "true" means the codeblock is forced to display as normal code block, otherwise the codeblock is tried to parse as corresponding diagrams.**
+  * **The common "codeblock" field value of json is "true" or "false" in syntax language attribute, and it is empty means "false". It is "true" means the codeblock is forced to display as normal code block, otherwise the codeblock is tried to parse as corresponding diagrams.**
 
-    - For example, see following [Network Sequence](#network-sequence) example.
+  * For example, see following [Network Sequence](#network-sequence) example.
 
 ## Table
 
-- The following features are extended based on the showdown's table:
+* The following features are extended based on the showdown's table:
 
-  - Cell spans over columns
-  - Cell spans over rows (optional)
-  - Omitted table header (optional)
+  * Cell spans over columns
+  * Cell spans over rows (optional)
+  * Omitted table header (optional)
 
-- Showdown's table
+* Showdown's table
 
 cell style syntax has "-{2,}",":-{2,}",":-{2,}:","-{2,}:", means default (align left), align left, align center, and align right style
 
-    | Return Code | Style | Value | DESC      |
-    | ----------- | :-----: | :----- | ---------: |
-    | OK          | int   | 1     | Succeeded |
-    | ERROR       | int   | 0     | Failed '\|'    |
+```
+| Return Code | Style | Value | DESC      |
+| ----------- | :-----: | :----- | ---------: |
+| OK          | int   | 1     | Succeeded |
+| ERROR       | int   | 0     | Failed '\|'    |
+```
 
 | Return Code | Style | Value | DESC      |
 | ----------- | :-----: | :----- | ---------: |
 | OK          | int   | 1     | Succeeded |
 | ERROR       | int   | 0     | Failed    |
 
-- Colspan table
+* Colspan table
 
 "||" indicates cells being merged left.
 
-    | Return Code | Style | Value | DESC      |
-    | ====== | :-----: | ===== | ===== |
-    | **OK**          | int   | 1     | [Succeeded](https://www.baidu.com) |
-    | ERROR       | int   | 0     ||
-    | ERROR       || 0     ||
+```
+| Return Code | Style | Value | DESC      |
+| ====== | :-----: | ===== | ===== |
+| **OK**          | int   | 1     | [Succeeded](https://www.baidu.com) |
+| ERROR       | int   | 0     ||
+| ERROR       || 0     ||
+```
 
 | Return Code | Style | Value | DESC      |
 | ====== | :-----: | ===== | ===== |
@@ -55,17 +59,19 @@ cell style syntax has "-{2,}",":-{2,}",":-{2,}:","-{2,}:", means default (align 
 | ERROR       | int   | 0     ||
 | ERROR       || 0     ||
 
-- Rowspan table (optional: tablesRowspan)
+* Rowspan table (optional: tablesRowspan)
 
 "^^" indicates cells being merged above.
 
-    | Return Code | Style | Value | DESC      |
-    | ====== | :-----: | ===== | ===== |
-    | ^^         || 1     | [Succeeded](https://www.baidu.com) |
-    | ^^       || 0     ||
-    | ERROR       | int   | 0     ||
-    | ERROR       || 0     ||
-    | ^^       || 0     ||
+```
+| Return Code | Style | Value | DESC      |
+| ====== | :-----: | ===== | ===== |
+| ^^         || 1     | [Succeeded](https://www.baidu.com) |
+| ^^       || 0     ||
+| ERROR       | int   | 0     ||
+| ERROR       || 0     ||
+| ^^       || 0     ||
+```
 
 | Return Code | Style | Value | DESC      |
 | ====== | :-----: | ===== | ===== |
@@ -75,19 +81,21 @@ cell style syntax has "-{2,}",":-{2,}",":-{2,}:","-{2,}:", means default (align 
 | ERROR       || 0     ||
 | ^^       || 0     ||
 
-- Headerless table (optional: tablesHeaderless)
+* Headerless table (optional: tablesHeaderless)
 
 Table header can be eliminated.
 
-    |--|--|--|--|--|--|--|--|
-    |♜|  |♝|♛|♚|♝|♞|♜|
-    |  |♟|♟|♟|  |♟|♟|♟|
-    |♟|  |♞|  |  |  |  |  |
-    |  |♗|  |  |♟|  |  |  |
-    |  |  |  |  |♙|  |  |  |
-    |  |  |  |  |  |♘|  |  |
-    |♙|♙|♙|♙|  |♙|♙|♙|
-    |♖|♘|♗|♕|♔|  |  |♖|
+```
+|--|--|--|--|--|--|--|--|
+|♜|  |♝|♛|♚|♝|♞|♜|
+|  |♟|♟|♟|  |♟|♟|♟|
+|♟|  |♞|  |  |  |  |  |
+|  |♗|  |  |♟|  |  |  |
+|  |  |  |  |♙|  |  |  |
+|  |  |  |  |  |♘|  |  |
+|♙|♙|♙|♙|  |♙|♙|♙|
+|♖|♘|♗|♕|♔|  |  |♖|
+```
 
 |--|--|--|--|--|--|--|--|
 |♜|  |♝|♛|♚|♝|♞|♜|
@@ -101,7 +109,7 @@ Table header can be eliminated.
 
 ## Markdown extension features
 
-[TOC]
+\[TOC]
 
 ### Table of Contents
 
@@ -109,11 +117,13 @@ It's implemented sub-TOC in showdown-toc.js.
 
 #### Markdown Syntax
 
-    [TOC]
+```
+[TOC]
+```
 
 #### sub-TOC examples
 
-[TOC]
+\[TOC]
 
 ##### sub-TOC examples1
 
@@ -129,11 +139,13 @@ It's implemented in showdown-footnotes.js, use for reference the [showdown-footn
 
 #### Markdown Syntax
 
-    [^1]: The explanation.
+```
+[^1]: The explanation.
+```
 
 #### Footnotes examples
 
-[^1]: The explanation.
+\[^1]: The explanation.
 
 ### Container
 
@@ -142,18 +154,22 @@ By default, The CSS effect with class name tip|info|warning|error|success|alert-
 
 #### Markdown Syntax
 
-    ::: <classname | parentclass-childclass> <title content>
-    *Some text*
-    :::
+```
+::: <classname | parentclass-childclass> <title content>
+*Some text*
+:::
+```
 
 Which will be rendered as:
 
-    <div class="showdown-container [container classname | parentclass parentclass-childclass]">
-      <p class="container-title">title content</p>
-      <p>
-        <em>Some text</em>
-      </p>
-    </div>
+```
+<div class="showdown-container [container classname | parentclass parentclass-childclass]">
+  <p class="container-title">title content</p>
+  <p>
+    <em>Some text</em>
+  </p>
+</div>
+```
 
 #### Container examples
 
@@ -206,7 +222,9 @@ Which will be rendered as:
 :::
 
 ::: alert-success-tip Alert Success Tip!
+
 <style>.alert-success-tip:after {content: '\00a0';width: 0;height: 0;display: block;border-style: solid;border-width: 15px;border-color: #f3961c transparent transparent transparent;position: absolute;z-index: -1;bottom: -30px;left: 50px;}</style>
+
 *A simple success alert text!*
 :::
 
@@ -216,40 +234,42 @@ It's supported by [showdown-katex](https://github.com/obedm503/showdown-katex.gi
 
 #### Markdown Syntax
 
-- AsciiMath syntax:
+* AsciiMath syntax:
 
   * Block multiple math
 
-      Multiple math are separated by an empty line.
+    Multiple math are separated by an empty line.
 
-            ```asciimath {"align": "left | center | right", "codeblock": true | false}
-            <code content>
+    ````
 
-            <code content>
-            ```
+        ```asciimath {"align": "left | center | right", "codeblock": true | false}
+        <code content>
+        ```
 
-  * Inline math
-
-      * `\\(...\\)` is delimiters of inline latex math
-      * `\\[...\\]` is delimiters of inline block latex math
-      * `$$...$$` is delimiters of inline block latex math
-
-- LaTex syntax:
-
-  * Block multiple math
-
-      Multiple math are separated by an empty line.
-
-            ```latex {"align": "left | center | right", "codeblock": true | false}
-            <code content>
-
-            <code content>
-            ```
+    ````
 
   * Inline math
 
       * `@@...@@` is delimiters of inline ascii math
       * `\\~...\\~` is delimiters of inline block ascii math
+
+* LaTex syntax:
+
+  * Block multiple latex
+
+    Multiple math are separated by an empty line.
+
+    ````
+        ```latex {"align": "left | center | right", "codeblock": true | false}
+        <code content>
+        ```
+    ````
+
+  * Inline latex
+
+      * `\\(...\\)` is delimiters of inline latex math
+      * `\\[...\\]` is delimiters of inline block latex math
+      * `$$...$$` is delimiters of inline block latex math
 
 #### LaTex examples
 
@@ -268,9 +288,9 @@ x=\frac{ -b\pm\sqrt{ b^2-4ac } } {2a}
 ```
 
 where:
-   
+
 * \\(\sqrt{ b^2-4ac }\\) is inline latex math
-* \\[\sqrt{ b^2-4ac }\\] is inline latex block math
+* \\\[\sqrt{ b^2-4ac }\\] is inline latex block math
 * $$\sqrt{ b^2-4ac }$$ is inline latex block math
 
 #### AsciiMath examples
@@ -291,7 +311,7 @@ delta Q = rho \ c \u
 
 where:
 
-- @@delta Q@@ is the internal heat energy per unit volume \\~(J * m^-3)\\~
+* @@delta Q@@ is the internal heat energy per unit volume \\~(J \* m^-3)\\~
 
 ### Mermaid
 
@@ -299,26 +319,32 @@ It's implemented in showdown-mermaid.js, render diagrams of Flowchart or Sequenc
 
 #### Markdown Syntax
 
-- Flowchart syntax:
+* Flowchart syntax:
 
-        ```mermaid {"align": "left | center | right", "codeblock": true | false}
-        graph TD;
-        <code content>
-        ```
+  ````
+    ```mermaid {"align": "left | center | right", "codeblock": true | false}
+    graph TD;
+    <code content>
+    ```
+  ````
 
-- Sequence diagram syntax:
+* Sequence diagram syntax:
 
-        ```mermaid {"align": "left | center | right", "codeblock": true | false}
-        sequenceDiagram
-        <code content>
-        ```
+  ````
+    ```mermaid {"align": "left | center | right", "codeblock": true | false}
+    sequenceDiagram
+    <code content>
+    ```
+  ````
 
-- Gantt diagram syntax:
+* Gantt diagram syntax:
 
-        ```mermaid {"align": "left | center | right", "codeblock": true | false}
-        gantt
-        <code content>
-        ```
+  ````
+    ```mermaid {"align": "left | center | right", "codeblock": true | false}
+    gantt
+    <code content>
+    ```
+  ````
 
 #### Mermaid examples
 
@@ -334,10 +360,10 @@ graph TD;
 
 ```mermaid {"align":"center"}
 graph TD;
-           A-->B;
-           A-->C;
-           B-->D;
-           C-->D;
+           A-->B
+           A-->C
+           B-->D
+           C-->D
 ```
 
 ##### Sequence diagram
@@ -377,15 +403,17 @@ It's implemented in showdown-plantuml.js. render diagrams of uml using [plantuml
 
 #### Markdown Syntax
 
-    ```plantuml {"align": "left | center | right", "codeblock": true | false}
-    @startuml
-    <code content>
-    @enduml
-    ```
+````
+```plantuml {"align": "left | center | right", "codeblock": true | false}
+@startuml
+<code content>
+@enduml
+```
+````
 
 #### Plantuml example
 
-```plantuml  {"align":"right"}
+```plantuml {"align":"right"}
       @startuml
       participant User
 
@@ -415,19 +443,23 @@ It's implemented in showdown-flowchart.js, render diagrams of flowchart using [f
 
 #### Markdown Syntax
 
-    ```flow {"align": "left | center | right", "codeblock": true | false}
-    <code content>
-    ```
+````
+```flow {"align": "left | center | right", "codeblock": true | false}
+<code content>
+```
+````
 
 OR
 
-    ```flowchart {"align": "left | center | right", "codeblock": true | false}
-    <code content>
-    ```
+````
+```flowchart {"align": "left | center | right", "codeblock": true | false}
+<code content>
+```
+````
 
 #### Flowchart example
 
-```flow  {"align":"center"}
+```flow {"align":"center"}
 st=>start: Start:>http://www.google.com[blank]
 e=>end:>http://www.google.com
 op1=>operation: My Operation
@@ -465,13 +497,15 @@ It's implemented in showdown-viz.js, render diagrams of graphviz's dot using [vi
 
 The \<engine name> of json's "engine" field value is 'circo', 'dot', 'neato', 'osage', 'twopi' in syntax language attribute.
 
-    ```dot {"engine": "<engine name>", "align": "<align>"}
-    <code content>
-    ```
+````
+```dot {"engine": "<engine name>", "align": "<align>"}
+<code content>
+```
+````
 
 #### Graphviz's dot example
 
-- Dot example with dot engine:
+* Dot example with dot engine:
 
 ```dot {"engine":"dot", "align":"center"}
 digraph G {
@@ -488,7 +522,7 @@ digraph G {
 
 <br>
 
-- Dot example with circo engine:
+* Dot example with circo engine:
 
 ```dot {"engine":"circo", "align":"right"}
 digraph G {
@@ -509,9 +543,11 @@ It's implemented in showdown-viz.js, render diagrams of railroad using [railroad
 
 #### Markdown Syntax
 
-    ```railroad {"align": "left | center | right", "codeblock": true | false}
-    <code content>
-    ```
+````
+```railroad {"align": "left | center | right", "codeblock": true | false}
+<code content>
+```
+````
 
 #### Railroad diagrams example
 
@@ -533,9 +569,11 @@ It's implemented in showdown-viz.js, render diagrams of wavedrom using [wavedrom
 
 #### Markdown Syntax
 
-    ```wavedrom {"align": "left | center | right", "codeblock": true | false}
-    <code content>
-    ```
+````
+```wavedrom {"align": "left | center | right", "codeblock": true | false}
+<code content>
+```
+````
 
 #### WaveDrom example
 
@@ -564,25 +602,71 @@ It's implemented in showdown-viz.js, render diagrams of wavedrom using [wavedrom
 ]}
 ```
 
+### Echarts
+
+#### Markdown Syntax
+
+````
+```echarts {"align": "left | center | right", "codeblock": true | false, "width":400, "height":300}
+<code content>
+```
+````
+
+#### Echarts example
+
+```echarts {"align":"center"}
+{
+  "title": { "text": "最近 30 天" },
+  "tooltip": { "trigger": "axis", "axisPointer": { "lineStyle": { "width": 0 } } },
+  "legend": { "data": ["帖子", "用户", "回帖"] },
+  "xAxis": [{
+      "type": "category",
+      "boundaryGap": false,
+      "data": ["2019-05-08","2019-05-09","2019-05-10","2019-05-11","2019-05-12","2019-05-13","2019-05-14","2019-05-15","2019-05-16","2019-05-17","2019-05-18","2019-05-19","2019-05-20","2019-05-21","2019-05-22","2019-05-23","2019-05-24","2019-05-25","2019-05-26","2019-05-27","2019-05-28","2019-05-29","2019-05-30","2019-05-31","2019-06-01","2019-06-02","2019-06-03","2019-06-04","2019-06-05","2019-06-06","2019-06-07"],
+      "axisTick": { "show": false },
+      "axisLine": { "show": false }
+  }],
+  "yAxis": [{ "type": "value", "axisTick": { "show": false }, "axisLine": { "show": false }, "splitLine": { "lineStyle": { "color": "rgba(0, 0, 0, .38)", "type": "dashed" } } }],
+  "series": [
+    {
+      "name": "帖子", "type": "line", "smooth": true, "itemStyle": { "color": "#d23f31" }, "areaStyle": { "normal": {} }, "z": 3,
+      "data": ["18","14","22","9","7","18","10","12","13","16","6","9","15","15","12","15","8","14","9","10","29","22","14","22","9","10","15","9","9","15","0"]
+    },
+    {
+      "name": "用户", "type": "line", "smooth": true, "itemStyle": { "color": "#f1e05a" }, "areaStyle": { "normal": {} }, "z": 2,
+      "data": ["31","33","30","23","16","29","23","37","41","29","16","13","39","23","38","136","89","35","22","50","57","47","36","59","14","23","46","44","51","43","0"]
+    },
+    {
+      "name": "回帖", "type": "line", "smooth": true, "itemStyle": { "color": "#4285f4" }, "areaStyle": { "normal": {} }, "z": 1,
+      "data": ["35","42","73","15","43","58","55","35","46","87","36","15","44","76","130","73","50","20","21","54","48","73","60","89","26","27","70","63","55","37","0"]
+    }
+  ]
+}
+```
+
 ### Vega and Vega-Lite
 
 It's implemented in showdown-vega.js, render diagrams of [Vega](https://github.com/vega/vega) and [Vega-Lite](https://github.com/vega/vega-lite) using [vega-embed](https://github.com/vega/vega-embed), check [vega website](https://vega.github.io/vega/) and [vega-lite website](https://vega.github.io/vega-lite) for more information.
 
 #### Markdown Syntax
 
-    ```vega {"align": "left | center | right", "codeblock": true | false}
-    <code content>
-    ```
+````
+```vega {"align": "left | center | right", "codeblock": true | false}
+<code content>
+```
+````
 
 OR
 
-    ```vega-lite {"align": "left | center | right", "codeblock": true | false}
-    <code content>
-    ```
+````
+```vega-lite {"align": "left | center | right", "codeblock": true | false}
+<code content>
+```
+````
 
 #### Vega and Vega-Lite example
 
-- Vega example:
+* Vega example:
 
 ```vega {"align":"center"}
 {
@@ -676,11 +760,11 @@ OR
 
 <br>
 
-- Vega-Lite example:
+* Vega-Lite example:
 
 ```vega-lite {"align":"right"}
 {
-  "$schema": "https://vega.github.io/schema/vega-lite/v4.json",
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
   "description": "Plots two functions using a generated sequence.",
   "width": 300,
   "height": 150,
@@ -732,13 +816,15 @@ It's implemented in showdown-sequence.js, render diagrams of sequence using [js-
 
 The \<theme name> of json's "theme" field value is "hand" or "simple" in syntax language attribute;
 
-    ```sequence {"theme": "<theme name>", "align": "<align>"}
-    <code content>
-    ```
+````
+```sequence {"theme": "<theme name>", "align": "<align>"}
+<code content>
+```
+````
 
 #### Network Sequence example
 
-- Sequence example with hand theme:
+* Sequence example with hand theme:
 
 ```sequence {"theme":"hand", "align":"center"}
 Alice->Bob: Hello Bob, how are you?
@@ -748,10 +834,34 @@ Bob-->Alice: I am good thanks!
 
 <br>
 
-- Sequence example with simple theme:
+* Sequence example with simple theme:
 
 ```sequence {"theme":"simple", "align":"right"}
 Alice->Bob: Hello Bob, how are you?
 Note right of Bob: Bob thinks
 Bob-->Alice: I am good thanks!
+```
+
+### ABC
+
+#### Markdown Syntax
+
+````
+```abc {"align": "<align>"}
+<code content>
+```
+````
+
+#### ABC example
+
+```abc
+X: 1
+T: Cooley's
+M: 4/4
+L: 1/8
+K: Emin
+|:D2|EB{c}BA B2 EB|~B2 AB dBAG|FDAD BDAD|FDAD dAFD|
+EBBA B2 EB|B2 AB defg|afe^c dBAF|DEFD E2:|
+|:gf|eB B2 efge|eB B2 gedB|A2 FA DAFA|A2 FA defg|
+eB B2 eBgB|eB B2 defg|afe^c dBAF|DEFD E2:|
 ```

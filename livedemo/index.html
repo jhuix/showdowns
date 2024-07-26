@@ -86,12 +86,12 @@
         background: rgba(128, 135, 139, 0.8);
       }
     </style>
-    <link rel="stylesheet" href="../dist/showdowns.css" />
+    <link rel="stylesheet" href="../dist/showdowns.min.css" />
   </head>
 
   <body style="display:none;" onload="document.body.style.display = 'block'">
     <div id="main" class="workspace-container"></div>
-    <script src="../dist/showdowns.js"></script>
+    <script src="../dist/showdowns.min.js"></script>
     <script>
       (function(element) {
         showdowns.setCDN("local");
@@ -129,9 +129,13 @@
               .makeHtml(md, csstypes => {
                 cssTypes = csstypes;
               })
-              .then(obj => {
-                  element.innerHTML = obj.html;
-                  showdowns.completedHtml(obj.scripts);
+              .then(res => {
+                if (typeof res === 'object') {
+                  element.innerHTML = res.html;
+                  showdowns.completedHtml(res.scripts);
+                } else {
+                  element.innerHTML = res;
+                }
               })
               .catch(err => {
                 element.innerText = err;
@@ -144,9 +148,16 @@
                 .makeHtml(md, csstypes => {
                   cssTypes = csstypes;
                 })
-                .then( obj => {
-                    element.innerHTML = obj.html;
-                    showdowns.completedHTML(obj.scritps);
+                .then(res => {
+                  if (typeof res === 'object') {
+                    element.innerHTML = res.html;
+                    showdowns.completedHtml(res.scripts);
+                  } else {
+                    element.innerHTML = res;
+                  }
+                })
+                .catch(err => {
+                  element.innerText = err;
                 });
             }
           });

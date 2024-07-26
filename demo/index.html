@@ -116,8 +116,16 @@
               .makeHtml(md, csstypes => {
                 mdCssTypes = csstypes;
               })
-              .then(content => {
-                element.innerHTML = content;
+              .then(res => {
+                if (typeof res === 'object') {
+                  element.innerHTML = res.html;
+                  showdowns.completedHtml(res.scripts);
+                } else {
+                  element.innerHTML = res;
+                }
+              })
+              .catch(err => {
+                element.innerText = err;
               });
           })
           .catch(function(error) {
@@ -127,8 +135,16 @@
                 .makeHtml(md, csstypes => {
                   mdCssTypes = csstypes;
                 })
-                .then(content => {
-                  element.innerHTML = content;
+                .then(res => {
+                  if (typeof res === 'object') {
+                    element.innerHTML = res.html;
+                    showdowns.completedHtml(res.scripts);
+                  } else {
+                    element.innerHTML = res;
+                  }
+                })
+                .catch(err => {
+                  element.innerText = err;
                 });
             }
           });
