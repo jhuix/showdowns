@@ -346,15 +346,21 @@ Put the following line into your HTML page \<header> or \<body>:
           })
           .then(function(text) {
             md = md + `\n\n## Showdown's Markdown syntax\n\n` + text;
-            showdowns.makeHtml(md).then(html => {
-              element.innerHTML = html;
+            showdowns.makeHtml(md).then(obj => {
+              element.innerHTML = obj.html;
+              showdowns.completedHtml(obj.scripts);
+            }).catch(err =>{
+              console.log(err);
             });
           })
           .catch(function(error) {
             console.log(error);
             if (md) {
-              showdowns.makeHtml(md).then(html => {
-                element.innerHTML = html;
+              showdowns.makeHtml(md).then(obj => {
+                element.innerHTML = obj.html;
+                showdowns.completedHtml(obj.scripts);
+              }).catch(err =>{
+                console.log(err);
               });
             }
           });
