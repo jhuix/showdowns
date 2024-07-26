@@ -199,7 +199,7 @@ showdown.Converter.prototype.initConvertExtObj = function(flavor, asyncExtension
     const content = this.makeHtml(text);
     const outputs = this.extObj.getAsyncExtensions();
     if (!outputs.length) {
-      return Promise.resolve(content);
+      return Promise.resolve({html: content});
     }
 
     var globals = {
@@ -210,7 +210,8 @@ showdown.Converter.prototype.initConvertExtObj = function(flavor, asyncExtension
     const doc = parser.parseFromString(content, 'text/html');
     const wrapper = typeof doc.body !== 'undefined' ? doc.body : doc;
     const options = this.getOptions();
-    let result = Promise.resolve({ wrapper, options, globals });
+    let scripts = [];
+    let result = Promise.resolve({ wrapper, options, globals, scripts });
     //forEach写法
     outputs.forEach(function(ext) {
       result = result.then(obj => {
@@ -223,11 +224,11 @@ showdown.Converter.prototype.initConvertExtObj = function(flavor, asyncExtension
         const promise = callback(obj);
         if (promise instanceof Promise) {
           return promise.then(obj => {
-            return obj.wrapper.innerHTML;
+            return { html: obj.wrapper.innerHTML, scripts: obj.scripts };
           });
         }
       }
-      return obj.wrapper.innerHTML;
+      return { html: obj.wrapper.innerHTML, scripts: obj.scripts };
     });
   };
 

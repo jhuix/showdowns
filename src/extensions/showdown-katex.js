@@ -10,6 +10,7 @@ if (typeof window === 'undefined') {
 
 import asciimathToTex from './asciimath2tex';
 import cdnjs from './cdn';
+import utils from './utils';
 
 if (typeof katex === 'undefined') {
   var katex = window.katex || undefined;
@@ -37,11 +38,11 @@ function dyncLoadScript(callback) {
       cdnjs
         .loadScript('katex')
         .then(name => {
-          katex = cdnjs.interopDefault(window[name]);
+          katex = utils.interopDefault(window[name]);
           return cdnjs.loadScript('renderMathInElement');
         })
         .then(name => {
-          RenderMathInElement = cdnjs.interopDefault(window[name]);
+          RenderMathInElement = utils.interopDefault(window[name]);
           if (typeof callback === 'function' && callback) {
             callback(RenderMathInElement);
           }
@@ -98,59 +99,33 @@ function onRenderKatex(resolve, res) {
 
 function renderKatex(element, config, isAsciimath) {
   return new Promise(resolve => {
-    const latex = element.textContent.trim();
-    let data;
-    const codes = latex.split(/\n[ \f\r\t\v]*\n/);
-    if (codes.length > 1) {
-      data = new Array();
-      codes.forEach(code => {
-        code = code.trim();
-        if (code !== '') {
-          code = isAsciimath ? asciimathToTex(code) : code;
-        }
-        data.push(code);
-      });
-    } else {
-      data = isAsciimath ? asciimathToTex(latex) : latex;
+    let latex;
+    const meta = utils.createElementMeta('katex', element, code => {
+      let data;
+      latex = code;
+      const codes = code.split(/\n[ \f\r\t\v]*\n/);
+      if (codes.length > 1) {
+        data = new Array();
+        codes.forEach(code => {
+          code = code.trim();
+          if (code !== '') {
+            code = isAsciimath ? asciimathToTex(code) : code;
+          }
+          data.push(code);
+        });
+      } else {
+        data = isAsciimath ? asciimathToTex(latex) : latex;
+      }
+      return data;
+    });
+    if (!meta) {
+      return resolve(false);
     }
 
-    const langattr = element.dataset.lang;
-    const langobj = langattr ? JSON.parse(langattr) : null;
-    let diagramClass = '';
-    if (langobj) {
-      if (
-        (typeof langobj.codeblock === 'boolean' && langobj.codeblock) ||
-        (typeof langobj.codeblock === 'string' && langobj.codeblock.toLowerCase() === 'true')
-      ) {
-        return resolve(false);
-      }
-
-      if (langobj.align) {
-        //default left
-        if (langobj.align === 'center') {
-          diagramClass = 'diagram-center';
-        } else if (langobj.align === 'right') {
-          diagramClass = 'diagram-right';
-        }
-      }
-    }
-    const cssLink = cdnjs.getSrc(cssCdnName);
-    const name =
-      (element.classList.length > 0 ? element.classList[0] : '') +
-      (!element.className || !diagramClass ? '' : ' ') +
-      diagramClass;
-    const id = 'katex-' + Date.now() + '-' + Math.floor(Math.random() * 10000);
-    element.id = id;
-    const res = {
-      element: element,
-      id: id,
-      className: name,
-      input: latex,
-      data: data,
-      cssLink: cssLink,
-      options: config
-    };
-    onRenderKatex(resolve, res);
+    meta.cssLink = cdnjs.getSrc(cssCdnName);
+    meta.input = latex;
+    meta.options = config;
+    onRenderKatex(resolve, meta);
   });
 }
 

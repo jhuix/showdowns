@@ -14,6 +14,7 @@ import showdownViz from './extensions/showdown-viz.js';
 import showdownVega from './extensions/showdown-vega.js';
 import showdownAlign from './extensions/showdown-align.js';
 import showdownKatex from './extensions/showdown-katex.js';
+import showdownEcharts from './extensions/showdown-echarts.js';
 import showdownMermaid from './extensions/showdown-mermaid.js';
 import showdownPlantuml from './extensions/showdown-plantuml.js';
 import showdownRailroad from './extensions/showdown-railroad.js';
@@ -50,6 +51,7 @@ const getAsyncExtensions = (options, extensions = {}) => {
     'showdown-wavedrom': showdownWavedrom,
     'showdown-railroad': showdownRailroad,
     'showdown-abc': showdownAbc,
+    'showdown-echarts': showdownEcharts,
     ...extensions
   };
 
@@ -82,6 +84,30 @@ const getExtensions = (options, extensions = {}) => {
   }
   return extnames;
 };
+
+const loadScript = (id, code) => {
+  if (!code || typeof document === 'undefined') {
+    return false;
+  }
+
+  const body = document.body;
+  const parent = document.getElementById(id);
+  if (parent) {
+    const scriptID = `script-${id}`;
+    let script = document.querySelector(`#parent > #${scriptID}`);
+    if (script) {
+      body.removeChild(script);
+    } else {
+      script = document.createElement('script');
+      script.id = scriptID;
+    }
+    script.type = "text/javascript";
+    script.text = code;
+    parent.appendChild(script);
+  }
+  return true
+};
+
 
 const showdownFlavors = ['github', 'ghost', 'vanilla', 'original', 'allon'];
 const mermaidThemes = ['default', 'forest', 'dark', 'neutral'];
@@ -386,12 +412,26 @@ const showdowns = {
         });
       }
 
-      return this.converter.asyncMakeHtml(content, _checkCssTypes).then(html => {
-        content = `<div class='showdowns'>${html}</div>`;
-        return content;
+      return this.converter.asyncMakeHtml(content, _checkCssTypes).then( obj => {
+        content = `<div class='showdowns'>${obj.html}</div>`;
+        return { html: content, scripts: obj.scripts };
       });
     }
     return Promise.reject(!content ? 'Content is empty.' : 'Converter is invaild.');
+  },
+  completedHtml: function(scripts) {
+    if (!showdown.helper.isArray(scripts)) {
+      scripts = [scripts];
+    }
+    return new Promise((revole, reject) => {
+      for (var i = 0; i < scripts.length; ++i) {
+        const script = scripts[i];
+        if (!loadScript(script.id, script.code)) {
+          return reject('Args is invaild!');
+        }
+      }
+      revole(true);
+    });
   },
   zDecode: function(zContent) {
     return zlibcodec.zDecode(zContent);

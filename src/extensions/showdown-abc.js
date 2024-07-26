@@ -1,15 +1,19 @@
 /*
  * Copyright (c) 2024-present, Jhuix (Hui Jin) <jhuix0117@gmail.com>. All rights reserved.
  * Use of this source code is governed by a MIT license that can be found in the LICENSE file.
- * Description: showdown railroad extension for markdown
+ * Description: showdown abc extension for markdown
  */
 'use strict';
 
+const extName = 'abc';
+const cssCdnName = 'ABCJSCSS';
+
 if (typeof window === 'undefined') {
-  throw Error('The showdown railroad extension can only be used in browser environment!');
+  throw Error('The showdown abcjs extension can only be used in browser environment!');
 }
 
 import cdnjs from './cdn';
+import utils from './utils';
 
 if (typeof ABCJS === 'undefined') {
     var ABCJS = window.ABCJS || undefined;
@@ -20,7 +24,6 @@ function hasAbc() {
 }
 
 let dync = false;
-const cssCdnName = 'ABCJSCSS';
 function dyncLoadScript() {
   const sync = hasAbc();
   if (typeof window !== 'undefined') {
@@ -28,7 +31,7 @@ function dyncLoadScript() {
       dync = true;
       cdnjs.loadStyleSheet(cssCdnName);
       cdnjs.loadScript('ABCJS').then(name => {
-        ABCJS = cdnjs.interopDefault(window[name]);
+        ABCJS = utils.interopDefault(window[name]);
       });
     }
   }
@@ -47,12 +50,12 @@ function onRenderAbc(resolve, res) {
       : `<div id="${id}" class="${name}"></div>`;
     const element = doc.getElementById(id);
     ABCJS.renderAbc(element, data);
-    resolve(true);
-  } else {
-    setTimeout(() => {
-      onRenderAbc(resolve, res);
-    }, 50);
+    return resolve(true);
   }
+
+  setTimeout(() => {
+    onRenderAbc(resolve, res);
+  }, 20);
 }
 
 /**
@@ -60,42 +63,13 @@ function onRenderAbc(resolve, res) {
  */
 function renderAbc(element) {
   return new Promise(resolve => {
-    const langattr = element.dataset.lang;
-    const langobj = langattr ? JSON.parse(langattr) : null;
-    let diagramClass = '';
-    if (langobj) {
-      if (
-        (typeof langobj.codeblock === 'boolean' && langobj.codeblock) ||
-        (typeof langobj.codeblock === 'string' && langobj.codeblock.toLowerCase() === 'true')
-      ) {
-        return resolve(false);
-      }
-
-      if (langobj.align) {
-        //default left
-        if (langobj.align === 'center') {
-          diagramClass = 'diagram-center';
-        } else if (langobj.align === 'right') {
-          diagramClass = 'diagram-right';
-        }
-      }
+    let meta = utils.createElementMeta(extName, element);
+    if (!meta) {
+      return resolve(false);
     }
-    const cssLink = cdnjs.getSrc(cssCdnName);
-    const code = element.textContent.trim();
-    const name =
-      (element.classList.length > 0 ? element.classList[0] : '') +
-      (!element.className || !diagramClass ? '' : ' ') +
-      diagramClass;
-    const id = 'abc-' + Date.now() + '-' + Math.floor(Math.random() * 10000);
-    element.id = id;
-    const res = {
-      element: element,
-      id: id,
-      className: name,
-      data: code,
-      cssLink: cssLink
-    };
-    onRenderAbc(resolve, res);
+
+    meta.cssLink = cdnjs.getSrc(cssCdnName);
+    onRenderAbc(resolve, meta);
   });
 }
 
@@ -113,7 +87,7 @@ function renderAbcElements(elements) {
   });
 }
 
-const extName = 'abc';
+
 function showdownAbc() {
   return [
     {
@@ -123,7 +97,7 @@ function showdownAbc() {
         if (!wrapper) {
           return false;
         }
-        // find the railroad in code blocks
+        // find the abc in code blocks
         const elements = wrapper.querySelectorAll(`code.${extName}.language-${extName}`);
         if (!elements.length) {
           return false;

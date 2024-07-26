@@ -5,8 +5,6 @@
  */
 'use strict';
 
-import './date-format.js';
-
 let cdnName = 'jsdelivr';
 let scheme = document.location.protocol === 'file:' ? 'https://' : document.location.protocol + '//';
 let defScheme = '';
@@ -16,6 +14,7 @@ const cdnSrc = {
   local: {
     ABCJS: '../node_modules/abcjs/dist/abcjs-basic.js',
     ABCJSCSS: '../node_modules/abcjs/abcjs-audio.css',
+    echarts: '../node_modules/echarts/dist/echarts.js',
     Viz: '../node_modules/@viz-js/viz/lib/viz-standalone.js',
     Raphael: '../node_modules/raphael/raphael.min.js',
     flowchart: '../dist/diagrams/flowchart/flowchart.min.js',
@@ -129,9 +128,9 @@ function getSrc(name, def) {
     }
 
     if (url) {
-      if (url.substr(0, scheme.length) === scheme) {
+      if (url.substring(0, scheme.length) === scheme) {
         def = url;
-      } else if (url.substr(0, 8) === '../dist/') {
+      } else if (url.substring(0, 8) === '../dist/') {
         def = distScheme + url;
       } else {
         def = defScheme + url;
@@ -143,32 +142,32 @@ function getSrc(name, def) {
 
 function loadScript(src, name) {
   return new Promise((res, rej) => {
-    if (!src || typeof document === 'undefined') {
-      rej('Args is invaild!');
-    }
+      if (!src || typeof document === 'undefined') {
+          rej('Args is invaild!');
+      }
 
-    if (typeof name === 'undefined') {
-      name = src;
-    }
+      if (typeof name === 'undefined') {
+          name = src;
+      }
 
-    src = getSrc(name, src);
-    const head = document.head || document.getElementsByTagName('head')[0];
-    const script = document.createElement('script');
-    script.src = src;
-    script.onload = () => {
-      res(name);
-    };
-    head.appendChild(script);
+      src = getSrc(name, src);
+      const head = document.head || document.getElementsByTagName('head')[0];
+      const script = document.createElement('script');
+      script.src = src;
+      script.onload = () => {
+          res(name);
+      };
+      head.appendChild(script);
   });
 }
 
 function loadStyleSheet(css, name) {
   if (!css || typeof document === 'undefined') {
-    return '';
+      return '';
   }
 
   if (typeof name === 'undefined') {
-    name = css;
+      name = css;
   }
 
   css = getSrc(name, css);
@@ -180,42 +179,12 @@ function loadStyleSheet(css, name) {
   return cdnName === 'local' ? '' : css;
 }
 
-function interopDefault(ex) {
-  return ex && typeof ex === 'object' && 'default' in ex ? ex['default'] : ex;
-}
-
-function renderCacheElement(doc, id, name, callback) {
-  if (typeof window !== 'undefined' && window.document) {
-    doc = window.document;
-  }
-  const el = doc.createElement('div');
-  el.id = id;
-  el.className = name;
-  el.style.display = 'none';
-  doc.body.appendChild(el);
-  if (typeof callback === 'function' && callback) {
-    const result = callback(el);
-    if (result instanceof Promise) {
-      result.then(el => {
-        doc.body.removeChild(el);
-        el.style.display = '';
-      });
-      return el.outerHTML;
-    }
-  }
-  doc.body.removeChild(el);
-  el.style.display = '';
-  return el.outerHTML;
-}
-
 const cdnjs = {
-  interopDefault,
-  loadScript,
-  loadStyleSheet,
-  renderCacheElement,
   setCDN,
   getCDN,
-  getSrc
+  getSrc,
+  loadScript,
+  loadStyleSheet
 };
 
 export default cdnjs;

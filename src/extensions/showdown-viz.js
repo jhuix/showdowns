@@ -10,10 +10,7 @@ if (typeof window === 'undefined') {
 }
 
 import cdnjs from './cdn';
-// import viz from 'viz.js';
-// if (typeof Viz === 'undefined') {
-//   var Viz = viz;
-// }
+import utils from './utils';
 
 if (typeof Viz === 'undefined') {
   var Viz = window.Viz || undefined;
@@ -34,7 +31,7 @@ function dyncLoadScript() {
     if (!sync && !dync) {
       dync = true;
       cdnjs.loadScript('Viz').then(name => {
-        Viz = cdnjs.interopDefault(window[name]);
+        Viz = utils.interopDefault(window[name]);
       });
     }
   }
@@ -47,7 +44,7 @@ function onRenderViz(resolve, res) {
     const name = res.className;
     const data = res.data;
     const el = res.element;
-    const langattr = res.langattr;
+    const langattr = res.element.dataset.lang;
     let engine = 'dot';
     if (langattr) {
       const obj = JSON.parse(langattr);
@@ -60,11 +57,12 @@ function onRenderViz(resolve, res) {
       el.parentNode.outerHTML = `<div id="${id}" class="${name}">${svg}</div>`;
       resolve(true)
     });
-  } else {
-    setTimeout(() => {
-      onRenderViz(resolve, res);
-    }, 50);
+    return;
   }
+
+  setTimeout(() => {
+    onRenderViz(resolve, res);
+  }, 10);
 }
 
 /**
@@ -72,42 +70,12 @@ function onRenderViz(resolve, res) {
  */
 function renderViz(element) {
   return new Promise(resolve => {
-    const langattr = element.dataset.lang;
-    const langobj = langattr ? JSON.parse(langattr) : null;
-    let diagramClass = '';
-    if (langobj) {
-      if (
-        (typeof langobj.codeblock === 'boolean' && langobj.codeblock) ||
-        (typeof langobj.codeblock === 'string' && langobj.codeblock.toLowerCase() === 'true')
-      ) {
-        return resolve(false);
-      }
-
-      if (langobj.align) {
-        //default left
-        if (langobj.align === 'center') {
-          diagramClass = 'diagram-center';
-        } else if (langobj.align === 'right') {
-          diagramClass = 'diagram-right';
-        }
-      }
+    const meta = utils.createElementMeta("viz", element);
+    if (!meta) {
+      return resolve(false);
     }
-
-    const code = element.textContent.trim();
-    const name =
-      (element.classList.length > 0 ? element.classList[0] : '') +
-      (!element.className || !diagramClass ? '' : ' ') +
-      diagramClass;
-    const id = 'viz-' + Date.now() + '-' + Math.floor(Math.random() * 10000);
-    element.id = id;
-    const res = {
-      element: element,
-      id: id,
-      className: name,
-      data: code,
-      langattr: langattr
-    };
-    onRenderViz(resolve, res);
+ 
+    onRenderViz(resolve, meta);
   });
 }
 

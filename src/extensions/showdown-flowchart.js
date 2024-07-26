@@ -10,14 +10,7 @@ if (typeof window === 'undefined') {
 }
 
 import cdnjs from './cdn';
-// import raphael from 'raphael';
-// import flowchart from 'flowchart.js';
-// if (typeof Raphael === 'undefined') {
-//   var Raphael = raphael;
-// }
-// if (typeof Flowchart === 'undefined') {
-//   var Flowchart = flowchart;
-// }
+import utils from './utils';
 
 if (typeof Raphael === 'undefined') {
   var Raphael = window.Raphael || undefined;
@@ -40,11 +33,11 @@ function dyncLoadScript() {
       cdnjs
         .loadScript('Raphael')
         .then(name => {
-          Raphael = cdnjs.interopDefault(window[name]);
+          Raphael = utils.interopDefault(window[name]);
           return cdnjs.loadScript('flowchart');
         })
         .then(name => {
-          flowchart = cdnjs.interopDefault(window[name]);
+          flowchart = utils.interopDefault(window[name]);
         });
     }
   }
@@ -58,15 +51,16 @@ function onRenderFlowchart(resolve, res) {
     const data = res.data;
     const options = res.options;
     const doc = res.element.ownerDocument;
-    res.element.parentNode.outerHTML = cdnjs.renderCacheElement(doc, id, name, el => {
+    res.element.parentNode.outerHTML = utils.renderCacheElement(doc, id, name, el => {
       flowchart.parse(data).drawSVG(el, options);
     });
     resolve(true);
-  } else {
-    setTimeout(() => {
-      onRenderFlowchart(resolve, res);
-    }, 50);
+    return;
   }
+  
+  setTimeout(() => {
+    onRenderFlowchart(resolve, res);
+  }, 10);
 }
 
 /**
@@ -74,41 +68,13 @@ function onRenderFlowchart(resolve, res) {
  */
 function renderFlowchart(element, options) {
   return new Promise(resolve => {
-    const langattr = element.dataset.lang;
-    const langobj = langattr ? JSON.parse(langattr) : null;
-    let diagramClass = '';
-    if (langobj) {
-      if (
-        (typeof langobj.codeblock === 'boolean' && langobj.codeblock) ||
-        (typeof langobj.codeblock === 'string' && langobj.codeblock.toLowerCase() === 'true')
-      ) {
-        return resolve(false);
-      }
-
-      if (langobj.align) {
-        //default left
-        if (langobj.align === 'center') {
-          diagramClass = 'diagram-center';
-        } else if (langobj.align === 'right') {
-          diagramClass = 'diagram-right';
-        }
-      }
+    const meta = utils.createElementMeta('flowchart', element);
+    if (!meta) {
+      return resolve(false);
     }
-    const code = element.textContent.trim();
-    const name =
-      (element.classList.length > 0 ? element.classList[0] : '') +
-      (!element.className || !diagramClass ? '' : ' ') +
-      diagramClass;
-    const id = 'flowchart-' + Date.now() + '-' + Math.floor(Math.random() * 10000);
-    element.id = id;
-    const res = {
-      element: element,
-      id: id,
-      className: name,
-      data: code,
-      options: options
-    };
-    onRenderFlowchart(resolve, res);
+
+    meta.options = options;
+    onRenderFlowchart(resolve, meta);
   });
 }
 

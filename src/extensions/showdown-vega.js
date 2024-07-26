@@ -5,15 +5,14 @@
  */
 'use strict';
 
+const extName = "vega";
+
 if (typeof window === 'undefined') {
   throw Error('The showdown vega extension can only be used in browser environment!');
 }
 
 import cdnjs from './cdn';
-// import vegaEmbed from 'vega-embed';
-// if (typeof VegaEmbed === 'undefined') {
-//   var VegaEmbed = vegaEmbed;
-// }
+import utils from './utils';
 
 if (typeof vegaEmbed === 'undefined') {
   var vegaEmbed = window.vegaEmbed || undefined;
@@ -30,7 +29,7 @@ function dyncLoadScript() {
     if (!sync && !dync) {
       dync = true;
       cdnjs
-        .loadScript('vega')
+        .loadScript(extName)
         .then(() => {
           return cdnjs.loadScript('vegaLite');
         })
@@ -38,7 +37,7 @@ function dyncLoadScript() {
           return cdnjs.loadScript('vegaEmbed');
         })
         .then(name => {
-          vegaEmbed = cdnjs.interopDefault(window[name]);
+          vegaEmbed = utils.interopDefault(window[name]);
         });
     }
   }
@@ -48,58 +47,40 @@ function dyncLoadScript() {
 /**
  * render VegaEmbed graphs
  */
-function renderVega(element, options, isVegaLite) {
+function renderVega(element, options, scripts, isVegaLite) {
+  const meta = utils.createElementMeta(extName, element);
+  if (!meta) {
+    return Promise.resolve(false);
+  }
+
+  const config = JSON.stringify(options);      
+  const data = JSON.stringify(JSON.parse(meta.data));
+  const id = meta.id;
+  const script = {
+    id: id,
+    code: `(function() {
+      let el = document.getElementById('${id}');
+      if (el){
+        vegaEmbed(el, JSON.parse('${data}'), JSON.parse('${config}'));
+      }
+    })();`
+  }
+  scripts.push(script);
   return new Promise(resolve => {
-    const langattr = element.dataset.lang;
-    const langobj = langattr ? JSON.parse(langattr) : null;
-    let diagramClass = '';
-    if (langobj) {
-      if (
-        (typeof langobj.codeblock === 'boolean' && langobj.codeblock) ||
-        (typeof langobj.codeblock === 'string' && langobj.codeblock.toLowerCase() === 'true')
-      ) {
-        return resolve(false);
-      }
-
-      if (langobj.align) {
-        //default left
-        if (langobj.align === 'center') {
-          diagramClass = 'diagram-center';
-        } else if (langobj.align === 'right') {
-          diagramClass = 'diagram-right';
-        }
-      }
-    }
-
-    const code = element.textContent.trim();
-    const name =
-      (element.classList.length > 0 ? element.classList[0] : '') +
-      (!element.className || !diagramClass ? '' : ' ') +
-      diagramClass;
-    const id = 'vega-' + Date.now() + '-' + Math.floor(Math.random() * 10000);
-    element.id = id;
-    const res = {
-      element: element,
-      id: id,
-      className: name,
-      data: code,
-      options: options,
-      isVegaLite: isVegaLite
-    };
-    onRenderVega(resolve, res);
+    onRenderVega(resolve, meta);
   });
 }
 
 // <div class="vegaembed || flow"></div>
-function renderVegaElements(vegaElements, vegaLiteElements, options) {
+function renderVegaElements(vegaElements, vegaLiteElements, scripts, options) {
   dyncLoadScript();
   return new Promise(resolve => {
     const promiseArray = [];
     vegaElements.forEach(element => {
-      promiseArray.push(renderVega(element, options, false));
+      promiseArray.push(renderVega(element, options, scripts, false));
     });
     vegaLiteElements.forEach(element => {
-      promiseArray.push(renderVega(element, options, true));
+      promiseArray.push(renderVega(element, options, scripts, true));
     });
     Promise.all(promiseArray).then(() => {
       resolve(true);
@@ -116,57 +97,18 @@ const getOptions = (userOptions = {}) => ({
   ...userOptions
 });
 
-async function renderVegaEmbed(nr, r, element, el, data, options) {
-  await vegaEmbed.embed(el, JSON.parse(data), options);
-  element.parentNode.outerHTML = el.outerHTML;
-  nr(true);
-  r(el);
-}
-
 function onRenderVega(resolve, res) {
   if (hasVegaEmbed()) {
     const id = res.id;
     const name = res.className;
-    const data = res.data;
-    const options = res.options;
-    let element = res.element;
-    const doc = element.ownerDocument;
-    cdnjs.renderCacheElement(doc, id, name, el => {
-      return new Promise(solve =>{
-        vegaEmbed(el, JSON.parse(data), options).then(() => {
-          element.parentNode.outerHTML = el.outerHTML;
-          element = doc.getElementById(id);
-          if (element) {
-            element.style.display = '';
-          }          
-          resolve(true);
-          solve(el);
-        });
-      });
-      // return new Promise(solve => {
-      //   //Async draw svg, need to check whether the drawing is completed regularly.
-      //   function checkDraw() {
-      //     if (el.childNodes.length > 0) {
-      //       element.parentNode.outerHTML = el.outerHTML;
-      //       //Replace display element
-      //       element = doc.getElementById(id);
-      //       if (element) {
-      //         element.style.display = '';
-      //       }
-      //       resolve(true);
-      //       solve(el);
-      //     } else {
-      //       setTimeout(checkDraw, 50);
-      //     }
-      //   }
-      //   checkDraw();
-      // });
-    });
-  } else {
-    setTimeout(() => {
-      onRenderVega(resolve, res);
-    }, 50);
+    const node = res.element.parentNode;
+    node.outerHTML = `<div id="${id}" class="${name}"></div>`;
+    return resolve(true);
   }
+  
+  setTimeout(() => {
+    onRenderVega(resolve, res);
+  }, 10);
 }
 
 function showdownVega(userOptions) {
@@ -188,8 +130,10 @@ function showdownVega(userOptions) {
         if (!vegaElements.length && !vegaLiteElements.length) {
           return false;
         }
+
+        const scripts = obj.scripts;  
         console.log(`${new Date().Format('yyyy-MM-dd HH:mm:ss.S')} Begin render vega elements.`);
-        return renderVegaElements(vegaElements, vegaLiteElements, this.config).then(() => {
+        return renderVegaElements(vegaElements, vegaLiteElements, scripts, this.config).then(() => {
           console.log(`${new Date().Format('yyyy-MM-dd HH:mm:ss.S')} End render vega elements.`);
           return obj;
         });

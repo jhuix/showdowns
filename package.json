@@ -75,6 +75,7 @@
     "@rokt33r/js-sequence-diagrams": "^2.0.6-2",
     "@viz-js/viz": "^3.7.0",
     "abcjs": "^6.4.1",
+    "echarts": "^5.5.1",
     "flowchart.js": "^1.18.0",
     "katex": "^0.16.11",
     "mermaid": "^10.9.1",

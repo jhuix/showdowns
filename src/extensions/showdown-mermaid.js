@@ -5,15 +5,14 @@
  */
 'use strict';
 
+const extName = "mermaid";
+
 if (typeof window === 'undefined') {
   throw Error('The showdown mermaid extension can only be used in browser environment!');
 }
 
 import cdnjs from './cdn';
-// import mermaid from 'mermaid';
-// if (typeof Mermaid === 'undefined') {
-//   var Mermaid = mermaid;
-// }
+import utils from './utils';
 
 if (typeof mermaid === 'undefined') {
   var mermaid = window.mermaid || undefined;
@@ -32,8 +31,8 @@ function dyncLoadScript(config) {
   if (typeof window !== 'undefined') {
     if (!sync && !dync) {
       dync = true;
-      cdnjs.loadScript('mermaid').then(name => {
-        mermaid = cdnjs.interopDefault(window[name]);
+      cdnjs.loadScript(extName).then(name => {
+        mermaid = utils.interopDefault(window[name]);
         mermaid.initialize(config);
       });
       return sync
@@ -49,17 +48,17 @@ function onRenderMermaid(resolve, res) {
     const id = res.id;
     const name = res.className;
     const data = res.data;
-    const doc = res.element.ownerDocument;
     const node = res.element.parentNode;
     mermaid.render(id, data).then(m =>{
       node.outerHTML = `<div class="${name}">${m.svg}</div>`;
       resolve(true);
     });
-  } else {
-    setTimeout(() => {
-      onRenderMermaid(resolve, res);
-    }, 50);
+    return;
   }
+
+  setTimeout(() => {
+    onRenderMermaid(resolve, res);
+  }, 10);
 }
 
 /**
@@ -67,42 +66,12 @@ function onRenderMermaid(resolve, res) {
  */
 function renderMermaid(element) {
   return new Promise(resolve => {
-    const langattr = element.dataset.lang;
-    const langobj = langattr ? JSON.parse(langattr) : null;
-    let diagramClass = '';
-    if (langobj) {
-      if (
-        (typeof langobj.codeblock === 'boolean' && langobj.codeblock) ||
-        (typeof langobj.codeblock === 'string' && langobj.codeblock.toLowerCase() === 'true')
-      ) {
-        return resolve(false);
-      }
-
-      if (langobj.align) {
-        //default left
-        if (langobj.align === 'center') {
-          diagramClass = 'diagram-center';
-        } else if (langobj.align === 'right') {
-          diagramClass = 'diagram-right';
-        }
-      }
+    const meta = utils.createElementMeta(extName, element);
+    if (!meta) {
+      return resolve(false);
     }
 
-    const code = element.textContent.trim();
-    const name =
-      (element.classList.length > 0 ? element.classList[0] : '') +
-      (!element.className || !diagramClass ? '' : ' ') +
-      diagramClass;
-    const id = 'mermaid-' + Date.now() + '-' + Math.floor(Math.random() * 10000);
-    element.id = id;
-    const res = {
-      element: element,
-      id: id,
-      className: name,
-      data: code,
-      resolve: resolve
-    };
-    onRenderMermaid(resolve, res);
+    onRenderMermaid(resolve, meta);
   });
 }
 

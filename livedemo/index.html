@@ -129,10 +129,14 @@
               .makeHtml(md, csstypes => {
                 cssTypes = csstypes;
               })
-              .then(content => {
-                element.innerHTML = content;
+              .then(obj => {
+                  element.innerHTML = obj.html;
+                  showdowns.completedHtml(obj.scripts);
+              })
+              .catch(err => {
+                element.innerText = err;
               });
-          })
+          })          
           .catch(function(error) {
             console.log(error);
             if (md) {
@@ -140,8 +144,9 @@
                 .makeHtml(md, csstypes => {
                   cssTypes = csstypes;
                 })
-                .then(content => {
-                  element.innerHTML = content;
+                .then( obj => {
+                    element.innerHTML = obj.html;
+                    showdowns.completedHTML(obj.scritps);
                 });
             }
           });

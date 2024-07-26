@@ -10,10 +10,7 @@ if (typeof window === 'undefined') {
 }
 
 import cdnjs from './cdn';
-// import WaveDrom from 'wavedrom';
-// if (typeof wavedrom === 'undefined') {
-//   var wavedrom = WaveDrom;
-// }
+import utils from './utils';
 
 if (typeof WaveDrom === 'undefined') {
   var WaveDrom = window.WaveDrom || undefined;
@@ -37,7 +34,7 @@ function dyncLoadScript(skin) {
           return cdnjs.loadScript('WaveDrom');
         })
         .then(name => {
-          WaveDrom = cdnjs.interopDefault(window[name]);
+          WaveDrom = utils.interopDefault(window[name]);
         });
     }
   }
@@ -52,7 +49,7 @@ function onRenderWavedrom(resolve, res) {
     const data = res.data;
     let element = res.element;
     const doc = element.ownerDocument;
-    element.parentNode.outerHTML = cdnjs.renderCacheElement(doc, id + index, name, el => {
+    element.parentNode.outerHTML = utils.renderCacheElement(doc, id + index, name, el => {
       const obj = window.eval(`(${data})`);
       WaveDrom.RenderWaveForm(index, obj, id);
       // Replace the created cache element with the original element with the same id.
@@ -63,12 +60,12 @@ function onRenderWavedrom(resolve, res) {
         }
       }
     });
-    resolve(true);
-  } else {
-    setTimeout(() => {
-      onRenderWavedrom(resolve, res);
-    }, 50);
+    return resolve(true);
   }
+  
+  setTimeout(() => {
+    onRenderWavedrom(resolve, res);
+  }, 10);
 }
 /**
  * render wavedrom graphs

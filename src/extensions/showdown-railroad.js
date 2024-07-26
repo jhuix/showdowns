@@ -5,11 +5,15 @@
  */
 'use strict';
 
+const extName = "railroad";
+const cssCdnName = 'railroadCSS';
+
 if (typeof window === 'undefined') {
   throw Error('The showdown railroad extension can only be used in browser environment!');
 }
 
 import cdnjs from './cdn';
+import utils from './utils';
 
 let railroad = false;
 function hasRailroad() {
@@ -17,14 +21,13 @@ function hasRailroad() {
 }
 
 let dync = false;
-const cssCdnName = 'railroadCSS';
 function dyncLoadScript() {
   const sync = hasRailroad();
   if (typeof window !== 'undefined') {
     if (!sync && !dync) {
       dync = true;
       cdnjs.loadStyleSheet(cssCdnName);
-      cdnjs.loadScript('railroad').then(() => {
+      cdnjs.loadScript(extName).then(() => {
         railroad = true;
       });
     }
@@ -44,12 +47,12 @@ function onRenderRailroad(resolve, res) {
       ? `<div id="${id}" class="${name} css-railroad" data-css="${cssLink}"></div>`
       : `<div id="${id}" class="${name}"></div>`;
     railroadElement.addTo(doc.getElementById(id));
-    resolve(true);
-  } else {
-    setTimeout(() => {
-      onRenderRailroad(resolve, res);
-    }, 50);
+    return resolve(true);
   }
+  
+  setTimeout(() => {
+    onRenderRailroad(resolve, res);
+  }, 10);
 }
 
 /**
@@ -57,42 +60,14 @@ function onRenderRailroad(resolve, res) {
  */
 function renderRailroad(element) {
   return new Promise(resolve => {
-    const langattr = element.dataset.lang;
-    const langobj = langattr ? JSON.parse(langattr) : null;
-    let diagramClass = '';
-    if (langobj) {
-      if (
-        (typeof langobj.codeblock === 'boolean' && langobj.codeblock) ||
-        (typeof langobj.codeblock === 'string' && langobj.codeblock.toLowerCase() === 'true')
-      ) {
-        return resolve(false);
-      }
-
-      if (langobj.align) {
-        //default left
-        if (langobj.align === 'center') {
-          diagramClass = 'diagram-center';
-        } else if (langobj.align === 'right') {
-          diagramClass = 'diagram-right';
-        }
-      }
+    const meta = utils.createElementMeta(extName, element);
+    if (!meta) {
+      return resolve(false);
     }
-    const cssLink = cdnjs.getSrc(cssCdnName);
-    const code = element.textContent.trim();
-    const name =
-      (element.classList.length > 0 ? element.classList[0] : '') +
-      (!element.className || !diagramClass ? '' : ' ') +
-      diagramClass;
-    const id = 'railroad-' + Date.now() + '-' + Math.floor(Math.random() * 10000);
-    element.id = id;
-    const res = {
-      element: element,
-      id: id,
-      className: name,
-      data: code,
-      cssLink: cssLink
-    };
-    onRenderRailroad(resolve, res);
+
+
+    meta.cssLink = cdnjs.getSrc(cssCdnName);
+    onRenderRailroad(resolve, meta);
   });
 }
 

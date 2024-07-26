@@ -395,33 +395,26 @@
     background-color: #f9f9f9;
   }
 
-  .diagram-center:not(.vega-embed):not(.asciimath):not(.latex) {
-    svg {
-      margin: auto;
-      display: inherit;
-    }
-  }
-
-  .diagram-right:not(.vega-embed):not(.asciimath):not(.latex) {
-    svg {
-      margin: auto 0 auto auto;
-      display: inherit;
-    }
-  }
-
-  .diagram-center.vega-embed {
+  .diagram-center:not(.asciimath):not(.latex):not(.mermaid) {
     margin: auto;
     display: table;
   }
 
-  .diagram-right.vega-embed {
+  .diagram-right:not(.asciimath):not(.latex):not(.mermaid) {
     margin: auto 0 auto auto;
     display: table;
   }
 
+  .diagram-center.mermaid {
+    text-align: center;
+  }
+
+  .diagram-right.mermaid {
+    text-align: right;
+  }  
+
   .asciimath:not(.diagram-center):not(.diagram-right),
   .latex:not(.diagram-center):not(.diagram-right) {
-
     .katex-display,
     .katex {
       text-align: unset;
@@ -430,7 +423,6 @@
 
   .asciimath.diagram-center,
   .latex.diagram-center {
-
     .katex-display,
     .katex {
       text-align: center;
@@ -439,7 +431,6 @@
 
   .asciimath.diagram-right,
   .latex.diagram-right {
-
     .katex-display,
     .katex {
       text-align: right;
