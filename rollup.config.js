@@ -11,7 +11,7 @@ import babel from '@rollup/plugin-babel';
 // 将非ES6语法的包转为ES6可用
 import commonjs from '@rollup/plugin-commonjs';
 // 混淆JS文件
-import { terser } from '@rollup/plugin-terser';
+import terser from '@rollup/plugin-terser';
 // 集成zlib crypto等库
 import builtins from 'rollup-plugin-node-builtins';
 import globals from 'rollup-plugin-node-globals';
@@ -151,7 +151,7 @@ if (isFormatCJS) {
 if (isMinBuild) {
   config.plugins.push(
     terser({
-      include: [/^.+\.min\.js$/],
+      // include: [/^.+\.min\.js$/],
       compress: {
         pure_getters: true,
         unsafe: true,
