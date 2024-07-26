@@ -42,6 +42,7 @@ const cdnSrc = {
   cdnjs: {
     ABCJS: scheme + 'cdnjs.cloudflare.com/ajax/libs/abcjs/6.4.1/abcjs-basic-min.js',
     ABCJSCSS: scheme + 'cdnjs.cloudflare.com/ajax/libs/abcjs/abcjs-audio.css',
+    echarts: scheme + 'cdnjs.cloudflare.com/ajax/libs/echarts/5.5.0/echarts.min.js',
     Viz: scheme + 'cdn.jsdelivr.net/npm/@viz-js/viz@3/lib/viz-standalone.js',
     Raphael: scheme + 'cdnjs.cloudflare.com/ajax/libs/raphael/2.3.0/raphael.min.js',
     flowchart: scheme + 'cdnjs.cloudflare.com/ajax/libs/flowchart/1.18.0/flowchart.min.js',
@@ -68,7 +69,8 @@ const cdnSrc = {
   },
   jsdelivr: {
     ABCJS: scheme + 'cdn.jsdelivr.net/npm/abcjs@6/dist/abcjs-basic-min.js',
-    ABCJSCSS: scheme + 'cdn.jsdelivr.net/npm/abcjs@6/abcjs-audio.css',    
+    ABCJSCSS: scheme + 'cdn.jsdelivr.net/npm/abcjs@6/abcjs-audio.css',
+    echarts: scheme + 'cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js',
     Viz: scheme + 'cdn.jsdelivr.net/npm/@viz-js/viz@3/lib/viz-standalone.js',
     Raphael: scheme + 'cdn.jsdelivr.net/npm/raphael@2/raphael.min.js',
     flowchart: scheme + 'cdnjs.cloudflare.com/ajax/libs/flowchart/1.18.0/flowchart.min.js',

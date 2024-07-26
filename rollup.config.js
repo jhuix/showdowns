@@ -171,7 +171,8 @@ if (!isFormatCJS) {
           { src: 'public/*', dest: 'docs' },
           { src: 'demo', dest: 'docs' },
           { src: 'logo.png', dest: 'docs' },
-          { src: 'favicon.ico', dest: 'docs' }
+          { src: 'favicon.ico', dest: 'docs' },
+          { src: 'dist/showdowns.min.*', dest: 'docs/dist' }
         ]
       })
     );
