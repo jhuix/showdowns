@@ -478,6 +478,8 @@ Default async extensions is described below:
       'showdown-vega': showdownVega(vegaOptions),
       'showdown-wavedrom': showdownWavedrom,
       'showdown-railroad': showdownRailroad,
+      'showdown-abc': showdownAbc,
+      'showdown-echarts': showdownEcharts,
     }
 
 ### Properties
@@ -617,9 +619,15 @@ Type: ({type:'zip', content: string} | string,
           hasKatex: boolean;
           hasRailroad: boolean;
           hasSequence: boolean
-       }) => void) => Promise<string>
+       }) => void) => Promise\<{html, scripts}>
 
 A async function to make markdown to html that showdown.convertor converte it in current showdowns instance.
+
+#### completedHtml
+
+Type: ( scripts?: [] | string) => Promise\<boolean>
+
+A async function to completed markdown to html that append scripts to dom.
 
 #### zDecode
 
