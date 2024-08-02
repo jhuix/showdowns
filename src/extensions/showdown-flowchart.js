@@ -9,6 +9,7 @@ if (typeof window === 'undefined') {
   throw Error('The showdown flowchart extension can only be used in browser environment!');
 }
 
+import format from './log';
 import cdnjs from './cdn';
 import utils from './utils';
 
@@ -20,28 +21,72 @@ if (typeof flowchart === 'undefined') {
   var flowchart = window.flowchart || undefined;
 }
 
+function hasRaphael() {
+  return !!Raphael
+}
+
 function hasFlowchart() {
   return typeof Raphael !== 'undefined' && Raphael && typeof flowchart !== 'undefined' && flowchart ? true : false;
+}
+
+function hasSequence() {
+  return hasRaphael() && !!window.SequenceJS;
 }
 
 let dync = false;
 function dyncLoadScript() {
   const sync = hasFlowchart();
   if (typeof window !== 'undefined') {
-    if (!sync && !dync) {
+    if (dync) {
+      return sync;
+    }
+
+    if (!sync) {
       dync = true;
+      if (!hasRaphael()) {
+        cdnjs
+          .loadScript('Raphael')
+          .then(name => {
+            Raphael = utils.interopDefault(window[name]);
+            return cdnjs.loadScript('flowchart');
+          })
+          .then(name => {
+            flowchart = utils.interopDefault(window[name]);
+          });
+        return sync
+      }
+
       cdnjs
-        .loadScript('Raphael')
-        .then(name => {
-          Raphael = utils.interopDefault(window[name]);
-          return cdnjs.loadScript('flowchart');
-        })
-        .then(name => {
-          flowchart = utils.interopDefault(window[name]);
-        });
+      .loadScript('flowchart')
+      .then(name => {
+        flowchart = utils.interopDefault(window[name]);
+      });
     }
   }
   return sync;
+}
+
+function unloadScript() {
+  if (!hasFlowchart()) return;
+  cdnjs.unloadScript('flowchart');
+  flowchart = null;
+  window.flowchart = null;
+  if (!hasSequence()) {
+    cdnjs.unloadScript('Raphael');
+    const es = document.getElementsByTagName('i');
+    if (es && es.length > 0) {
+      const body = document.body;
+      for (let i = 0; i < es.length; i++) {
+        const e = es[i];
+        if (e.title && e.title === 'Raphaël Colour Picker') {
+          body.removeChild(e);
+        }
+      }
+    }
+    Raphael = null;
+    window.Raphael = null;
+  }
+  dync = false;
 }
 
 function onRenderFlowchart(resolve, res) {
@@ -197,9 +242,9 @@ function showdownFlowchart(userOptions) {
         if (!flowchartElements.length && !flowElements.length) {
           return false;
         }
-        console.log(`${new Date().Format('yyyy-MM-dd HH:mm:ss.S')} Begin render flowchart elements.`);
+        console.log(format(`Begin render flowchart elements.`));
         return renderFlowchartElements(flowchartElements, flowElements, this.config).then(() => {
-          console.log(`${new Date().Format('yyyy-MM-dd HH:mm:ss.S')} End render flowchart elements.`);
+          console.log(format(`End render flowchart elements.`));
           return obj;
         });
       }

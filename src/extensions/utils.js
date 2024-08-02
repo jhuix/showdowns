@@ -4,7 +4,22 @@
  */
 'use strict';
 
-import './date-format.js';
+function loadStyle(name, css) {
+  if (!name || !css || typeof document === 'undefined') {
+    return false;
+  }
+
+  const id = 'css-' + name.toLowerCase();
+  const script = document.getElementById(id);
+  if (!script) {
+    const head = document.head || document.getElementsByTagName('head')[0];
+    const style = document.createElement('style');
+    style.id = id;
+    style.innerText = css;
+    head.appendChild(style);
+  }
+  return true;
+}
 
 function loadScript(id, code) {
     return new Promise((res, rej) => {
@@ -108,10 +123,11 @@ function createElementMeta(name, element, callback) {
 
 const utils = {
     interopDefault,
+    loadStyle,
     loadScript,
     renderCacheElement,
     renderElement,
-    createElementMeta
+    createElementMeta,
 };
 
 export default utils;

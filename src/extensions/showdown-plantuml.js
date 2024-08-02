@@ -5,6 +5,7 @@
  */
 'use strict';
 
+import format from './log';
 import plantumlcodec from '../utils/plantuml-codec.js';
 
 const defaultUmlWebsite = 'www.plantuml.com/plantuml';
@@ -116,9 +117,9 @@ function showdownPlantuml(userConfig) {
           return false;
         }
 
-        console.log(`${new Date().Format('yyyy-MM-dd HH:mm:ss.S')} Begin render plantuml elements.`);
+        console.log(format(`Begin render plantuml elements.`));
         return renderPlantumlElements(elements, this.config).then(() => {
-          console.log(`${new Date().Format('yyyy-MM-dd HH:mm:ss.S')} End render plantuml elements.`);
+          console.log(format(`End render plantuml elements.`));
           return obj;
         });
       }

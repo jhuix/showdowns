@@ -11,6 +11,7 @@ if (typeof window === 'undefined') {
   throw Error('The showdown vega extension can only be used in browser environment!');
 }
 
+import format from './log';
 import cdnjs from './cdn';
 import utils from './utils';
 
@@ -26,7 +27,11 @@ let dync = false;
 function dyncLoadScript() {
   const sync = hasVegaEmbed();
   if (typeof window !== 'undefined') {
-    if (!sync && !dync) {
+    if (dync) {
+      return sync;
+    }
+
+    if (!sync) {   
       dync = true;
       cdnjs
         .loadScript(extName)
@@ -42,6 +47,21 @@ function dyncLoadScript() {
     }
   }
   return sync;
+}
+
+function unloadScript() {
+  if (!hasVegaEmbed()) return;
+  cdnjs.unloadScript('vegaEmbed');
+  cdnjs.unloadScript('vegaLite');
+  cdnjs.unloadScript(extName);
+  const vegaStyle = document.getElementById('vega-embed-style');
+  if (vegaStyle && vegaStyle.tagName.toLowerCase() === 'style') {
+    const head = document.head || document.getElementsByTagName('head')[0];
+    head.removeChild(vegaStyle);
+  }
+  vegaEmbed = null;
+  window.vegaEmbed = null;
+  dync = false;  
 }
 
 /**
@@ -131,10 +151,9 @@ function showdownVega(userOptions) {
           return false;
         }
 
-        const scripts = obj.scripts;  
-        console.log(`${new Date().Format('yyyy-MM-dd HH:mm:ss.S')} Begin render vega elements.`);
-        return renderVegaElements(vegaElements, vegaLiteElements, scripts, this.config).then(() => {
-          console.log(`${new Date().Format('yyyy-MM-dd HH:mm:ss.S')} End render vega elements.`);
+        console.log(format(`Begin render vega elements.`));
+        return renderVegaElements(vegaElements, vegaLiteElements, obj.scripts, this.config).then(() => {
+          console.log(format(`End render vega elements.`));
           return obj;
         });
       }

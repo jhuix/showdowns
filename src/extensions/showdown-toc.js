@@ -5,6 +5,8 @@
  */
 'use strict';
 
+import format from './log';
+
 function createHeadingElement(wrapper, element, toc, nexthead) {
   try {
     if (nexthead) {
@@ -18,7 +20,7 @@ function createHeadingElement(wrapper, element, toc, nexthead) {
       child.href = '#' + element.id;
     }
   } catch {
-    console.log("append child error:" + wrapper);
+    console.warn(format('append child error:'), wrapper);
   }
   return toc;
 }

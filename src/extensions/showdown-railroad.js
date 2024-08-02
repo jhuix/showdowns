@@ -12,6 +12,7 @@ if (typeof window === 'undefined') {
   throw Error('The showdown railroad extension can only be used in browser environment!');
 }
 
+import format from './log';
 import cdnjs from './cdn';
 import utils from './utils';
 
@@ -24,7 +25,11 @@ let dync = false;
 function dyncLoadScript() {
   const sync = hasRailroad();
   if (typeof window !== 'undefined') {
-    if (!sync && !dync) {
+    if (dync) {
+      return sync;
+    }
+
+    if (!sync) {    
       dync = true;
       cdnjs.loadStyleSheet(cssCdnName);
       cdnjs.loadScript(extName).then(() => {
@@ -33,6 +38,14 @@ function dyncLoadScript() {
     }
   }
   return sync;
+}
+
+function unloadScript() {
+  if (!hasRailroad()) return;
+  cdnjs.unloadScript(extName);
+  cdnjs.unloadStyleSheet(cssCdnName);
+  railroad = false;
+  dync = false; 
 }
 
 function onRenderRailroad(resolve, res) {
@@ -103,9 +116,9 @@ function showdownRailroad() {
         this.config = {
           cssLink: cdnjs.getSrc(cssCdnName)
         };
-        console.log(`${new Date().Format('yyyy-MM-dd HH:mm:ss.S')} Begin render railroad elements.`);
+        console.log(format(`Begin render railroad elements.`));
         return renderRailroadElements(elements).then(() => {
-          console.log(`${new Date().Format('yyyy-MM-dd HH:mm:ss.S')} End render railroad elements.`);
+          console.log(format(`End render railroad elements.`));
           return obj;
         });
       }

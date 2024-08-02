@@ -115,6 +115,18 @@ function getCDN() {
   return cdnName;
 }
 
+function getName(name) {
+  if (typeof name === 'object') {
+    const key = Object.keys(name)[0];
+    const val = name[key];
+    if (typeof val === 'string') {
+      return key + "-" + val;
+    }    
+  }
+
+  return name;
+}
+
 function getSrc(name, def) {
   if (cdnSrc.hasOwnProperty(cdnName)) {
     const cdn = cdnSrc[cdnName];
@@ -142,43 +154,81 @@ function getSrc(name, def) {
   return def;
 }
 
-function loadScript(src, name) {
-  return new Promise((res, rej) => {
-      if (!src || typeof document === 'undefined') {
-          rej('Args is invaild!');
+function loadScript(name, src) {
+  return new Promise((resovle, reject) => {
+      if (!name || typeof document === 'undefined') {
+        reject('Args is invaild!');
       }
 
-      if (typeof name === 'undefined') {
-          name = src;
+      if (typeof src === 'undefined') {
+        src = '';
       }
 
       src = getSrc(name, src);
+      if (!src) {
+        reject(name + ' script source invaild!');
+      }
+
+      const id = 'script-' + getName(name).toLowerCase();
+      let script = document.getElementById(id);
+      if (script) {
+        return resovle(name);
+      }
+
       const head = document.head || document.getElementsByTagName('head')[0];
-      const script = document.createElement('script');
+      script = document.createElement('script');
       script.src = src;
+      script.id = id;
       script.onload = () => {
-          res(name);
+        resovle(name);
       };
       head.appendChild(script);
   });
 }
 
-function loadStyleSheet(css, name) {
-  if (!css || typeof document === 'undefined') {
+function unloadScript(name) {
+  name = getName(name);
+  const e = document.getElementById('script-' + name.toLowerCase());
+  if (e) {
+    const head = document.head || document.getElementsByTagName('head')[0];
+    head.removeChild(e);
+  }
+}
+
+function loadStyleSheet(name, css) {
+  if (!name || typeof document === 'undefined') {
       return '';
   }
 
-  if (typeof name === 'undefined') {
-      name = css;
+  if (typeof css === 'undefined') {
+    css = '';
   }
 
   css = getSrc(name, css);
-  var head = document.head || document.getElementsByTagName('head')[0];
-  var link = document.createElement('link');
-  link.rel = 'stylesheet';
-  link.href = css;
-  head.appendChild(link);
+  if (!css) {
+    return '';
+  }
+
+  const id = 'css-' + getName(name).toLowerCase();
+  let script = document.getElementById(id);
+  if (!script) {
+    var head = document.head || document.getElementsByTagName('head')[0];
+    var link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = css;
+    link.id = id;
+    head.appendChild(link);
+  }
   return cdnName === 'local' ? '' : css;
+}
+
+function unloadStyleSheet(name) {
+  name = getName(name);
+  const e = document.getElementById('css-' + name.toLowerCase());
+  if (e) {
+    const head = document.head || document.getElementsByTagName('head')[0];
+    head.removeChild(e);
+  }
 }
 
 const cdnjs = {
@@ -186,7 +236,9 @@ const cdnjs = {
   getCDN,
   getSrc,
   loadScript,
-  loadStyleSheet
+  unloadScript,
+  loadStyleSheet,
+  unloadStyleSheet
 };
 
 export default cdnjs;

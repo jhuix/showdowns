@@ -10,6 +10,11 @@ if (typeof window === 'undefined') {
 }
 
 import cdnjs from './cdn';
+import utils from './utils';
+
+if (typeof Raphael === 'undefined') {
+  var Raphael = window.Raphael || undefined;
+}
 
 // js-sequence-diagrams can create a global object named Diagrams of window,
 // To be compatible with railroad diagrams extension that also has window.Diagram object,
@@ -29,8 +34,16 @@ if (typeof sequence === 'undefined' && typeof window !== 'undefined') {
   var sequence = window.SequenceJS;
 }
 
+function hasRaphael() {
+  return !!Raphael
+}
+
 function hasSequence() {
-  return !!sequence;
+  return hasRaphael() && !!sequence;
+}
+
+function hasFlowchart() {
+  return hasRaphael() && !!window.flowchart;
 }
 
 let dync = false;
@@ -38,19 +51,31 @@ const cssCdnName = 'sequenceCSS';
 function dyncLoadScript() {
   const sync = hasSequence();
   if (typeof window !== 'undefined') {
-    if (!sync && !dync) {
+    if (dync) {
+      return sync;
+    }
+
+    if (!sync) { 
       dync = true;
       cdnjs.loadStyleSheet(cssCdnName);
       cdnjs
         .loadScript('WebFont')
         .then(() => {
+          if (!hasRaphael()) {
+            return cdnjs.loadScript('Raphael');
+          }
+
+          return 'Raphael';
+        })
+        .then((name) => {
+          Raphael = utils.interopDefault(window[name]);
           return cdnjs.loadScript('Snap');
         })
         .then(() => {
           return cdnjs.loadScript('underscore');
         })
         .then(() => {
-          // You need to save the original Diagrams object of railroad diagrams extension here.
+          // You need to save the original Diagrams object of sequence diagrams extension here.
           if (!diagram && window['Diagram']) {
             diagram = window['Diagram'];
           }
@@ -59,7 +84,7 @@ function dyncLoadScript() {
         .then(() => {
           sequence = window['Diagram'];
           window.SequenceJS = sequence;
-          // You need to replace the original Diagrams object of railroad diagrams extension here.
+          // You need to replace the original Diagrams object of sequence diagrams extension here.
           if (diagram) {
             window['Diagram'] = diagram;
           }
@@ -67,6 +92,35 @@ function dyncLoadScript() {
     }
   }
   return sync;
+}
+
+function unloadScript() {
+  if (!hasSequence()) return;
+  cdnjs.unloadScript('sequence');
+  cdnjs.unloadScript('underscore');
+  cdnjs.unloadScript('Snap');
+  cdnjs.unloadScript('WebFont');
+  cdnjs.unloadStyleSheet(cssCdnName);
+  diagram = null;
+  sequence = null;
+  window.Diagram = null;
+  window.SequenceJS = null;
+  if (!hasFlowchart()) {
+    cdnjs.unloadScript('Raphael');
+    const es = document.getElementsByTagName('i');
+    if (es && es.length > 0) {
+      const body = document.body;
+      for (let i = 0; i < es.length; i++) {
+        const e = es[i];
+        if (e.title && e.title === 'Raphaël Colour Picker') {
+          body.removeChild(e);
+        }
+      }
+    }
+    Raphael = null;
+    window.Raphael = null;
+  }  
+  dync = false;  
 }
 
 /**
@@ -175,20 +229,12 @@ function onRenderSequence(element) {
   }
   setTimeout(() => {
     onRenderSequence(element);
-  }, 50);
+  }, 10);
 }
 
 function showdownSequence() {
+  let hasEvent = false;
   const parser = new DOMParser();
-
-  if (typeof window !== 'undefined' && window.dispatchEvent) {
-    // Listen sequence custom event
-    window.addEventListener('sequence', event => {
-      if (event.detail) {
-        onRenderSequence(event.detail);
-      }
-    });
-  }
 
   return [
     {
@@ -201,6 +247,18 @@ function showdownSequence() {
         // find the sequence in code blocks
         const elements = wrapper.querySelectorAll('code.sequence.language-sequence');
         if (elements.length) {
+          if (!hasEvent) {
+            if (typeof window !== 'undefined' && window.dispatchEvent) {
+              hasEvent = true;
+              // Listen sequence custom event
+              window.addEventListener('sequence', event => {
+                if (event.detail) {
+                  onRenderSequence(event.detail);
+                }
+              });              
+            }
+          }
+
           this.config = {
             cssLink: cdnjs.getSrc(cssCdnName)
           };

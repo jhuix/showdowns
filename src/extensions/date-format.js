@@ -22,10 +22,15 @@ Date.prototype.Format = function(fmt) {
     S: this.getMilliseconds() //毫秒
   };
   if (!fmt) fmt = 'yyyy-MM-dd hh:mm:ss.S';
-  if (/(y+)/.test(fmt)) fmt = fmt.replace(RegExp.$1, (this.getFullYear() + '').substr(4 - RegExp.$1.length));
-  for (var k in o) {
-    if (new RegExp('(' + k + ')').test(fmt)) {
-      fmt = fmt.replace(RegExp.$1, RegExp.$1.length == 1 ? o[k] : ('00' + o[k]).substr(('' + o[k]).length));
+  const matches = /(y+)/.exec(fmt);
+  if (matches) fmt = fmt.replace(matches[1], (this.getFullYear() + '').substring(4 - matches[1].length));
+  for (const k in o) {
+    const m = new RegExp('(' + k + ')').exec(fmt)
+    if (m) {
+      let n = o[k];
+      if (m[1].length == 1) n = ('000' + o[k]).substring(('' + o[k]).length);
+      else if (m[1].length == 2) n = ('00' + o[k]).substring(('' + o[k]).length);
+      fmt = fmt.replace(m[1], n);
     }
   }
   return fmt;

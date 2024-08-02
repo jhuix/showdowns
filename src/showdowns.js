@@ -85,25 +85,28 @@ const getExtensions = (options, extensions = {}) => {
   return extnames;
 };
 
-const loadScript = (id, code) => {
+const loadScript = (id, code, element) => {
   if (!code || typeof document === 'undefined') {
     return false;
   }
 
-  const body = document.body;
-  const parent = document.getElementById(id);
-  if (parent) {
+  if (!element) {
+    element = document.getElementById(id);
+  }
+  
+  if (element) {
+    const eid = element.id;
     const scriptID = `script-${id}`;
-    let script = document.querySelector(`#parent > #${scriptID}`);
+    let script = document.querySelector(`#${eid} > #${scriptID}`);
     if (script) {
-      body.removeChild(script);
+      document.body.removeChild(script);
     } else {
       script = document.createElement('script');
       script.id = scriptID;
     }
     script.type = "text/javascript";
     script.text = code;
-    parent.appendChild(script);
+    element.appendChild(script);
   }
   return true
 };
@@ -419,14 +422,15 @@ const showdowns = {
     }
     return Promise.reject(!content ? 'Content is empty.' : 'Converter is invaild.');
   },
-  completedHtml: function(scripts) {
+  completedHtml: function(scripts, element) {
     if (!showdown.helper.isArray(scripts)) {
       scripts = [scripts];
     }
+
     return new Promise((revole, reject) => {
       for (var i = 0; i < scripts.length; ++i) {
         const script = scripts[i];
-        if (!loadScript(script.id, script.code)) {
+        if (!loadScript(script.id, script.code, element)) {
           return reject('Args is invaild!');
         }
       }

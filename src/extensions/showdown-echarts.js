@@ -11,6 +11,7 @@ if (typeof window === 'undefined') {
   throw Error(`The showdown ${extName} extension can only be used in browser environment!`);
 }
 
+import format from './log';
 import cdnjs from './cdn';
 import utils from './utils';
 
@@ -26,7 +27,11 @@ let dync = false;
 function dyncLoadScript() {
   const sync = hasEcharts();
   if (typeof window !== 'undefined') {
-    if (!sync && !dync) {
+    if (dync) {
+      return sync;
+    }
+
+    if (!sync) {
       dync = true;
       cdnjs.loadScript(extName).then(name => {
         echarts = utils.interopDefault(window[name]);
@@ -34,6 +39,14 @@ function dyncLoadScript() {
     }
   }
   return sync;
+}
+
+function unloadScript() {
+  if (!hasEcharts()) return;
+  cdnjs.unloadScript(extName);
+  echarts = null;
+  window.echarts = null;
+  dync = false;
 }
 
 function onRenderEcharts(resolve, res) {
@@ -139,10 +152,9 @@ function showdownEcharts(userConfig) {
           return false;
         }
 
-        const scripts = obj.scripts;
-        console.log(`${new Date().Format('yyyy-MM-dd HH:mm:ss.S')} Begin render ${extName} elements.`);
-        return renderEchartsElements(elements, scripts, this.config).then(() => {
-          console.log(`${new Date().Format('yyyy-MM-dd HH:mm:ss.S')} End render ${extName} elements.`);
+        console.log(format(`Begin render ${extName} elements.`));
+        return renderEchartsElements(elements, obj.scripts, this.config).then(() => {
+          console.log(format(`End render ${extName} elements.`));
           return obj;
         });
       }

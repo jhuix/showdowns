@@ -9,6 +9,7 @@ if (typeof window === 'undefined') {
   throw Error('The showdown wavedrom extension can only be used in browser environment!');
 }
 
+import log from './log';
 import cdnjs from './cdn';
 import utils from './utils';
 
@@ -25,7 +26,11 @@ function hasWavedrom() {
 let dync = false;
 function dyncLoadScript(skin) {
   const sync = hasWavedrom();
-  if (!sync && !dync) {
+  if (dync) {
+    return sync;
+  }
+
+  if (!sync) { 
     dync = true;
     if (typeof window !== 'undefined') {
       cdnjs
@@ -39,6 +44,15 @@ function dyncLoadScript(skin) {
     }
   }
   return sync;
+}
+
+function unloadScript(skin) {
+  if (!hasWavedrom()) return;
+  cdnjs.unloadScript('WaveDrom');
+  cdnjs.unloadScript({ WaveDromSkin: skin });
+  WaveDrom = null;
+  window.WaveDrom = null;
+  dync = false;  
 }
 
 function onRenderWavedrom(resolve, res) {
@@ -171,9 +185,9 @@ function showdownWavedrom(skinConfig) {
           return false;
         }
 
-        console.log(`${new Date().Format('yyyy-MM-dd hh:mm:ss.S')} Begin render wavedrom elements.`);
+        log(`Begin render wavedrom elements.`);
         return renderWavedromElements(elements, this.config.skin).then(() => {
-          console.log(`${new Date().Format('yyyy-MM-dd hh:mm:ss.S')} End render wavedrom elements.`);
+          log(`End render wavedrom elements.`);
           return obj;
         });
       }

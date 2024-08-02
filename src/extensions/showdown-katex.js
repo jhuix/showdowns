@@ -8,6 +8,7 @@ if (typeof window === 'undefined') {
   throw Error('The showdown katex extension can only be used in browser environment!');
 }
 
+import format from './log';
 import asciimathToTex from './asciimath2tex';
 import cdnjs from './cdn';
 import utils from './utils';
@@ -32,7 +33,11 @@ const cssCdnName = 'katexCSS';
 function dyncLoadScript(callback) {
   const sync = hasKatex();
   if (typeof window !== 'undefined') {
-    if (!sync && !dync) {
+    if (dync) {
+      return sync;
+    }
+
+    if (!sync) {    
       dync = true;
       cdnjs.loadStyleSheet(cssCdnName);
       cdnjs
@@ -46,6 +51,9 @@ function dyncLoadScript(callback) {
           if (typeof callback === 'function' && callback) {
             callback(RenderMathInElement);
           }
+        })
+        .catch(e => {
+          console.log('load script error: ' + e);
         });
       return sync;
     }
@@ -55,6 +63,18 @@ function dyncLoadScript(callback) {
     callback(RenderMathInElement);
   }
   return sync;
+}
+
+function unloadScript() {
+  if (!hasKatex()) return;
+  cdnjs.unloadScript('renderMathInElement');
+  cdnjs.unloadScript('katex');
+  cdnjs.unloadStyleSheet(cssCdnName);
+  katex = null;
+  window.katex = null;
+  RenderMathInElement = null;
+  window.renderMathInElement = null;  
+  dync = false;  
 }
 
 function onRenderKatex(resolve, res) {
@@ -93,7 +113,7 @@ function onRenderKatex(resolve, res) {
   } else {
     setTimeout(() => {
       onRenderKatex(resolve, res);
-    }, 50);
+    }, 10);
   }
 }
 
@@ -264,6 +284,7 @@ function showdownKatex(userConfig) {
       type: 'output',
       config: config,
       filter: function(obj) {
+        inlineMathCount = 0;
         const wrapper = obj.wrapper;
         if (!wrapper) {
           return false;
@@ -304,16 +325,16 @@ function showdownKatex(userConfig) {
               } else {
                 setTimeout(() => {
                   asyncRenderKatex(resolve, render);
-                }, 50);
+                }, 10);
               }
             }
-            console.log(`${new Date().Format('yyyy-MM-dd HH:mm:ss.S')} Begin render inline katex elements.`);
+            console.log(format(`Begin render inline katex elements.`));
             return new Promise(resolve => {
               dyncLoadScript(render => {
                 asyncRenderKatex(resolve, render);
               });
             }).then(() => {
-              console.log(`${new Date().Format('yyyy-MM-dd HH:mm:ss.S')} End render inline katex elements.`);
+              console.log(format(`End render inline katex elements.`));
               return obj;
             });
           }
@@ -322,9 +343,9 @@ function showdownKatex(userConfig) {
         }
 
         config.cssLink = cdnjs.getSrc(cssCdnName);
-        console.log(`${new Date().Format('yyyy-MM-dd HH:mm:ss.S')} Begin render katex elements.`);
+        console.log(format(`Begin render katex elements.`));
         return renderBlockElements(latex, asciimath, this.config).then(() => {
-          console.log(`${new Date().Format('yyyy-MM-dd HH:mm:ss.S')} End render katex elements.`);
+          console.log(format(`End render katex elements.`));
           return obj;
         });
       }

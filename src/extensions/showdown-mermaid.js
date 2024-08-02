@@ -11,6 +11,7 @@ if (typeof window === 'undefined') {
   throw Error('The showdown mermaid extension can only be used in browser environment!');
 }
 
+import format from './log';
 import cdnjs from './cdn';
 import utils from './utils';
 
@@ -29,7 +30,11 @@ function dyncLoadScript(config) {
   // In browser environment, html need to be rendered asynchronously.
   const sync = hasMermaid();
   if (typeof window !== 'undefined') {
-    if (!sync && !dync) {
+    if (dync) {
+      return sync;
+    }
+
+    if (!sync) {
       dync = true;
       cdnjs.loadScript(extName).then(name => {
         mermaid = utils.interopDefault(window[name]);
@@ -42,6 +47,16 @@ function dyncLoadScript(config) {
   mermaid.initialize(config);
   return sync;
 }
+
+function unloadScript() {
+  if (!hasMermaid()) return;
+  cdnjs.unloadScript(extName);
+  katex = null;
+  window.mermaid = null;
+  mermaid = null; 
+  dync = false;  
+}
+
 
 function onRenderMermaid(resolve, res) {
   if (hasMermaid()) {
@@ -124,9 +139,9 @@ function showdownMermaid(userConfig) {
           return false;
         }
 
-        console.log(`${new Date().Format('yyyy-MM-dd HH:mm:ss.S')} Begin render mermaid elements.`);
+        console.log(format(`Begin render mermaid elements.`));
         return renderMermaidElements(elements, this.config).then(() => {
-          console.log(`${new Date().Format('yyyy-MM-dd HH:mm:ss.S')} End render mermaid elements.`);
+          console.log(format(`End render mermaid elements.`));
           return obj;
         });
       }

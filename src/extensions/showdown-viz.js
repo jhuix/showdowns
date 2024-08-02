@@ -9,6 +9,7 @@ if (typeof window === 'undefined') {
   throw Error('The showdown viz extension can only be used in browser environment!');
 }
 
+import format from './log';
 import cdnjs from './cdn';
 import utils from './utils';
 
@@ -28,7 +29,11 @@ let dync = false;
 function dyncLoadScript() {
   const sync = hasViz();
   if (typeof window !== 'undefined') {
-    if (!sync && !dync) {
+    if (dync) {
+      return sync;
+    }
+
+    if (!sync) {  
       dync = true;
       cdnjs.loadScript('Viz').then(name => {
         Viz = utils.interopDefault(window[name]);
@@ -36,6 +41,14 @@ function dyncLoadScript() {
     }
   }
   return sync;
+}
+
+function unloadScript() {
+  if (!hasViz()) return;
+  cdnjs.unloadScript('Viz');
+  Viz = null;
+  window.Viz = null;
+  dync = false;  
 }
 
 function onRenderViz(resolve, res) {
@@ -107,9 +120,9 @@ function showdownViz() {
         if (!elements.length) {
           return false;
         }
-        console.log(`${new Date().Format('yyyy-MM-dd HH:mm:ss.S')} Begin render dot elements.`);
+        console.log(format(`Begin render dot elements.`));
         return renderVizElements(elements).then(() => {
-          console.log(`${new Date().Format('yyyy-MM-dd HH:mm:ss.S')} End render dot elements.`);
+          console.log(format(`End render dot elements.`));
           return obj;
         });
       }
