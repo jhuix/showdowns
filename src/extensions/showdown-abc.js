@@ -18,7 +18,7 @@ import utils from './utils';
 
 if (typeof ABCJS === 'undefined') {
     var ABCJS = window.ABCJS || undefined;
-}  
+}
 
 function hasAbc() {
     return !!ABCJS;
@@ -117,33 +117,37 @@ function CursorControl(id) {
 	};
 }
 
-let synthControl;
-
-function load(audio, render, abc) {
+function load(audio, render) {
+  let synthControl;
 	if (ABCJS.synth.supportsAudio()) {
 		synthControl = new ABCJS.synth.SynthController();
-		synthControl.load(`#${audio}`, new CursorControl(render), {displayLoop: true, displayRestart: true, displayPlay: true, displayProgress: true, displayWarp: true});
+		synthControl.load(`#${audio}`, new CursorControl(render.id), {displayLoop: true, displayRestart: true, displayPlay: true, displayProgress: true, displayWarp: true});
 	} else {
 		document.querySelector(`#${audio}`).innerHTML = "<div class='audio-error'>Audio is not supported in this browser.</div>";
 	}
-	setTune(render, false, abc);
+	setTune(render, false, synthControl);
 }
 
-function setTune(render, userAction, abc) {
-	synthControl.disable(true);
-	const visualObj = ABCJS.renderAbc(`${render}`, abc, abcOptions)[0];
+function setTune(render, userAction, synthControl) {
+  const id = render.id;
+  const abc = decodeURIComponent(atob(render.data));
+  if (!synthControl) {
+    ABCJS.renderAbc(`${id}`, abc, abcOptions)[0];
+    return;
+  }
+
+  synthControl.disable(true);
+	const visualObj = ABCJS.renderAbc(`${id}`, abc, abcOptions)[0];
 	const midiBuffer = new ABCJS.synth.CreateSynth();
 	midiBuffer.init({
 		visualObj: visualObj,
 	}).then(function (response) {
 		// console.log(response);
-		if (synthControl) {
-			synthControl.setTune(visualObj, userAction).then(function (response) {
-				console.log(format("Audio successfully loaded."));
-			}).catch(function (error) {
-				console.warn("Audio problem:", error);
-			});
-		}
+		synthControl.setTune(visualObj, userAction).then(function (response) {
+			console.log(format("Audio successfully loaded."));
+		}).catch(function (error) {
+			console.warn("Audio problem:", error);
+		});
 	}).catch(function (error) {
 		console.warn("Audio problem:", error);
 	});
@@ -153,17 +157,19 @@ function onRenderAbc(resolve, scripts, res) {
   if (hasAbc()) {
     const id = res.id;
     const name = res.className;
-    const data = btoa(res.data);
-    const cssLink = res.cssLink;
-    // const doc = res.element.ownerDocument;
+    let html = `<div id="${id}" class="${name}"></div>`;
+    if (!res.lang || !res.lang.audio) {
+      const data = res.data;
+      const doc = res.element.ownerDocument;
+      const element = doc.getElementById(id);
+      ABCJS.renderAbc(element, data);
+      return resolve(true);
+    }
+
+    const data = btoa(encodeURIComponent(res.data));
     const audio = id + '-audio';
-    let html = cssLink
-      ? `<div id="${id}" class="${name} css-abc" data-css="${cssLink}"></div>`
-      : `<div id="${id}" class="${name}"></div>`;
     html +=`<div id="${audio}"></div>`;
     res.element.parentNode.outerHTML = html;
-    // const renderElement = doc.getElementById(id);
-    // ABCJS.renderAbc(element, data);
     const script = {
       id: id,
       code: `(function() {
@@ -171,8 +177,11 @@ function onRenderAbc(resolve, scripts, res) {
                 window.dispatchEvent(new CustomEvent('abcjs',{
                   detail: {
                     audio: '${audio}',
-                    render: '${id}',
-                    data: '${data}'
+                    render: {
+                      id:'${id}',
+                      class:'${name}',
+                      data:"${data}"
+                    }
                   }
                 }));
               }
@@ -197,7 +206,6 @@ function renderAbc(element, scripts) {
       return resolve(false);
     }
 
-    meta.cssLink = cdnjs.getSrc(cssCdnName);
     onRenderAbc(resolve, scripts, meta);
   });
 }
@@ -239,15 +247,12 @@ function showdownAbc() {
             // Listen sequence custom event
             window.addEventListener('abcjs', event => {
               if (event.detail) {
-                load(event.detail.audio, event.detail.render, atob(event.detail.data));
+                load(event.detail.audio, event.detail.render);
               }
-            });              
+            });
           }
         }
 
-        this.config = {
-          cssLink: cdnjs.getSrc(cssCdnName)
-        };
         console.log(format(`Begin render ${extName} elements.`));
         return renderAbcElements(elements, obj.scripts).then(() => {
           console.log(format(`End render ${extName} elements.`));

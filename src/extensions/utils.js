@@ -117,7 +117,8 @@ function createElementMeta(name, element, callback) {
       id: id,
       className: className,
       data: code,
-      element: element,      
+      element: element,
+      lang: langobj
     };
 }
 
