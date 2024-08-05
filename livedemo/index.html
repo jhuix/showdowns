@@ -108,7 +108,7 @@
         let md = "";
         let cssTypes;
         window
-          .fetch("http://127.0.0.1:5500/docs/showdowns-features.md")
+          .fetch("http://127.0.0.1:15505/docs/showdowns-features.md")
           .then(function(response) {
             if (response.ok) {
               return response.text();
@@ -116,7 +116,7 @@
           })
           .then(function(text) {
             md = text;
-            return window.fetch("http://127.0.0.1:5500/docs/Showdown's-Markdown-syntax.md");
+            return window.fetch("http://127.0.0.1:15505/docs/Showdown's-Markdown-syntax.md");
           })
           .then(function(response) {
             if (response.ok) {

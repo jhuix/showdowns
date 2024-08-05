@@ -161,6 +161,7 @@ function onRenderAbc(resolve, scripts, res) {
     if (!res.lang || !res.lang.audio) {
       const data = res.data;
       const doc = res.element.ownerDocument;
+      res.element.parentNode.outerHTML = html;
       const element = doc.getElementById(id);
       ABCJS.renderAbc(element, data);
       return resolve(true);
