@@ -76,12 +76,13 @@ function renderVega(element, options, scripts, isVegaLite) {
   const config = JSON.stringify(options);      
   const data = JSON.stringify(JSON.parse(meta.data));
   const id = meta.id;
+  const container = meta.container;
   const script = {
-    id: id,
+    id: container,
     code: `(function() {
       let el = document.getElementById('${id}');
       if (el){
-        vegaEmbed(el, JSON.parse('${data}'), JSON.parse('${config}'));
+        vegaEmbed(el, JSON.parse(\`${data}\`), JSON.parse('${config}'));
       }
     })();`
   }
@@ -93,14 +94,32 @@ function renderVega(element, options, scripts, isVegaLite) {
 
 // <div class="vegaembed || flow"></div>
 function renderVegaElements(vegaElements, vegaLiteElements, scripts, options) {
+  const script = {
+    outer: [
+      {
+        name: extName,
+        src: cdnjs.getSrc(extName,'jsdelivr')
+      },
+      {
+        name: 'vegaLite',
+        src: cdnjs.getSrc('vegaLite','jsdelivr')
+      },
+      {
+        name: 'vegaEmbed',
+        src: cdnjs.getSrc('vegaEmbed','jsdelivr')
+      }    
+    ],
+    inner: []
+  };
+  scripts.push(script); 
   dyncLoadScript();
   return new Promise(resolve => {
     const promiseArray = [];
     vegaElements.forEach(element => {
-      promiseArray.push(renderVega(element, options, scripts, false));
+      promiseArray.push(renderVega(element, options, script.inner, false));
     });
     vegaLiteElements.forEach(element => {
-      promiseArray.push(renderVega(element, options, scripts, true));
+      promiseArray.push(renderVega(element, options, script.inner, true));
     });
     Promise.all(promiseArray).then(() => {
       resolve(true);
@@ -117,17 +136,18 @@ const getOptions = (userOptions = {}) => ({
   ...userOptions
 });
 
-function onRenderVega(resolve, res) {
+function onRenderVega(resolve, meta) {
   if (hasVegaEmbed()) {
-    const id = res.id;
-    const name = res.className;
-    const node = res.element.parentNode;
-    node.outerHTML = `<div id="${id}" class="${name}"></div>`;
+    const id = meta.id;
+    const name = meta.className;
+    const container = meta.container;
+    const node = meta.element.parentNode;
+    node.outerHTML = `<div id="${container}"><div id="${id}" class="${name}"></div></div>`;
     return resolve(true);
   }
   
   setTimeout(() => {
-    onRenderVega(resolve, res);
+    onRenderVega(resolve, meta);
   }, 10);
 }
 

@@ -26,6 +26,7 @@ import showdownFlowchart from './extensions/showdown-flowchart.js';
 
 import * as zlibcodec from './utils/zlib-codec.js';
 import cdnjs from './extensions/cdn';
+import format from './extensions/log';
 
 //////////////////////////////////////////////////////////////////////
 const getOptions = (options = {}) => {
@@ -85,32 +86,86 @@ const getExtensions = (options, extensions = {}) => {
   return extnames;
 };
 
-const loadScript = (id, code, element) => {
-  if (!code || typeof document === 'undefined') {
+const loadScript = (id, code, parent) => {
+  if (!id || !code || typeof document === 'undefined') {
     return false;
   }
 
+  let element = document.getElementById(id);
   if (!element) {
-    element = document.getElementById(id);
-  }
-  
-  if (element) {
-    const eid = element.id;
-    const scriptID = `script-${id}`;
-    let script = document.querySelector(`#${eid} > #${scriptID}`);
-    if (script) {
-      document.body.removeChild(script);
-    } else {
-      script = document.createElement('script');
-      script.id = scriptID;
+    if (!parent) {
+      parent = document.body;
+    } else if (typeof parent === 'string') {
+      parent = document.querySelector(parent);
     }
-    script.type = "text/javascript";
-    script.text = code;
-    element.appendChild(script);
+    element = parent;
   }
+  const tag = element.tagName;
+  const scriptID = `script-${id}`;
+  let script = document.querySelector(`${tag} > #${scriptID}`);
+  if (script) {
+    return true;
+  }
+    
+  script = document.createElement('script');
+  script.id = scriptID;
+  script.type = "text/javascript";
+  script.text = code;
+  element.appendChild(script);
   return true
 };
 
+const insertScript = (id, code, parent) => {
+  if (!id || !code || typeof document === 'undefined') {
+    return false;
+  }
+
+  let element = document.getElementById(id);
+  if (!element) {
+    if (!parent) {
+      parent = document.body;
+    } else if (typeof parent === 'string') {
+      parent = document.querySelector(parent);
+    }
+    element = parent;
+  }
+  const tag = element.tagName;
+  const scriptID = `script-${id}`;
+  let script = document.querySelector(`${tag} > #${scriptID}`);
+  if (script) {
+    return true;
+  }
+    
+  script = document.createElement('script');
+  script.id = scriptID;
+  script.type = "text/javascript";
+  script.text = code;
+  element.insertBefore(script, element.children[0]);
+  return true
+};
+
+function appendScript(name, src) {
+  return new Promise((resovle, reject) => {
+      if (!name || !src || typeof document === 'undefined' ) {
+        reject('Args is invaild!');
+      }
+
+      const id = 'script-' + name.toLowerCase();
+      let script = document.getElementById(id);
+      if (script) {
+        return resovle(name);
+      }
+
+      const head = document.head || document.getElementsByTagName('head')[0];
+      script = document.createElement('script');
+      script.src = src;
+      script.id = id;
+      script.onload = () => {
+        resovle(name);
+      };
+      head.appendChild(script);
+  });
+}
 
 const showdownFlavors = ['github', 'ghost', 'vanilla', 'original', 'allon'];
 const mermaidThemes = ['default', 'forest', 'dark', 'neutral'];
@@ -394,18 +449,21 @@ const showdowns = {
         }
 
         return new Promise(resolve => {
+          const abcCssLink = _getCssLink(wrapper, '.css-abc', 'showdown-abc');
           const katexCssLink = _getCssLink(wrapper, '.css-katex', 'showdown-katex');
-          const sequenceCssLink = _getCssLink(wrapper, '.css-sequence', 'showdown-sequence');
           const railroadCssLink = _getCssLink(wrapper, '.css-railroad', 'showdown-railroad');
+          const sequenceCssLink = _getCssLink(wrapper, '.css-sequence', 'showdown-sequence');          
 
           obj.cssTypes = {
+            hasAbc: abcCssLink ? true : false,
             hasKatex: katexCssLink ? true : false,
-            hasSequence: sequenceCssLink ? true : false,
             hasRailroad: railroadCssLink ? true : false,
+            hasSequence: sequenceCssLink ? true : false,            
             css: {
+              abc: abcCssLink,
               katex: katexCssLink,
-              sequence: sequenceCssLink,
-              railroad: railroadCssLink
+              railroad: railroadCssLink,
+              sequence: sequenceCssLink
             }
           };
           if (typeof callback === 'function' && callback) {
@@ -428,8 +486,47 @@ const showdowns = {
     }
 
     return new Promise((revole, reject) => {
-      for (var i = 0; i < scripts.length; ++i) {
+      if (typeof element === 'string') {
+        element = document.querySelector(element);
+      }
+      for (let i = 0; i < scripts.length; ++i) {
         const script = scripts[i];
+        if (script.outer) {
+          if (!showdown.helper.isArray(script.outer)) {
+            script.outer = [script.outer];
+          }
+          if (!showdown.helper.isArray(script.inner)) {
+            script.inner = [script.inner];
+          }
+          let o = script.outer[0];
+          let result = appendScript(o.name, o.src);
+          for (let k = 1; k < script.outer.length; ++k) {
+            result = result.then(() => {
+              o = script.outer[k];
+              return appendScript(o.name, o.src);
+            });
+          }
+          result.then(() =>{
+            if (script.code) {
+              if (!insertScript(script.id, script.code, element)) {
+                console.log(format('Args is invaild with insert script!'), script);
+                return
+              }
+            }
+
+            if (script.inner.length > 0) {
+              for (let j = 0; j < script.inner.length; ++j) {
+                const s = script.inner[j];
+                if (!loadScript(s.id, s.code, element)) {
+                  console.log(format('Args is invaild with load script!'), s);
+                  return
+                }
+              }
+            }
+          })
+          continue;
+        }
+
         if (!loadScript(script.id, script.code, element)) {
           return reject('Args is invaild!');
         }

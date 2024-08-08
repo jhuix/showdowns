@@ -15,29 +15,34 @@ function loadStyle(name, css) {
     const head = document.head || document.getElementsByTagName('head')[0];
     const style = document.createElement('style');
     style.id = id;
+    style.type = 'text/css';
     style.innerText = css;
     head.appendChild(style);
   }
   return true;
 }
 
-function loadScript(id, code) {
+function loadScript(id, code, element) {
     return new Promise((res, rej) => {
-        if (!code || typeof document === 'undefined') {
-            rej('Args is invaild!');
+        if (!id || !code || typeof document === 'undefined') {
+            return rej('Args is invaild!');
         }
 
-        const body = document.body;
         let script = document.getElementById(id);
         if (script) {
-            body.removeChild(script);
-        } else {
-            script = document.createElement('script');
-            script.id = id;
+          return res(true);
         }
+
+        if (!element) {
+          element = document.body;
+        } else if (typeof element === 'string') {
+          element = document.querySelector(element);
+        }
+        script = document.createElement('script');
+        script.id = id;
         script.type = "text/javascript";
         script.text = code;
-        body.appendChild(script);
+        element.appendChild(script);
         res(true);
     });
 }
@@ -111,10 +116,11 @@ function createElementMeta(name, element, callback) {
       (element.classList.length > 0 ? element.classList[0] : '') +
       (!element.className || !diagramClass ? '' : ' ') +
       diagramClass;
-    const id = name + '-' + Date.now() + '-' + Math.floor(Math.random() * 10000);
+    const id = name.toLowerCase() + '-' + Date.now() + '-' + Math.floor(Math.random() * 10000);
     element.id = id;
     return {
       id: id,
+      container: id + '-container',
       className: className,
       data: code,
       element: element,

@@ -127,9 +127,12 @@ function getName(name) {
   return name;
 }
 
-function getSrc(name, def) {
-  if (cdnSrc.hasOwnProperty(cdnName)) {
-    const cdn = cdnSrc[cdnName];
+function getSrc(name, src, def) {
+  if (typeof src === 'undefined' || !src) {
+    src = getCDN();
+  }
+  if (cdnSrc.hasOwnProperty(src)) {
+    const cdn = cdnSrc[src];
     let url = '';
     if (typeof name === 'object') {
       const key = Object.keys(name)[0];

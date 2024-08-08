@@ -49,11 +49,12 @@ function unloadScript() {
   dync = false;
 }
 
-function onRenderEcharts(resolve, res) {
+function onRenderEcharts(resolve, meta) {
   if (hasEcharts()) {
-    const id = res.id;
-    const name = res.className;
-    const node = res.element.parentNode;
+    const id = meta.id;
+    const container = meta.container;
+    const name = meta.className;
+    const node = meta.element.parentNode;
     // // 在 SSR 模式下第一个参数不需要再传入 DOM 对象
     // let chart = echarts.init(null, null, {
     //   renderer: 'svg', // 必须使用 SVG 模式
@@ -69,12 +70,12 @@ function onRenderEcharts(resolve, res) {
     // // 如果不再需要图表，调用 dispose 以释放内存
     // chart.dispose();
     // chart = null;
-    node.outerHTML = `<div id="${id}" class="${name}"></div>`;
+    node.outerHTML = `<div id="${container}"><div id="${id}" class="${name}"></div></div>`;
     return resolve(true);
   }
 
   setTimeout(() => {
-    onRenderEcharts(resolve, res);
+    onRenderEcharts(resolve, meta);
   }, 20);
 }
 
@@ -91,13 +92,17 @@ function renderEcharts(element, scripts, config) {
   config = JSON.stringify({ ...config, ssr: false });
   const data = JSON.stringify(JSON.parse(meta.data));
   const script = {
-    id: meta.id,
+    id: meta.container,
     code: `(function() {
         let el = document.getElementById('${meta.id}');
         if (el){
+          let chart = echarts.getInstanceByDom(el);
+          if (!chart) {
+            el.innerHTML = '';
+          }
           let config = JSON.parse('${config}');
-          let chart = echarts.init(el, null, config);
-          let option = JSON.parse('${data}');
+          chart = echarts.init(el, null, config);
+          let option = JSON.parse(\`${data}\`);
           chart.setOption(option);
         }
       })();`
@@ -110,11 +115,21 @@ function renderEcharts(element, scripts, config) {
 
 // <div class="echarts"></div>
 function renderEchartsElements(elements, scripts, config) {
+  const script = {
+    outer: [
+      {
+        name: extName,
+        src: cdnjs.getSrc(extName,'jsdelivr')
+      }
+    ],
+    inner: []
+  };
+  scripts.push(script); 
   dyncLoadScript();
   return new Promise(resolve => {
     const promiseArray = [];
     elements.forEach(element => {
-      promiseArray.push(renderEcharts(element, scripts, config));
+      promiseArray.push(renderEcharts(element, script.inner, config));
     });
     Promise.all(promiseArray).then(() => {
       resolve(true);
@@ -146,6 +161,7 @@ function showdownEcharts(userConfig) {
         if (!wrapper) {
           return false;
         }
+
         // find the echarts in code blocks
         const elements = wrapper.querySelectorAll(`code.${extName}.language-${extName}`);
         if (!elements.length) {

@@ -55,18 +55,20 @@ function unloadScript() {
   dync = false;
 }
 
+const scriptCode = `
 var abcOptions = {
 	add_classes: true,
 	responsive: "resize"
 };
 
-function CursorControl(id) {
+function cursorControl(id) {
 	const self = this;
 
 	self.onReady = function() {
 	};
 	self.onStart = function() {
-		const svg = document.querySelector(`#${id} svg`);
+    const tag = "#"+ id + " svg";
+		const svg = document.querySelector(tag);
 		const cursor = document.createElementNS("http://www.w3.org/2000/svg", "line");
 		cursor.setAttribute("class", "abcjs-cursor");
 		cursor.setAttributeNS(null, 'x1', 0);
@@ -83,7 +85,8 @@ function CursorControl(id) {
 		if (ev.measureStart && ev.left === null)
 			return; // this was the second part of a tie across a measure line. Just ignore it.
 
-		const lastSelection = document.querySelectorAll(`#${id} svg .highlight`);
+		const className = "#"+ id + " svg .highlight";
+		const lastSelection = document.querySelectorAll(className);
 		for (let k = 0; k < lastSelection.length; k++)
 			lastSelection[k].classList.remove("highlight");
 
@@ -94,7 +97,8 @@ function CursorControl(id) {
 			}
 		}
 
-		const cursor = document.querySelector(`#${id} svg .abcjs-cursor`);
+    const tag = "#"+ id + " svg .abcjs-cursor";
+		const cursor = document.querySelector(tag);
 		if (cursor) {
 			cursor.setAttribute("x1", ev.left - 2);
 			cursor.setAttribute("x2", ev.left - 2);
@@ -103,11 +107,13 @@ function CursorControl(id) {
 		}
 	};
 	self.onFinished = function() {
-		const els = document.querySelectorAll(`#${id} svg .highlight`);
+		const className = "#"+ id + " svg .highlight";
+		const els = document.querySelectorAll(className);
 		for (let i = 0; i < els.length; i++ ) {
 			els[i].classList.remove("highlight");
 		}
-		const cursor = document.querySelector(`#${id} svg .abcjs-cursor`);
+    const tag = "#"+ id + " svg .abcjs-cursor";
+		const cursor = document.querySelector(tag);
 		if (cursor) {
 			cursor.setAttribute("x1", 0);
 			cursor.setAttribute("x2", 0);
@@ -119,25 +125,26 @@ function CursorControl(id) {
 
 function load(audio, render) {
   let synthControl;
+  const id = "#" + audio;
 	if (ABCJS.synth.supportsAudio()) {
 		synthControl = new ABCJS.synth.SynthController();
-		synthControl.load(`#${audio}`, new CursorControl(render.id), {displayLoop: true, displayRestart: true, displayPlay: true, displayProgress: true, displayWarp: true});
+		synthControl.load(id, new cursorControl(render.id), {displayLoop: true, displayRestart: true, displayPlay: true, displayProgress: true, displayWarp: true});
 	} else {
-		document.querySelector(`#${audio}`).innerHTML = "<div class='audio-error'>Audio is not supported in this browser.</div>";
+		document.querySelector(id).innerHTML = "<div class='audio-error'>Audio is not supported in this browser.</div>";
 	}
 	setTune(render, false, synthControl);
 }
 
 function setTune(render, userAction, synthControl) {
   const id = render.id;
-  const abc = decodeURIComponent(atob(render.data));
+  const abc = render.data;
   if (!synthControl) {
-    ABCJS.renderAbc(`${id}`, abc, abcOptions)[0];
+    ABCJS.renderAbc(id, abc, abcOptions)[0];
     return;
   }
 
   synthControl.disable(true);
-	const visualObj = ABCJS.renderAbc(`${id}`, abc, abcOptions)[0];
+	const visualObj = ABCJS.renderAbc(id, abc, abcOptions)[0];
 	const midiBuffer = new ABCJS.synth.CreateSynth();
 	midiBuffer.init({
 		visualObj: visualObj,
@@ -152,40 +159,41 @@ function setTune(render, userAction, synthControl) {
 		console.warn("Audio problem:", error);
 	});
 }
+`;
 
-function onRenderAbc(resolve, scripts, res) {
+function onRenderAbc(resolve, scripts, meta) {
   if (hasAbc()) {
-    const id = res.id;
-    const name = res.className;
-    let html = `<div id="${id}" class="${name}"></div>`;
-    if (!res.lang || !res.lang.audio) {
-      const data = res.data;
-      const doc = res.element.ownerDocument;
-      res.element.parentNode.outerHTML = html;
+    const id = meta.id;
+    const name = meta.className;
+    const container = meta.container;
+    let html = `<div id="${container}">`;
+    html += `<div id="${id}" class="${name}"></div>`;
+    if (!meta.lang || !meta.lang.audio) {
+      const data = meta.data;
+      const doc = meta.element.ownerDocument;
+      html += '</div>';
+      meta.element.parentNode.outerHTML = html;
       const element = doc.getElementById(id);
       ABCJS.renderAbc(element, data);
       return resolve(true);
     }
 
-    const data = btoa(encodeURIComponent(res.data));
+    const cssLink = meta.cssLink;
+    const data = meta.data;
     const audio = id + '-audio';
-    html +=`<div id="${audio}"></div>`;
-    res.element.parentNode.outerHTML = html;
+    html += cssLink 
+    ? `<div id="${audio}" class="css-abc" data-css="${cssLink}"></div>`
+    : `<div id="${audio}"></div>`;
+    html += '</div>';
+    meta.element.parentNode.outerHTML = html;
     const script = {
-      id: id,
+      id: container,
       code: `(function() {
-              if (typeof window !== 'undefined' && window.dispatchEvent) {
-                window.dispatchEvent(new CustomEvent('abcjs',{
-                  detail: {
-                    audio: '${audio}',
-                    render: {
-                      id:'${id}',
-                      class:'${name}',
-                      data:"${data}"
-                    }
-                  }
-                }));
-              }
+              load('${audio}', {
+                id:'${id}',
+                class:'${name}',
+                data:\`${data}\`
+              });
             })();`
     }
     scripts.push(script);
@@ -193,7 +201,7 @@ function onRenderAbc(resolve, scripts, res) {
   }
 
   setTimeout(() => {
-    onRenderAbc(resolve, scripts, res);
+    onRenderAbc(resolve, scripts, meta);
   }, 10);
 }
 
@@ -207,17 +215,30 @@ function renderAbc(element, scripts) {
       return resolve(false);
     }
 
+    meta.cssLink = cdnjs.getSrc(cssCdnName);
     onRenderAbc(resolve, scripts, meta);
   });
 }
 
 // <div class="abc"></div>
 function renderAbcElements(elements, scripts) {
+  const script = {
+    outer:[
+      {
+        name: 'ABCJS',
+        src: cdnjs.getSrc('ABCJS','jsdelivr')
+      }
+    ],
+    id: 'abcjs-ext',    
+    code: scriptCode,
+    inner: []
+  };
+  scripts.push(script); 
   dyncLoadScript();
   return new Promise(resolve => {
     const promiseArray = [];
     elements.forEach(element => {
-      promiseArray.push(renderAbc(element, scripts));
+      promiseArray.push(renderAbc(element, script.inner));
     });
     Promise.all(promiseArray).then(() => {
       resolve(true);
@@ -227,7 +248,6 @@ function renderAbcElements(elements, scripts) {
 
 
 function showdownAbc() {
-  let hasEvent = false;
   return [
     {
       type: 'output',
@@ -236,24 +256,16 @@ function showdownAbc() {
         if (!wrapper) {
           return false;
         }
+
         // find the abc in code blocks
         const elements = wrapper.querySelectorAll(`code.${extName}.language-${extName}`);
         if (!elements.length) {
           return false;
         }
 
-        if (!hasEvent) {
-          if (typeof window !== 'undefined' && window.dispatchEvent) {
-            hasEvent = true;
-            // Listen sequence custom event
-            window.addEventListener('abcjs', event => {
-              if (event.detail) {
-                load(event.detail.audio, event.detail.render);
-              }
-            });
-          }
-        }
-
+        this.config = {
+          cssLink: cdnjs.getSrc(cssCdnName)
+        };
         console.log(format(`Begin render ${extName} elements.`));
         return renderAbcElements(elements, obj.scripts).then(() => {
           console.log(format(`End render ${extName} elements.`));
