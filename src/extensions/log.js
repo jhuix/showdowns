@@ -8,7 +8,7 @@
 import './date-format.js';
 
 function format(s) {
-    return `${new Date().Format('yyyy-MM-dd HH:mm:ss.S')} ${s}`
+    return `${new Date().Format('yyyy-MM-dd HH:mm:ss.S')} ${s}`;
 }
 
 export default format;

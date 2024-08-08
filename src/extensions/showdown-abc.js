@@ -151,7 +151,7 @@ function setTune(render, userAction, synthControl) {
 	}).then(function (response) {
 		// console.log(response);
 		synthControl.setTune(visualObj, userAction).then(function (response) {
-			console.log(format("Audio successfully loaded."));
+			console.log("Audio successfully loaded.");
 		}).catch(function (error) {
 			console.warn("Audio problem:", error);
 		});
