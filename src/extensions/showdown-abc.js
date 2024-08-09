@@ -57,107 +57,108 @@ function unloadScript() {
 
 const scriptCode = `
 var abcOptions = {
-	add_classes: true,
-	responsive: "resize"
+  add_classes: true,
+  responsive: "resize"
 };
 
 function cursorControl(id) {
-	const self = this;
+  const self = this;
 
-	self.onReady = function() {
-	};
-	self.onStart = function() {
+  self.onReady = function() {
+  };
+  self.onStart = function() {
     const tag = "#"+ id + " svg";
-		const svg = document.querySelector(tag);
-		const cursor = document.createElementNS("http://www.w3.org/2000/svg", "line");
-		cursor.setAttribute("class", "abcjs-cursor");
-		cursor.setAttributeNS(null, 'x1', 0);
-		cursor.setAttributeNS(null, 'y1', 0);
-		cursor.setAttributeNS(null, 'x2', 0);
-		cursor.setAttributeNS(null, 'y2', 0);
-		svg.appendChild(cursor);
+    const svg = document.querySelector(tag);
+    const cursor = document.createElementNS("http://www.w3.org/2000/svg", "line");
+    cursor.setAttribute("class", "abcjs-cursor");
+    cursor.setAttributeNS(null, 'x1', 0);
+    cursor.setAttributeNS(null, 'y1', 0);
+    cursor.setAttributeNS(null, 'x2', 0);
+    cursor.setAttributeNS(null, 'y2', 0);
+    svg.appendChild(cursor);
+  };
+  self.beatSubdivisions = 2;
+  self.onBeat = function(beatNumber, totalBeats, totalTime) {
+  };
+  self.onEvent = function(ev) {
+    if (ev.measureStart && ev.left === null)
+      return; // this was the second part of a tie across a measure line. Just ignore it.
 
-	};
-	self.beatSubdivisions = 2;
-	self.onBeat = function(beatNumber, totalBeats, totalTime) {
-	};
-	self.onEvent = function(ev) {
-		if (ev.measureStart && ev.left === null)
-			return; // this was the second part of a tie across a measure line. Just ignore it.
+    const className = "#"+ id + " svg .highlight";
+    const lastSelection = document.querySelectorAll(className);
+    for (let k = 0; k < lastSelection.length; k++)
+      lastSelection[k].classList.remove("highlight");
 
-		const className = "#"+ id + " svg .highlight";
-		const lastSelection = document.querySelectorAll(className);
-		for (let k = 0; k < lastSelection.length; k++)
-			lastSelection[k].classList.remove("highlight");
-
-		for (let i = 0; i < ev.elements.length; i++ ) {
-			const note = ev.elements[i];
-			for (let j = 0; j < note.length; j++) {
-				note[j].classList.add("highlight");
-			}
-		}
+    for (let i = 0; i < ev.elements.length; i++ ) {
+      const note = ev.elements[i];
+      for (let j = 0; j < note.length; j++) {
+        note[j].classList.add("highlight");
+      }
+    }
 
     const tag = "#"+ id + " svg .abcjs-cursor";
-		const cursor = document.querySelector(tag);
-		if (cursor) {
-			cursor.setAttribute("x1", ev.left - 2);
-			cursor.setAttribute("x2", ev.left - 2);
-			cursor.setAttribute("y1", ev.top);
-			cursor.setAttribute("y2", ev.top + ev.height);
-		}
-	};
-	self.onFinished = function() {
-		const className = "#"+ id + " svg .highlight";
-		const els = document.querySelectorAll(className);
-		for (let i = 0; i < els.length; i++ ) {
-			els[i].classList.remove("highlight");
-		}
+    const cursor = document.querySelector(tag);
+    if (cursor) {
+      cursor.setAttribute("x1", ev.left - 2);
+      cursor.setAttribute("x2", ev.left - 2);
+      cursor.setAttribute("y1", ev.top);
+      cursor.setAttribute("y2", ev.top + ev.height);
+    }
+  };
+  self.onFinished = function() {
+    const className = "#"+ id + " svg .highlight";
+    const els = document.querySelectorAll(className);
+    for (let i = 0; i < els.length; i++ ) {
+      els[i].classList.remove("highlight");
+    }
     const tag = "#"+ id + " svg .abcjs-cursor";
-		const cursor = document.querySelector(tag);
-		if (cursor) {
-			cursor.setAttribute("x1", 0);
-			cursor.setAttribute("x2", 0);
-			cursor.setAttribute("y1", 0);
-			cursor.setAttribute("y2", 0);
-		}
-	};
+    const cursor = document.querySelector(tag);
+    if (cursor) {
+      cursor.setAttribute("x1", 0);
+      cursor.setAttribute("x2", 0);
+      cursor.setAttribute("y1", 0);
+      cursor.setAttribute("y2", 0);
+    }
+  };
 }
 
 function load(audio, render) {
   let synthControl;
-  const id = "#" + audio;
-	if (ABCJS.synth.supportsAudio()) {
-		synthControl = new ABCJS.synth.SynthController();
-		synthControl.load(id, new cursorControl(render.id), {displayLoop: true, displayRestart: true, displayPlay: true, displayProgress: true, displayWarp: true});
-	} else {
-		document.querySelector(id).innerHTML = "<div class='audio-error'>Audio is not supported in this browser.</div>";
-	}
-	setTune(render, false, synthControl);
+  if (audio) {
+    const id = "#" + audio;
+    if (ABCJS.synth.supportsAudio()) {
+      synthControl = new ABCJS.synth.SynthController();
+      synthControl.load(id, new cursorControl(render.id), {displayLoop: true, displayRestart: true, displayPlay: true, displayProgress: true, displayWarp: true});
+    } else {
+      document.querySelector(id).innerHTML = "<div class='audio-error'>Audio is not supported in this browser.</div>";
+    }
+  }
+  setTune(render, false, synthControl);
 }
 
 function setTune(render, userAction, synthControl) {
   const id = render.id;
   const abc = render.data;
   if (!synthControl) {
-    ABCJS.renderAbc(id, abc, abcOptions)[0];
+    ABCJS.renderAbc(id, abc, abcOptions);
     return;
   }
 
   synthControl.disable(true);
-	const visualObj = ABCJS.renderAbc(id, abc, abcOptions)[0];
-	const midiBuffer = new ABCJS.synth.CreateSynth();
-	midiBuffer.init({
-		visualObj: visualObj,
-	}).then(function (response) {
-		// console.log(response);
-		synthControl.setTune(visualObj, userAction).then(function (response) {
-			console.log("Audio successfully loaded.");
-		}).catch(function (error) {
-			console.warn("Audio problem:", error);
-		});
-	}).catch(function (error) {
-		console.warn("Audio problem:", error);
-	});
+  const visualObj = ABCJS.renderAbc(id, abc, abcOptions)[0];
+  const midiBuffer = new ABCJS.synth.CreateSynth();
+  midiBuffer.init({
+    visualObj: visualObj,
+  }).then(function (response) {
+    // console.log(response);
+    synthControl.setTune(visualObj, userAction).then(function (response) {
+      console.log("Audio successfully loaded.");
+    }).catch(function (error) {
+      console.warn("Audio problem:", error);
+    });
+  }).catch(function (error) {
+    console.warn("Audio problem:", error);
+  });
 }
 `;
 
@@ -166,24 +167,48 @@ function onRenderAbc(resolve, scripts, meta) {
     const id = meta.id;
     const name = meta.className;
     const container = meta.container;
-    let html = `<div id="${container}">`;
-    html += `<div id="${id}" class="${name}"></div>`;
+    let style = '';
+    if (meta.lang) {
+      if (meta.lang.width) {
+        style += `width:${meta.lang.width};`;
+      }
+      if (meta.lang.height) {
+        style += `height:${meta.lang.height};`;
+      }
+    }
+    let html = '';
+    if (style) {
+      html += `<div id="${container}" class="${name}" style="${style}">`;
+      html += `<div id="${id}" style="width:100%;height:100%;display:inline-block"></div>`;
+    } else {
+      html += `<div id="${container}" class="${name}">`;
+      html += `<div id="${id}"></div>`;
+    }
     if (!meta.lang || !meta.lang.audio) {
       const data = meta.data;
       const doc = meta.element.ownerDocument;
       html += '</div>';
       meta.element.parentNode.outerHTML = html;
       const element = doc.getElementById(id);
-      ABCJS.renderAbc(element, data);
+      ABCJS.renderAbc(element, data, {
+        add_classes: true,
+        responsive: "resize"
+      });
       return resolve(true);
     }
 
     const cssLink = meta.cssLink;
     const data = meta.data;
     const audio = id + '-audio';
-    html += cssLink 
-    ? `<div id="${audio}" class="css-abc" data-css="${cssLink}"></div>`
-    : `<div id="${audio}"></div>`;
+    if (style) {
+      html += cssLink 
+        ? `<div id="${audio}" style="width:100%;height:100%;display:inline-block" class="css-abc" data-css="${cssLink}"></div>`
+        : `<div id="${audio}" style="width:100%;height:100%;display:inline-block"></div>`;
+    } else {
+      html += cssLink 
+      ? `<div id="${audio}" class="css-abc" data-css="${cssLink}"></div>`
+      : `<div id="${audio}"></div>`;
+    }
     html += '</div>';
     meta.element.parentNode.outerHTML = html;
     const script = {

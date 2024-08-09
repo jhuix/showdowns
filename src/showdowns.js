@@ -485,6 +485,32 @@ const showdowns = {
       scripts = [scripts];
     }
 
+    const opScript = function(script, element) {
+      if (!script.inner) {
+        if (!script.code) {
+          return true
+        }
+
+        return loadScript(script.id, script.code, element);
+      }
+
+      if (!showdown.helper.isArray(script.inner)) {
+        script.inner = [script.inner];
+      }
+      if (script.code) {
+        if (!insertScript(script.id, script.code, element)) {
+          console.log(format('Args is invaild with insert script!'), script);
+        }
+      }
+      if (script.inner.length > 0) {
+        for (let j = 0; j < script.inner.length; ++j) {
+          const s = script.inner[j];
+          loadScript(s.id, s.code, element);
+        }
+      }
+      return true;
+    }
+
     return new Promise((revole, reject) => {
       if (typeof element === 'string') {
         element = document.querySelector(element);
@@ -495,9 +521,6 @@ const showdowns = {
           if (!showdown.helper.isArray(script.outer)) {
             script.outer = [script.outer];
           }
-          if (!showdown.helper.isArray(script.inner)) {
-            script.inner = [script.inner];
-          }
           let o = script.outer[0];
           let result = appendScript(o.name, o.src);
           for (let k = 1; k < script.outer.length; ++k) {
@@ -507,27 +530,12 @@ const showdowns = {
             });
           }
           result.then(() =>{
-            if (script.code) {
-              if (!insertScript(script.id, script.code, element)) {
-                console.log(format('Args is invaild with insert script!'), script);
-                return
-              }
-            }
-
-            if (script.inner.length > 0) {
-              for (let j = 0; j < script.inner.length; ++j) {
-                const s = script.inner[j];
-                if (!loadScript(s.id, s.code, element)) {
-                  console.log(format('Args is invaild with load script!'), s);
-                  return
-                }
-              }
-            }
+            opScript(script, element);            
           })
           continue;
         }
 
-        if (!loadScript(script.id, script.code, element)) {
+        if (!opScript(script, element)) {
           return reject('Args is invaild!');
         }
       }

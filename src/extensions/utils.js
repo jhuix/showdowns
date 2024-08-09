@@ -106,6 +106,16 @@ function createElementMeta(name, element, callback) {
           diagramClass = 'diagram-right';
         }
       }
+      if (langobj.width) {
+        if (typeof langobj.width !== 'string') {
+          langobj.width = langobj.width + 'px';
+        }
+      }
+      if (langobj.height) {
+        if (typeof langobj.height !== 'string') {
+          langobj.height = langobj.height + 'px';
+        }
+      }
     }
 
     let code = element.textContent.trim();

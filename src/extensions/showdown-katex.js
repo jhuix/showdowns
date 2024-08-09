@@ -239,8 +239,7 @@ const getConfig = (userConfig = {}) => {
       )
       .concat(
         _getDelimiter(config.delimiters, 'asciimath', 'inline') || [
-          { left: '@ ', right: ' @', display: false, asciimath: true },
-          { left: "\\~", right: "\\~", display: false, asciimath: true }
+          { left: "\\$", right: "\\$", display: false, asciimath: true }
         ]
       );
   } else if (!config.delimiters.length) {
@@ -254,8 +253,7 @@ const getConfig = (userConfig = {}) => {
       { left: "\\begin{CD}", right: "\\end{CD}", display: true },      
       { left: '\\(', right: '\\)', display: false },
       { left: '@@', right: '@@', display: true, asciimath: true },
-      { left: '@ ', right: ' @', display: false, asciimath: true },
-      { left: "\\~", right: "\\~", display: false, asciimath: true }
+      { left: "\\$", right: "\\$", display: false, asciimath: true }
     ];
   }
   return config;

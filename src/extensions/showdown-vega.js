@@ -77,14 +77,24 @@ function renderVega(element, options, scripts, isVegaLite) {
   const data = JSON.stringify(JSON.parse(meta.data));
   const id = meta.id;
   const container = meta.container;
+  let code = `(function() {
+    let el = document.getElementById('${id}');
+    if (el){
+  `;  
+  if (meta.lang && meta.lang.type && typeof meta.lang.type === 'string'
+      && meta.lang.type.toLowerCase() == 'javascript') {
+    code += '    ' + meta.data;
+  } else { // JSON string
+    const data = JSON.stringify(JSON.parse(meta.data));
+    code += `    const option = JSON.parse(\`${data}\`);`;
+  }
+  code += `
+      vegaEmbed(el, option, JSON.parse('${config}'));
+    }
+  })();`
   const script = {
     id: container,
-    code: `(function() {
-      let el = document.getElementById('${id}');
-      if (el){
-        vegaEmbed(el, JSON.parse(\`${data}\`), JSON.parse('${config}'));
-      }
-    })();`
+    code: code
   }
   scripts.push(script);
   return new Promise(resolve => {
@@ -142,7 +152,7 @@ function onRenderVega(resolve, meta) {
     const name = meta.className;
     const container = meta.container;
     const node = meta.element.parentNode;
-    node.outerHTML = `<div id="${container}"><div id="${id}" class="${name}"></div></div>`;
+    node.outerHTML = `<div id="${container}" class="${name}"><div id="${id}"></div></div>`;
     return resolve(true);
   }
   

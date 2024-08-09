@@ -70,7 +70,14 @@ function onRenderEcharts(resolve, meta) {
     // // 如果不再需要图表，调用 dispose 以释放内存
     // chart.dispose();
     // chart = null;
-    node.outerHTML = `<div id="${container}"><div id="${id}" class="${name}"></div></div>`;
+    if (!meta.lang) {
+      meta.lang = {width:'400px', height:'300px'};
+    } else {
+      if (!meta.lang.width) meta.lang.width = '400px';
+      if (!meta.lang.height) meta.lang.height = '300px';
+    }
+    const style = `width:${meta.lang.width}; height:${meta.lang.height};`;    
+    node.outerHTML = `<div id="${container}" class="${name}" style="${style}"><div id="${id}" style="width:100%;height:100%;display:inline-block"></div></div>`;
     return resolve(true);
   }
 
@@ -89,23 +96,33 @@ function renderEcharts(element, scripts, config) {
     return Promise.resolve(false);
   }
 
-  config = JSON.stringify({ ...config, ssr: false });
-  const data = JSON.stringify(JSON.parse(meta.data));
+  config = { ...config, ssr: false };
+  config = JSON.stringify(config);
+  let code = `(function() {
+    let el = document.getElementById('${meta.id}');
+    if (el){
+      let chart = echarts.getInstanceByDom(el);
+      if (!chart) {
+        el.innerHTML = '';
+      }
+      let config = JSON.parse('${config}');
+      chart = echarts.init(el, null, config);
+  `;
+  
+  if (meta.lang && meta.lang.type && typeof meta.lang.type === 'string'
+     && meta.lang.type.toLowerCase() == 'javascript') {
+    code += '    ' + meta.data;
+  } else { // JSON string
+    const data = JSON.stringify(JSON.parse(meta.data));
+    code += `    const option = JSON.parse(\`${data}\`);`;
+  }
+  code += `
+      chart.setOption(option);
+    }
+  })();`
   const script = {
     id: meta.container,
-    code: `(function() {
-        let el = document.getElementById('${meta.id}');
-        if (el){
-          let chart = echarts.getInstanceByDom(el);
-          if (!chart) {
-            el.innerHTML = '';
-          }
-          let config = JSON.parse('${config}');
-          chart = echarts.init(el, null, config);
-          let option = JSON.parse(\`${data}\`);
-          chart.setOption(option);
-        }
-      })();`
+    code: code
   }
   scripts.push(script);
   return new Promise(resolve => {
@@ -141,12 +158,11 @@ function renderEchartsElements(elements, scripts, config) {
 const getConfig = (config = {}) => ({
   renderer: 'svg',
   ssr: false,
-  width: 400,
-  height: 300,
   tooltip: {
     show: true
   },
   animation: true,
+  useDirtyRect: false,
   ...config
 });
 
