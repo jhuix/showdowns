@@ -252,6 +252,10 @@ Table header can be eliminated.
 
 [Vega and Vega-Lite](https://github.com/jhuix/showdowns/blob/master/docs/showdowns-features.md#vega-and-vega-lite)
 
+[Echarts](https://github.com/jhuix/showdowns/blob/master/docs/showdowns-features.md#echarts)
+
+[ABCJS](https://github.com/jhuix/showdowns/blob/master/docs/showdowns-features.md#abc)
+
 See more information, refer to the following document:
 
 [Extensions Examples](https://github.com/jhuix/showdowns/blob/master/docs/showdowns-features.md)
@@ -310,8 +314,8 @@ See more information, refer to the following document:
     var showdowns = require('showdowns'),
     showdowns.init()
     var text = '# hello, markdown!',
-    showdowns.makeHtml(text).then(html => {
-      //Do something for 'html'
+    showdowns.makeHtml(text).then(obj => {
+      //Do something for 'obj.html' and 'obj.scripts'      
     });
 
 #### Browser
@@ -348,8 +352,9 @@ Put the following line into your HTML page \<header> or \<body>:
             md = md + `\n\n## Showdown's Markdown syntax\n\n` + text;
             showdowns.makeHtml(md).then(obj => {
               element.innerHTML = obj.html;
-              showdowns.completedHtml(obj.scripts);
+              showdowns.completedHtml(obj.scripts, '.showdowns');
             }).catch(err =>{
+              element.innerHTML = '';
               console.log(err);
             });
           })
@@ -358,8 +363,9 @@ Put the following line into your HTML page \<header> or \<body>:
             if (md) {
               showdowns.makeHtml(md).then(obj => {
                 element.innerHTML = obj.html;
-                showdowns.completedHtml(obj.scripts);
+                showdowns.completedHtml(obj.scripts, '.showdowns');
               }).catch(err =>{
+                element.innerHTML = '';
                 console.log(err);
               });
             }
@@ -384,11 +390,14 @@ Default options is described below:
       katex: { mathDelimiters: [
         { left: '$$', right: '$$', display: true },
         { left: '\\[', right: '\\]', display: true },
-        { left: '$', right: '$', display: false },
+        { left: "\\begin{equation}", right: "\\end{equation}", display: true },
+        { left: "\\begin{align}", right: "\\end{align}", display: true },
+        { left: "\\begin{alignat}", right: "\\end{alignat}", display: true },
+        { left: "\\begin{gather}", right: "\\end{gather}", display: true },
+        { left: "\\begin{CD}", right: "\\end{CD}", display: true },      
         { left: '\\(', right: '\\)', display: false },
         { left: '@@', right: '@@', display: true, asciimath: true },
-        { left: '@ ', right: ' @', display: false, asciimath: true },
-        { left: '~ ', right: ' ~', display: false, asciimath: true }
+        { left: "\\$", right: "\\$", display: false, asciimath: true }
       ]},
       vega: { theme: 'vox' }
     };
@@ -431,16 +440,12 @@ Default options is described below:
                {left: '\\[', right: '\\]'}
             ],
             inline:  [
-              {left: "$", right: "$"},
               {left: '\\(', right: '\\)'}
             ]
           },
           asciimath: {
             display: [ {left: "@@", right: "@@"}],
-            inline:  [
-              {left: "@ ", right: " @"},
-              {left: "~ ", right: " ~"},
-            ]
+            inline:  [ {left: "\\$ ", right: "\\$"}]
           }
         }
       }
@@ -620,18 +625,29 @@ A function to init that be created showdown.convertor instance or update default
 
 #### makeHtml
 
+Type: interface script {
+    outer?:[
+      {name:string, src:string}
+    ],
+    id?:string,
+    code?:string,
+    inner?:[
+      {id:string, code:string}
+    ]
+}
+
 Type: ({type:'zip', content: string} | string,
        (csstypes?: {
           hasKatex: boolean;
           hasRailroad: boolean;
           hasSequence: boolean
-       }) => void) => Promise\<{html, scripts}>
+       }) => void) => Promise\<{html: string, scripts: [script]}>
 
 A async function to make markdown to html that showdown.convertor converte it in current showdowns instance.
 
 #### completedHtml
 
-Type: ( scripts?: [] | string) => Promise\<boolean>
+Type: ( scripts?: [script] | string, scriptContainer?: HTMLElement | string) => Promise\<boolean>
 
 A async function to completed markdown to html that append scripts to dom.
 
