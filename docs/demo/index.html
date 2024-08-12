@@ -138,7 +138,7 @@
                 .then(res => {
                   if (typeof res === 'object') {
                     element.innerHTML = res.html;
-                    showdowns.completedHtml(res.scripts);
+                    showdowns.completedHtml(res.scripts, '.showdowns');
                   } else {
                     element.innerHTML = res;
                   }

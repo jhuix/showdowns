@@ -311,7 +311,7 @@ delta Q = rho \ c \u
 
 where:
 
-* @@delta Q@@ is the internal heat energy per unit volume \\~(J \* m^-3)\\~
+* @@delta Q@@ is the internal heat energy per unit volume \\$(J \* m^-3)\\$
 
 ### Mermaid
 
@@ -607,14 +607,14 @@ It's implemented in showdown-viz.js, render diagrams of wavedrom using [wavedrom
 #### Markdown Syntax
 
 ````
-```echarts {"align": "left | center | right", "codeblock": true | false, "width":400, "height":300}
+```echarts {"align": "left | center | right", "codeblock": true | false, "width":400, "height":300, "type": "javascript" | "json"}
 <code content>
 ```
 ````
 
 #### Echarts example
 
-```echarts {"align":"center"}
+```echarts {"align":"center", "width":640, "height":480}
 {
   "title": { "text": "最近 30 天" },
   "tooltip": { "trigger": "axis", "axisPointer": { "lineStyle": { "width": 0 } } },
@@ -644,6 +644,43 @@ It's implemented in showdown-viz.js, render diagrams of wavedrom using [wavedrom
 }
 ```
 
+```echarts {"align":"center", "width":640, "height":480, "type":"javascript"}
+const data = [];
+for (let i = 0; i <= 100; i++) {
+  let theta = (i / 100) * 360;
+  let r = 5 * (1 + Math.sin((theta / 180) * Math.PI));
+  data.push([r, theta]);
+}
+const option = {
+  title: {
+    text: 'Two Value-Axes in Polar'
+  },
+  legend: {
+    data: ['line']
+  },
+  polar: {},
+  tooltip: {
+    trigger: 'axis',
+    axisPointer: {
+      type: 'cross'
+    }
+  },
+  angleAxis: {
+    type: 'value',
+    startAngle: 0
+  },
+  radiusAxis: {},
+  series: [
+    {
+      coordinateSystem: 'polar',
+      name: 'line',
+      type: 'line',
+      data: data
+    }
+  ]
+};
+```
+
 ### Vega and Vega-Lite
 
 It's implemented in showdown-vega.js, render diagrams of [Vega](https://github.com/vega/vega) and [Vega-Lite](https://github.com/vega/vega-lite) using [vega-embed](https://github.com/vega/vega-embed), check [vega website](https://vega.github.io/vega/) and [vega-lite website](https://vega.github.io/vega-lite) for more information.
@@ -651,7 +688,7 @@ It's implemented in showdown-vega.js, render diagrams of [Vega](https://github.c
 #### Markdown Syntax
 
 ````
-```vega {"align": "left | center | right", "codeblock": true | false}
+```vega {"align": "left | center | right", "codeblock": true | false, "type": "javascript" | "json"}
 <code content>
 ```
 ````
@@ -659,7 +696,7 @@ It's implemented in showdown-vega.js, render diagrams of [Vega](https://github.c
 OR
 
 ````
-```vega-lite {"align": "left | center | right", "codeblock": true | false}
+```vega-lite {"align": "left | center | right", "codeblock": true | false, "type": "javascript" | "json"}
 <code content>
 ```
 ````
@@ -854,7 +891,7 @@ Bob-->Alice: I am good thanks!
 
 #### ABC example
 
-```abc
+```abc {"width": 640}
 T: Cooley's
 M: 4/4
 Q: 1/4=120
