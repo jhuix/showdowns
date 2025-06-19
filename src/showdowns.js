@@ -6,6 +6,7 @@
 
 import './less/preview.less';
 import './less/container.less';
+import './less/toc.less';
 
 import showdown from './parser/showdown.js';
 import showdownAbc from './extensions/showdown-abc.js';
@@ -32,7 +33,7 @@ import format from './extensions/log';
 const getOptions = (options = {}) => {
   return {
     flavor: 'github',
-    ...options
+    ...options,
   };
 };
 
@@ -43,6 +44,7 @@ const getAsyncExtensions = (options, extensions = {}) => {
   const vegaOptions = options ? options.vega || {} : {};
 
   const asyncExtensions = {
+    'showdown-toc': showdownToc(),
     'showdown-plantuml': showdownPlantuml(plantumlOptions),
     'showdown-mermaid': showdownMermaid(mermaidOptions),
     'showdown-katex': showdownKatex(katexOptions),
@@ -53,7 +55,7 @@ const getAsyncExtensions = (options, extensions = {}) => {
     'showdown-railroad': showdownRailroad,
     'showdown-abc': showdownAbc,
     'showdown-echarts': showdownEcharts,
-    ...extensions
+    ...extensions,
   };
 
   let extnames = [];
@@ -73,7 +75,7 @@ const getExtensions = (options, extensions = {}) => {
     'showdown-footnotes': showdownFootnotes,
     'showdown-container': showdownContainer,
     'showdown-sequence': showdownSequence,
-    ...extensions
+    ...extensions,
   };
 
   let extnames = [];
@@ -106,13 +108,13 @@ const loadScript = (id, code, parent) => {
   if (script) {
     return true;
   }
-    
+
   script = document.createElement('script');
   script.id = scriptID;
-  script.type = "text/javascript";
+  script.type = 'text/javascript';
   script.text = code;
   element.appendChild(script);
-  return true
+  return true;
 };
 
 const insertScript = (id, code, parent) => {
@@ -135,35 +137,35 @@ const insertScript = (id, code, parent) => {
   if (script) {
     return true;
   }
-    
+
   script = document.createElement('script');
   script.id = scriptID;
-  script.type = "text/javascript";
+  script.type = 'text/javascript';
   script.text = code;
   element.insertBefore(script, element.children[0]);
-  return true
+  return true;
 };
 
 function appendScript(name, src) {
   return new Promise((resovle, reject) => {
-      if (!name || !src || typeof document === 'undefined' ) {
-        reject('Args is invaild!');
-      }
+    if (!name || !src || typeof document === 'undefined') {
+      reject('Args is invaild!');
+    }
 
-      const id = 'script-' + name.toLowerCase();
-      let script = document.getElementById(id);
-      if (script) {
-        return resovle(name);
-      }
+    const id = 'script-' + name.toLowerCase();
+    let script = document.getElementById(id);
+    if (script) {
+      return resovle(name);
+    }
 
-      const head = document.head || document.getElementsByTagName('head')[0];
-      script = document.createElement('script');
-      script.src = src;
-      script.id = id;
-      script.onload = () => {
-        resovle(name);
-      };
-      head.appendChild(script);
+    const head = document.head || document.getElementsByTagName('head')[0];
+    script = document.createElement('script');
+    script.src = src;
+    script.id = id;
+    script.onload = () => {
+      resovle(name);
+    };
+    head.appendChild(script);
   });
 }
 
@@ -187,31 +189,31 @@ const showdowns = {
     plantuml: { imageFormat: 'svg' },
     mermaid: { theme: 'default' },
     katex: {},
-    vega: { theme: 'vox' }
+    vega: { theme: 'vox' },
   },
   defaultExtensions: {},
   defaultAsyncExtensions: {},
-  markdownDecodeFilter: function(doc) {
+  markdownDecodeFilter: function (doc) {
     return '';
   },
-  initDefaultOptions: function() {
+  initDefaultOptions: function () {
     if (!this.defaultOptions) {
       this.defaultOptions = {
         showdown: {},
         plantuml: {},
         mermaid: {},
         katex: {},
-        vega: {}
+        vega: {},
       };
     }
   },
-  setFlavor: function(name) {
+  setFlavor: function (name) {
     this.showdown.setFlavor(name);
     if (this.converter) {
       this.converter.setFlavor(name);
     }
   },
-  addOptions: function(options) {
+  addOptions: function (options) {
     for (const key in options) {
       if (key !== 'flavor') {
         this.showdown.setOption(key, options[key]);
@@ -221,7 +223,7 @@ const showdowns = {
       }
     }
   },
-  addExtension: function(name, extension) {
+  addExtension: function (name, extension) {
     this.removeExtension(name);
     if (typeof name === 'string') {
       try {
@@ -234,7 +236,7 @@ const showdowns = {
       }
     }
   },
-  removeExtension: function(name) {
+  removeExtension: function (name) {
     if (typeof name !== 'string') return;
     if (this.converter) {
       let ext = null;
@@ -248,7 +250,7 @@ const showdowns = {
     }
     showdown.removeExtension(name);
   },
-  addAsyncExtension: function(name, extension) {
+  addAsyncExtension: function (name, extension) {
     this.removeAsyncExtension(name);
     if (typeof name === 'string') {
       try {
@@ -261,7 +263,7 @@ const showdowns = {
       }
     }
   },
-  removeAsyncExtension: function(name) {
+  removeAsyncExtension: function (name) {
     if (typeof name !== 'string') return;
     if (this.converter) {
       let ext = null;
@@ -275,12 +277,12 @@ const showdowns = {
     }
     showdown.removeAsyncExtension(name);
   },
-  setCDN: function(cdnname, defScheme, distScheme) {
+  setCDN: function (cdnname, defScheme, distScheme) {
     if (typeof cdnname === 'string' && cdnname) {
       cdnjs.setCDN(cdnname, defScheme, distScheme);
     }
   },
-  setShowdownFlavor: function(name) {
+  setShowdownFlavor: function (name) {
     this.initDefaultOptions();
     if (name) {
       if (showdownFlavors.indexOf(name) === -1) {
@@ -290,7 +292,7 @@ const showdowns = {
       this.setFlavor(name);
     }
   },
-  setShowdownOptions: function(options) {
+  setShowdownOptions: function (options) {
     this.initDefaultOptions();
     if (typeof options !== 'object' || !options) options = {};
     this.defaultOptions.showdown = Object.assign(this.defaultOptions.showdown || {}, options);
@@ -298,7 +300,7 @@ const showdowns = {
     this.addOptions(this.defaultOptions.showdown);
     return this.defaultOptions.showdown;
   },
-  setPlantumlOptions: function(options) {
+  setPlantumlOptions: function (options) {
     this.initDefaultOptions();
     if (typeof options !== 'object' || !options) options = {};
     this.defaultOptions.plantuml = Object.assign(this.defaultOptions.plantuml || {}, options);
@@ -311,7 +313,7 @@ const showdowns = {
     }
     return this.defaultOptions.plantuml;
   },
-  setMermaidOptions: function(options) {
+  setMermaidOptions: function (options) {
     this.initDefaultOptions();
     if (typeof options !== 'object' || !options) options = {};
     this.defaultOptions.mermaid = Object.assign(this.defaultOptions.mermaid || {}, options);
@@ -324,7 +326,7 @@ const showdowns = {
     }
     return this.defaultOptions.mermaid;
   },
-  setKatexOptions: function(options) {
+  setKatexOptions: function (options) {
     this.initDefaultOptions();
     if (typeof options !== 'object' || !options) options = {};
     this.defaultOptions.katex = Object.assign(this.defaultOptions.katex || {}, options);
@@ -333,7 +335,7 @@ const showdowns = {
     }
     return this.defaultOptions.katex;
   },
-  setVegaOptions: function(options) {
+  setVegaOptions: function (options) {
     this.initDefaultOptions();
     if (typeof options !== 'object' || !options) options = {};
     this.defaultOptions.vega = Object.assign(this.defaultOptions.vega || {}, options);
@@ -350,7 +352,7 @@ const showdowns = {
     }
     return this.defaultOptions.vega;
   },
-  init: function(reset) {
+  init: function (reset) {
     if (!this.converter) {
       const showdownOptions = this.defaultOptions ? this.defaultOptions.showdown || {} : {};
       const options = getOptions(showdownOptions);
@@ -359,7 +361,7 @@ const showdowns = {
       this.setFlavor(options.flavor);
       // converter instance of showdown
       this.converter = new showdown.Converter({
-        extensions: extensions
+        extensions: extensions,
       }).initConvertExtObj(options.flavor, asyncExtensions);
       this.addOptions(options);
     } else {
@@ -384,7 +386,7 @@ const showdowns = {
     }
     return this;
   },
-  makeHtml: function(doc, callback) {
+  makeHtml: function (doc, callback) {
     let content = '';
     if (typeof doc === 'object') {
       if (typeof doc.content === 'string') {
@@ -448,23 +450,23 @@ const showdowns = {
           return false;
         }
 
-        return new Promise(resolve => {
+        return new Promise((resolve) => {
           const abcCssLink = _getCssLink(wrapper, '.css-abc', 'showdown-abc');
           const katexCssLink = _getCssLink(wrapper, '.css-katex', 'showdown-katex');
           const railroadCssLink = _getCssLink(wrapper, '.css-railroad', 'showdown-railroad');
-          const sequenceCssLink = _getCssLink(wrapper, '.css-sequence', 'showdown-sequence');          
+          const sequenceCssLink = _getCssLink(wrapper, '.css-sequence', 'showdown-sequence');
 
           obj.cssTypes = {
             hasAbc: abcCssLink ? true : false,
             hasKatex: katexCssLink ? true : false,
             hasRailroad: railroadCssLink ? true : false,
-            hasSequence: sequenceCssLink ? true : false,            
+            hasSequence: sequenceCssLink ? true : false,
             css: {
               abc: abcCssLink,
               katex: katexCssLink,
               railroad: railroadCssLink,
-              sequence: sequenceCssLink
-            }
+              sequence: sequenceCssLink,
+            },
           };
           if (typeof callback === 'function' && callback) {
             callback(obj.cssTypes);
@@ -473,43 +475,75 @@ const showdowns = {
         });
       }
 
-      return this.converter.asyncMakeHtml(content, _checkCssTypes).then( obj => {
+      return this.converter.asyncMakeHtml(content, _checkCssTypes).then((obj) => {
         content = `<div class='showdowns'>${obj.html}</div>`;
+        if (obj.extras) {
+          let extras = obj.extras;
+          if (!showdown.helper.isArray(extras)) {
+            extras = [extras];
+          }
+          for (let i = 0; i < extras.length; ++i) {
+            if (typeof extras[i] !== 'string') continue;
+            content += extras[i];
+          }
+        }
         return { html: content, scripts: obj.scripts };
       });
     }
     return Promise.reject(!content ? 'Content is empty.' : 'Converter is invaild.');
   },
-  completedHtml: function(scripts, element) {
+  completedHtml: function (scripts, element) {
     if (!showdown.helper.isArray(scripts)) {
       scripts = [scripts];
     }
 
-    const opScript = function(script, element) {
+    const opScript = function (script, root) {
       if (!script.inner) {
         if (!script.code) {
-          return true
+          return true;
         }
 
-        return loadScript(script.id, script.code, element);
+        if (typeof script.code === 'function') {
+          script.code();
+          return true;
+        }
+
+        let host = root;
+        if (script.host && typeof script.host === 'string') {
+          host = document.querySelector(script.host);
+        }
+        return loadScript(script.id, script.code, host);
       }
 
       if (!showdown.helper.isArray(script.inner)) {
         script.inner = [script.inner];
       }
       if (script.code) {
-        if (!insertScript(script.id, script.code, element)) {
+        if (typeof script.code === 'function') {
+          script.code();
+        } else if (!insertScript(script.id, script.code, host)) {
           console.log(format('Args is invaild with insert script!'), script);
         }
       }
       if (script.inner.length > 0) {
         for (let j = 0; j < script.inner.length; ++j) {
           const s = script.inner[j];
-          loadScript(s.id, s.code, element);
+          if (!s.code) continue;
+
+          if (typeof s.code === 'function') {
+            s.code();
+            continue;
+          }
+
+          let host = root;
+          if (s.host && typeof s.host === 'string') {
+            host = document.querySelector(s.host);
+          }
+          loadScript(s.id, s.code, host);
         }
       }
       return true;
-    }
+    };
 
     return new Promise((revole, reject) => {
       if (typeof element === 'string') {
@@ -525,13 +559,13 @@ const showdowns = {
           let result = appendScript(o.name, o.src);
           for (let k = 1; k < script.outer.length; ++k) {
             result = result.then(() => {
-              o = script.outer[k];
+              o = script.outer[k];              
               return appendScript(o.name, o.src);
             });
           }
-          result.then(() =>{
-            opScript(script, element);            
-          })
+          result.then(() => {
+            opScript(script, element);
+          });
           continue;
         }
 
@@ -542,12 +576,12 @@ const showdowns = {
       revole(true);
     });
   },
-  zDecode: function(zContent) {
+  zDecode: function (zContent) {
     return zlibcodec.zDecode(zContent);
   },
-  zEncode: function(content) {
+  zEncode: function (content) {
     return zlibcodec.zEncode(content);
-  }
+  },
 };
 
 export default showdowns;

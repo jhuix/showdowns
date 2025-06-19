@@ -224,7 +224,7 @@ showdown.Converter.prototype.initConvertExtObj = function(flavor, asyncExtension
         const promise = callback(obj);
         if (promise instanceof Promise) {
           return promise.then(obj => {
-            return { html: obj.wrapper.innerHTML, scripts: obj.scripts };
+            return { html: obj.wrapper.innerHTML, extras: obj.extras, scripts: obj.scripts };
           });
         }
       }

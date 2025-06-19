@@ -1,5 +1,7 @@
 ![Showdowns](https://jhuix.github.io/showdowns/logo.png)
 
+\[TOC]
+
 # [Showdowns Features](https://jhuix.github.io/showdowns)
 
 [Showdowns](https://github.com/jhuix/showdowns) is a lib that make markdown to html with some extensions of showdown.js.

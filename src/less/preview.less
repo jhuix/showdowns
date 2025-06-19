@@ -3,6 +3,10 @@
  * Use of this source code is governed by a MIT license that can be found in the LICENSE file.
  */
 .showdowns {
+  position: relative;
+  margin-left: 1rem;
+  overflow-x: hidden;
+  flex-grow: 1;
 
   div,
   dl,
@@ -116,34 +120,33 @@
   }
 
   h1,
-  h2
-  {
-    padding-bottom: .3em;
+  h2 {
+    padding-bottom: 0.3em;
     border-bottom: 1px solid #d6d6d6;
   }
 
   h1 {
-    font-size: 2em;
+    font-size: 3.2rem;
   }
 
   h2 {
-    font-size: 1.5em;
+    font-size: 2.8rem;
   }
 
   h3 {
-    font-size: 1.25em;
+    font-size: 2.4rem;
   }
 
   h4 {
-    font-size: 1em;
+    font-size: 2rem;
   }
 
   h5 {
-    font-size: 0.875em;
+    font-size: 1.8rem;
   }
 
   h6 {
-    font-size: 0.85em;
+    font-size: 1.6rem;
     color: #6a737d;
   }
 
@@ -411,7 +414,7 @@
 
   .diagram-right.mermaid {
     text-align: right;
-  }  
+  }
 
   .asciimath:not(.diagram-center):not(.diagram-right),
   .latex:not(.diagram-center):not(.diagram-right) {
