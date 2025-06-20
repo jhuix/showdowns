@@ -102,6 +102,7 @@
         let md = "";
         let mdCssTypes = null;
         window
+        
           .fetch("https://jhuix.github.io/showdowns/showdowns-features.md")
           .then(function(response) {
             if (response.ok) {
@@ -118,7 +119,7 @@
             }
           })
           .then(function(text) {
-            md = md + `\n\n## Showdown's Markdown syntax\n\n` + text;
+            md = md + `\n\n# Showdown's Markdown syntax\n\n` + text;
             showdowns
               .makeHtml(md, csstypes => {
                 mdCssTypes = csstypes;
