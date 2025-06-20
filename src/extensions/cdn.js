@@ -35,26 +35,26 @@ const cdnSrc = {
       lowkey: '../node_modules/wavedrom/skins/lowkey.js',
       narrow: '../node_modules/wavedrom/skins/narrow.js'
     },
-    vega: '../node_modules/vega/build/vega.js',
-    vegaLite: '../node_modules/vega-lite/build/vega-lite.js',
-    vegaEmbed: '../node_modules/vega-embed/build/vega-embed.js'
+    vega: '../node_modules/vega/build/vega.min.js',
+    vegaLite: '../node_modules/vega-lite/build/vega-lite.min.js',
+    vegaEmbed: '../node_modules/vega-embed/build/vega-embed.min.js'
   },
   cdnjs: {
-    ABCJS: scheme + 'cdnjs.cloudflare.com/ajax/libs/abcjs/6.4.1/abcjs-basic-min.js',
-    ABCJSCSS: scheme + 'cdnjs.cloudflare.com/ajax/libs/abcjs/abcjs-audio.css',
-    echarts: scheme + 'cdnjs.cloudflare.com/ajax/libs/echarts/5.5.0/echarts.min.js',
+    ABCJS: scheme + 'cdnjs.cloudflare.com/ajax/libs/abcjs/6.5.1/abcjs-basic-min.js',
+    ABCJSCSS: scheme + 'cdn.jsdelivr.net/npm/abcjs@6/abcjs-audio.css',
+    echarts: scheme + 'cdnjs.cloudflare.com/ajax/libs/echarts/5.6.0/echarts.min.js',
     Viz: scheme + 'cdn.jsdelivr.net/npm/@viz-js/viz@3/lib/viz-standalone.js',
     Raphael: scheme + 'cdnjs.cloudflare.com/ajax/libs/raphael/2.3.0/raphael.min.js',
     flowchart: scheme + 'cdnjs.cloudflare.com/ajax/libs/flowchart/1.18.0/flowchart.min.js',
-    mermaid: scheme + 'cdnjs.cloudflare.com/ajax/libs/mermaid/10.9.1/mermaid.min.js',
-    katex: scheme + 'cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.11/katex.min.js',
-    katexCSS: scheme + 'cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.11/katex.min.css',
-    renderMathInElement: scheme + 'cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.11/contrib/auto-render.js',
+    mermaid: scheme + 'cdnjs.cloudflare.com/ajax/libs/mermaid/11.6.0/mermaid.min.js',
+    katex: scheme + 'cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.22/katex.min.js',
+    katexCSS: scheme + 'cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.22/katex.min.css',
+    renderMathInElement: scheme + 'cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.22/contrib/auto-render.js',
     railroad: scheme + 'cdnjs.cloudflare.com/ajax/libs/railroad-diagrams/1.0.0/railroad-diagrams.js',
     railroadCSS: scheme + 'cdnjs.cloudflare.com/ajax/libs/railroad-diagrams/1.0.0/railroad-diagrams.css',
     Snap: scheme + 'cdnjs.cloudflare.com/ajax/libs/snap.svg/0.5.1/snap.svg-min.js',
     WebFont: scheme + 'cdnjs.cloudflare.com/ajax/libs/webfont/1.6.28/webfontloader.js',
-    underscore: scheme + 'cdnjs.cloudflare.com/ajax/libs/underscore.js/1.13.6/underscore-min.js',
+    underscore: scheme + 'cdnjs.cloudflare.com/ajax/libs/underscore.js/1.13.7/underscore-min.js',
     sequence: scheme + 'cdn.jsdelivr.net/npm/@rokt33r/js-sequence-diagrams@2.0.6-2/dist/sequence-diagram-min.js',
     sequenceCSS: scheme + 'cdn.jsdelivr.net/npm/@rokt33r/js-sequence-diagrams@2.0.6-2/dist/sequence-diagram-min.css',
     WaveDrom: scheme + 'cdnjs.cloudflare.com/ajax/libs/wavedrom/3.5.0/wavedrom.min.js',
@@ -63,9 +63,9 @@ const cdnSrc = {
       lowkey: scheme + 'cdnjs.cloudflare.com/ajax/libs/wavedrom/3.5.0/skins/lowkey.js',
       narrow: scheme + 'cdnjs.cloudflare.com/ajax/libs/wavedrom/3.5.0/skins/narrow.js'
     },
-    vega: scheme + 'cdnjs.cloudflare.com/ajax/libs/vega/5.30.0/vega.min.js',
-    vegaLite: scheme + 'cdnjs.cloudflare.com/ajax/libs/vega-lite/5.19.0/vega-lite.min.js',
-    vegaEmbed: scheme + 'cdnjs.cloudflare.com/ajax/libs/vega-embed/6.26.0/vega-embed.min.js'
+    vega: scheme + 'cdnjs.cloudflare.com/ajax/libs/vega/6.1.2/vega.min.js',
+    vegaLite: scheme + 'cdnjs.cloudflare.com/ajax/libs/vega-lite/6.1.0/vega-lite.min.js',
+    vegaEmbed: scheme + 'cdnjs.cloudflare.com/ajax/libs/vega-embed/7.0.2/vega-embed.min.js'
   },
   jsdelivr: {
     ABCJS: scheme + 'cdn.jsdelivr.net/npm/abcjs@6/dist/abcjs-basic-min.js',
@@ -74,7 +74,7 @@ const cdnSrc = {
     Viz: scheme + 'cdn.jsdelivr.net/npm/@viz-js/viz@3/lib/viz-standalone.js',
     Raphael: scheme + 'cdn.jsdelivr.net/npm/raphael@2/raphael.min.js',
     flowchart: scheme + 'cdnjs.cloudflare.com/ajax/libs/flowchart/1.18.0/flowchart.min.js',
-    mermaid: scheme + 'cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js',
+    mermaid: scheme + 'cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js',
     katex: scheme + 'cdn.jsdelivr.net/npm/katex@0/dist/katex.min.js',
     katexCSS: scheme + 'cdn.jsdelivr.net/npm/katex@0/dist/katex.min.css',
     renderMathInElement: scheme + 'cdn.jsdelivr.net/npm/katex@0/dist/contrib/auto-render.js',
@@ -91,9 +91,9 @@ const cdnSrc = {
       lowkey: scheme + 'cdn.jsdelivr.net/npm/wavedrom@3/skins/lowkey.js',
       narrow: scheme + 'cdn.jsdelivr.net/npm/wavedrom@3/skins/narrow.js'
     },
-    vega: scheme + 'cdn.jsdelivr.net/npm/vega@5/build/vega.js',
-    vegaLite: scheme + 'cdn.jsdelivr.net/npm/vega-lite@5/build/vega-lite.js',
-    vegaEmbed: scheme + 'cdn.jsdelivr.net/npm/vega-embed@6/build/vega-embed.js'
+    vega: scheme + 'cdn.jsdelivr.net/npm/vega@6/build/vega.min.js',
+    vegaLite: scheme + 'cdn.jsdelivr.net/npm/vega-lite@6/build/vega-lite.min.js',
+    vegaEmbed: scheme + 'cdn.jsdelivr.net/npm/vega-embed@7/build/vega-embed.min.js'
   }
 };
 

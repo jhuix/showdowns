@@ -498,6 +498,10 @@ const showdowns = {
     }
 
     const opScript = function (script, root) {
+      let host = root;
+      if (script.host && typeof script.host === 'string') {
+        host = document.querySelector(script.host);
+      }
       if (!script.inner) {
         if (!script.code) {
           return true;
@@ -508,10 +512,6 @@ const showdowns = {
           return true;
         }
 
-        let host = root;
-        if (script.host && typeof script.host === 'string') {
-          host = document.querySelector(script.host);
-        }
         return loadScript(script.id, script.code, host);
       }
 
@@ -535,11 +535,11 @@ const showdowns = {
             continue;
           }
 
-          let host = root;
+          let innerHost = host;
           if (s.host && typeof s.host === 'string') {
-            host = document.querySelector(s.host);
+            innerHost = document.querySelector(s.host);
           }
-          loadScript(s.id, s.code, host);
+          loadScript(s.id, s.code, innerHost);
         }
       }
       return true;

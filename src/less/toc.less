@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2025-present, Jhuix (Hui Jin) <jhuix0117@gmail.com>. All rights reserved.
+ * Use of this source code is governed by a MIT license that can be found in the LICENSE file.
+ */
 .hidden {
   display: none !important;
 }
@@ -24,7 +28,7 @@
   -moz-transition: height 0.2s linear;
   -webkit-transition: height 0.2s linear;
   -o-transition: height 0.2s linear;
-  transition: height 0.2s linear;  
+  transition: height 0.2s linear;
 }
 
 .total-toc {
@@ -75,12 +79,16 @@
   }
 
   .toc-icon:hover {
-    color: rgb(0, 137, 255) !important;
+    color: rgb(0, 137, 255);
   }
 
   .toc-view {
     width: 100%;
     overflow: auto;
+
+    .toc-chapter {
+      color: rgb(0, 137, 255);
+    }
 
     ul {
       display: block;
@@ -117,18 +125,17 @@
         div:hover {
           i,
           a {
-            color: #f59102 !important;
+            color: #f59102;
           }
 
           a {
-            /*background: #ededef !important;*/
             border-radius: 0.5rem;
           }
         }
         div:focus {
           i,
           a {
-            color: rgb(0, 137, 255) !important;
+            color: rgb(0, 137, 255);
           }
 
           a {
@@ -157,7 +164,7 @@
   .showdowns {
     height: 100vh;
   }
-  
+
   .total-toc {
     width: 40em;
     height: 100vh;
