@@ -174,13 +174,13 @@ Which will be append a link element to head as:
 
 #### CSS defined examples
 
-[](css:./disk/showdown.min.css)
+[](css:../dist/showdowns.min.css)
 
 Which will be append a link element to head as:
 
 ```
 
-<link rel="stylesheet" href="./disk/showdown.min.css">
+<link rel="stylesheet" href="../dist/showdowns.min.css">
 
 ```
 
