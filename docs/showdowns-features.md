@@ -142,12 +142,47 @@ It's implemented in showdown-footnotes.js, use for reference the [showdown-footn
 #### Markdown Syntax
 
 ```
-[^1]: The explanation.
+\[^1]: The explanation.
 ```
 
 #### Footnotes examples
 
-\[^1]: The explanation.
+[^1]: The explanation.
+
+
+### CSS Defined
+
+#### Markdown Syntax
+
+```
+
+[](css:<css-href>)
+
+或
+
+<a href="css:<css-href>" />
+
+```
+
+Which will be append a link element to head as:
+
+```
+
+<link rel="stylesheet" href="<css-href>">
+
+```
+
+#### CSS defined examples
+
+[](css:./disk/showdown.min.css)
+
+Which will be append a link element to head as:
+
+```
+
+<link rel="stylesheet" href="./disk/showdown.min.css">
+
+```
 
 ### Container
 
@@ -157,9 +192,9 @@ By default, The CSS effect with class name tip|info|warning|error|success|alert-
 #### Markdown Syntax
 
 ```
-::: <classname | parentclass-childclass> <title content>
-*Some text*
-:::
+    ::: <classname | parentclass-childclass> <title content>
+    *Some text*
+    :::
 ```
 
 Which will be rendered as:
