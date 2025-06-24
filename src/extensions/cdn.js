@@ -9,6 +9,7 @@ let cdnName = 'jsdelivr';
 let scheme = document.location.protocol === 'file:' ? 'https://' : document.location.protocol + '//';
 let defScheme = '';
 let distScheme = '';
+let uriPath = '';
 
 const cdnSrc = {
   local: {
@@ -33,11 +34,11 @@ const cdnSrc = {
     WaveDromSkin: {
       default: '../node_modules/wavedrom/skins/default.js',
       lowkey: '../node_modules/wavedrom/skins/lowkey.js',
-      narrow: '../node_modules/wavedrom/skins/narrow.js'
+      narrow: '../node_modules/wavedrom/skins/narrow.js',
     },
     vega: '../node_modules/vega/build/vega.min.js',
     vegaLite: '../node_modules/vega-lite/build/vega-lite.min.js',
-    vegaEmbed: '../node_modules/vega-embed/build/vega-embed.min.js'
+    vegaEmbed: '../node_modules/vega-embed/build/vega-embed.min.js',
   },
   cdnjs: {
     ABCJS: scheme + 'cdnjs.cloudflare.com/ajax/libs/abcjs/6.5.1/abcjs-basic-min.js',
@@ -61,11 +62,11 @@ const cdnSrc = {
     WaveDromSkin: {
       default: scheme + 'cdnjs.cloudflare.com/ajax/libs/wavedrom/3.5.0/skins/default.js',
       lowkey: scheme + 'cdnjs.cloudflare.com/ajax/libs/wavedrom/3.5.0/skins/lowkey.js',
-      narrow: scheme + 'cdnjs.cloudflare.com/ajax/libs/wavedrom/3.5.0/skins/narrow.js'
+      narrow: scheme + 'cdnjs.cloudflare.com/ajax/libs/wavedrom/3.5.0/skins/narrow.js',
     },
     vega: scheme + 'cdnjs.cloudflare.com/ajax/libs/vega/6.1.2/vega.min.js',
     vegaLite: scheme + 'cdnjs.cloudflare.com/ajax/libs/vega-lite/6.1.0/vega-lite.min.js',
-    vegaEmbed: scheme + 'cdnjs.cloudflare.com/ajax/libs/vega-embed/7.0.2/vega-embed.min.js'
+    vegaEmbed: scheme + 'cdnjs.cloudflare.com/ajax/libs/vega-embed/7.0.2/vega-embed.min.js',
   },
   jsdelivr: {
     ABCJS: scheme + 'cdn.jsdelivr.net/npm/abcjs@6/dist/abcjs-basic-min.js',
@@ -89,15 +90,15 @@ const cdnSrc = {
     WaveDromSkin: {
       default: scheme + 'cdn.jsdelivr.net/npm/wavedrom@3/skins/default.js',
       lowkey: scheme + 'cdn.jsdelivr.net/npm/wavedrom@3/skins/lowkey.js',
-      narrow: scheme + 'cdn.jsdelivr.net/npm/wavedrom@3/skins/narrow.js'
+      narrow: scheme + 'cdn.jsdelivr.net/npm/wavedrom@3/skins/narrow.js',
     },
     vega: scheme + 'cdn.jsdelivr.net/npm/vega@6/build/vega.min.js',
     vegaLite: scheme + 'cdn.jsdelivr.net/npm/vega-lite@6/build/vega-lite.min.js',
-    vegaEmbed: scheme + 'cdn.jsdelivr.net/npm/vega-embed@7/build/vega-embed.min.js'
-  }
+    vegaEmbed: scheme + 'cdn.jsdelivr.net/npm/vega-embed@7/build/vega-embed.min.js',
+  },
 };
 
-function setCDN(name, scheme_default, scheme_dist) {
+function setCDN(name, scheme_default, scheme_dist, uri_path) {
   if (name in cdnSrc) {
     cdnName = name;
   }
@@ -108,6 +109,13 @@ function setCDN(name, scheme_default, scheme_dist) {
 
   if (typeof scheme_dist === 'string' && scheme_dist) {
     distScheme = scheme_dist;
+  }
+
+  if (typeof uri_path === 'string' && uri_path) {
+    if (uriPath.at(uriPath.length - 1) !== '/') {
+      uri_path += '/';
+    }
+    uriPath = uri_path;
   }
 }
 
@@ -120,14 +128,38 @@ function getName(name) {
     const key = Object.keys(name)[0];
     const val = name[key];
     if (typeof val === 'string') {
-      return key + "-" + val;
-    }    
+      return key + '-' + val;
+    }
   }
 
   return name;
 }
 
-function getSrc(name, src, def) {
+function getUrl(url) {
+  try {
+    const uri = new URL(url);
+    if (uri.protocol === 'dist:') {
+      url = url.substring(uri.protocol.length + 2);
+      if (url.substring(0, 8) === '../dist/') {
+        url = distScheme + url;
+      } else {
+        url = defScheme + url;
+      }
+      return url;
+    }
+  } catch {
+    if (uriPath) {
+      const prefix = './';
+      if (url.substring(0, prefix.length) === prefix) {
+        url = url.substring(prefix.length);
+      }
+      url = uriPath + url;
+    }
+  }
+  return url;
+}
+
+function getSrc(native, name, src, def) {
   if (typeof src === 'undefined' || !src) {
     src = getCDN();
   }
@@ -145,7 +177,7 @@ function getSrc(name, src, def) {
     }
 
     if (url) {
-      if (url.substring(0, scheme.length) === scheme) {
+      if (native || url.substring(0, scheme.length) === scheme) {
         def = url;
       } else if (url.substring(0, 8) === '../dist/') {
         def = distScheme + url;
@@ -159,33 +191,33 @@ function getSrc(name, src, def) {
 
 function loadScript(name, src) {
   return new Promise((resovle, reject) => {
-      if (!name || typeof document === 'undefined') {
-        reject('Args is invaild!');
-      }
+    if (!name || typeof document === 'undefined') {
+      reject('Args is invaild!');
+    }
 
-      if (typeof src === 'undefined') {
-        src = '';
-      }
+    if (typeof src === 'undefined') {
+      src = '';
+    }
 
-      src = getSrc(name, src);
-      if (!src) {
-        reject(name + ' script source invaild!');
-      }
+    src = getSrc(false, name, src);
+    if (!src) {
+      reject(name + ' script source invaild!');
+    }
 
-      const id = 'script-' + getName(name).toLowerCase();
-      let script = document.getElementById(id);
-      if (script) {
-        return resovle(name);
-      }
+    const id = 'script-' + getName(name).toLowerCase();
+    let script = document.getElementById(id);
+    if (script) {
+      return resovle(name);
+    }
 
-      const head = document.head || document.getElementsByTagName('head')[0];
-      script = document.createElement('script');
-      script.src = src;
-      script.id = id;
-      script.onload = () => {
-        resovle(name);
-      };
-      head.appendChild(script);
+    const head = document.head || document.getElementsByTagName('head')[0];
+    script = document.createElement('script');
+    script.src = src;
+    script.id = id;
+    script.onload = () => {
+      resovle(name);
+    };
+    head.appendChild(script);
   });
 }
 
@@ -200,14 +232,14 @@ function unloadScript(name) {
 
 function loadStyleSheet(name, css) {
   if (!name || typeof document === 'undefined') {
-      return '';
+    return '';
   }
 
   if (typeof css === 'undefined') {
     css = '';
   }
 
-  css = getSrc(name, css);
+  css = getSrc(false, name, css);
   if (!css) {
     return '';
   }
@@ -237,11 +269,12 @@ function unloadStyleSheet(name) {
 const cdnjs = {
   setCDN,
   getCDN,
+  getUrl,
   getSrc,
   loadScript,
   unloadScript,
   loadStyleSheet,
-  unloadStyleSheet
+  unloadStyleSheet,
 };
 
 export default cdnjs;
