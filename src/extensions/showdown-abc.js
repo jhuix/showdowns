@@ -291,6 +291,7 @@ function showdownAbc() {
         this.config = {
           cssLink: cdnjs.getSrc(true, cssCdnName)
         };
+        utils.addCssLink(obj, this.config.cssLink, 'css-abc');
         console.log(format(`Begin render ${extName} elements.`));
         return renderAbcElements(elements, obj.scripts).then(() => {
           console.log(format(`End render ${extName} elements.`));

@@ -44,8 +44,18 @@ const getAsyncExtensions = (options, extensions = {}) => {
   const katexOptions = options ? options.katex || {} : {};
   const vegaOptions = options ? options.vega || {} : {};
 
+  const getExtension = (name, def) => {
+    let obj = null;
+    try {
+      obj = showdown.extension(name);
+    }catch{
+      console.log(`Warning: not found ${name} extension.`);
+    }
+    return obj ? obj : def;
+  };
+
   const asyncExtensions = {
-    'showdown-toc': showdownToc,
+    'showdown-toc': getExtension('showdown-toc',showdownToc),
     'showdown-plantuml': showdownPlantuml(plantumlOptions),
     'showdown-mermaid': showdownMermaid(mermaidOptions),
     'showdown-katex': showdownKatex(katexOptions),
@@ -56,6 +66,7 @@ const getAsyncExtensions = (options, extensions = {}) => {
     'showdown-railroad': showdownRailroad,
     'showdown-abc': showdownAbc,
     'showdown-echarts': showdownEcharts,
+    'showdown-sequence': getExtension('showdown-sequence', showdownSequence),
     ...extensions,
     'showdow-css': showdownCss,
   };
@@ -425,72 +436,38 @@ const showdowns = {
     }
 
     if (this.converter && content) {
-      function _getCssLink(wrapper, className, extName) {
-        // find elements that has csslink
-        const element = wrapper.querySelector(className);
-        let cssLink = '';
-        if (element) {
-          cssLink = element.dataset.css;
-        } else {
-          let ext;
-          try {
-            ext = showdown.extension(extName);
-          } catch {}
-
-          if (!ext) {
-            try {
-              ext = showdown.asyncExtension(extName);
-            } catch {}
-          }
-
-          if (ext) {
-            if (Array.isArray(ext)) {
-              for (var i = 0; i < ext.length; ++i) {
-                if (ext[i].hasOwnProperty('config') && ext[i].config.hasOwnProperty('cssLink')) {
-                  cssLink = ext[i].config.cssLink;
-                  break;
-                }
-              }
-            } else if (typeof ext === 'object') {
-              if (ext.hasOwnProperty('config') && ext.config.hasOwnProperty('cssLink')) {
-                cssLink = ext.config.cssLink;
-              }
-            }
-          }
-        }
-        return cssLink;
-      }
-
+      // Compatible with old versions, be deprecated in the future.
       function _checkCssTypes(obj) {
-        const wrapper = obj.wrapper;
-        if (!wrapper) {
-          return false;
-        }
-
         return new Promise((resolve) => {
-          const abcCssLink = _getCssLink(wrapper, '.css-abc', 'showdown-abc');
-          const katexCssLink = _getCssLink(wrapper, '.css-katex', 'showdown-katex');
-          const railroadCssLink = _getCssLink(wrapper, '.css-railroad', 'showdown-railroad');
-          const sequenceCssLink = _getCssLink(wrapper, '.css-sequence', 'showdown-sequence');
+          if (obj.cssLinks && Array.isArray(obj.cssLinks)) {
+            obj.cssTypes = {css:{}};
+            obj.cssLinks.forEach((css) => {
+              if (css.id === 'css-abc') {
+                obj.cssTypes.hasAbc = true;
+                obj.cssTypes.css.abc = css.link;
+                return
+              }
 
-          obj.cssTypes = {
-            hasAbc: abcCssLink ? true : false,
-            hasKatex: katexCssLink ? true : false,
-            hasRailroad: railroadCssLink ? true : false,
-            hasSequence: sequenceCssLink ? true : false,
-            css: {
-              abc: abcCssLink,
-              katex: katexCssLink,
-              railroad: railroadCssLink,
-              sequence: sequenceCssLink,
-            },
-          };
-          if (abcCssLink) addCssLink(obj, abcCssLink, 'css-abc');
-          if (katexCssLink) addCssLink(obj, katexCssLink, 'css-katex');
-          if (railroadCssLink) addCssLink(obj, railroadCssLink, 'css-railroad');
-          if (sequenceCssLink) addCssLink(obj, sequenceCssLink, 'css-sequence');
-          if (typeof callback === 'function' && callback) {
-            callback(obj.cssTypes);
+              if (css.id === 'css-katex') {
+                obj.cssTypes.hasKatex = true;
+                obj.cssTypes.css.katex = css.link;
+                return
+              }
+
+              if (css.id === 'css-railroad') {
+                obj.cssTypes.hasRailroad = true;
+                obj.cssTypes.css.railroad = css.link;
+                return
+              }
+
+              if (css.id === 'css-sequence') {
+                obj.cssTypes.hasSequence = true;
+                obj.cssTypes.css.sequence = css.link;
+              }
+            });
+            if (typeof callback === 'function' && callback) {
+              callback(obj.cssTypes);
+            }
           }
           return resolve(obj);
         });

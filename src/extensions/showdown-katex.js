@@ -340,7 +340,8 @@ function showdownKatex(userConfig) {
           return false;
         }
 
-        config.cssLink = cdnjs.getSrc(true, cssCdnName);
+        this.config.cssLink = cdnjs.getSrc(true, cssCdnName);
+        utils.addCssLink(obj, this.config.cssLink, 'css-katex');
         console.log(format(`Begin render katex elements.`));
         return renderBlockElements(latex, asciimath, this.config).then(() => {
           console.log(format(`End render katex elements.`));

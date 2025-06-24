@@ -229,7 +229,7 @@ showdown.Converter.prototype.initConvertExtObj = function(flavor, asyncExtension
           });
         }
       }
-      return { html: obj.wrapper.innerHTML, scripts: obj.scripts };
+      return { html: obj.wrapper.innerHTML, extras: obj.extras, scripts: obj.scripts, cssLinks: obj.cssLinks };
     });
   };
 

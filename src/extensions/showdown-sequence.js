@@ -270,7 +270,17 @@ function showdownSequence() {
           return wrapper.innerHTML;
         }
 
-        return html;
+        if (!html || !html.wrapper) {
+          return false;
+        }
+
+        const obj = html;
+        const wrapper = obj.wrapper;
+        const elements = wrapper.querySelectorAll('code.sequence.language-sequence');
+        if (elements.length > 0) {
+          utils.addCssLink(obj, cdnjs.getSrc(true, cssCdnName), 'css-sequence');
+        }
+        return obj;
       },
     },
   ];

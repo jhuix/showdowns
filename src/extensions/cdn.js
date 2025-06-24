@@ -147,6 +147,14 @@ function getUrl(url) {
       }
       return url;
     }
+
+    if (uri.protocol === 'file:') {
+      if (uriPath) {
+        const preUri = new URL(uriPath);
+        url = preUri.origin + '/' + url.substring(8);
+        return url;
+      }
+    }
   } catch {
     if (uriPath) {
       const prefix = './';

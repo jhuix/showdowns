@@ -116,6 +116,7 @@ function showdownRailroad() {
         this.config = {
           cssLink: cdnjs.getSrc(true, cssCdnName)
         };
+        utils.addCssLink(obj, this.config.cssLink, 'css-railroad');
         console.log(format(`Begin render railroad elements.`));
         return renderRailroadElements(elements).then(() => {
           console.log(format(`End render railroad elements.`));
