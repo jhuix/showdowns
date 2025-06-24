@@ -11,6 +11,7 @@ import './less/toc.less';
 import showdown from './parser/showdown.js';
 import showdownAbc from './extensions/showdown-abc.js';
 import showdownToc from './extensions/showdown-toc.js';
+import showdownCss from './extensions/showdown-css.js';
 import showdownViz from './extensions/showdown-viz.js';
 import showdownVega from './extensions/showdown-vega.js';
 import showdownAlign from './extensions/showdown-align.js';
@@ -44,7 +45,7 @@ const getAsyncExtensions = (options, extensions = {}) => {
   const vegaOptions = options ? options.vega || {} : {};
 
   const asyncExtensions = {
-    'showdown-toc': showdownToc(),
+    'showdown-toc': showdownToc,
     'showdown-plantuml': showdownPlantuml(plantumlOptions),
     'showdown-mermaid': showdownMermaid(mermaidOptions),
     'showdown-katex': showdownKatex(katexOptions),
@@ -56,6 +57,7 @@ const getAsyncExtensions = (options, extensions = {}) => {
     'showdown-abc': showdownAbc,
     'showdown-echarts': showdownEcharts,
     ...extensions,
+    'showdow-css': showdownCss,
   };
 
   let extnames = [];
@@ -169,6 +171,21 @@ function appendScript(name, src) {
   });
 }
 
+function addCssLink(obj, link, id) {
+  if (!obj.cssLinks) {
+    obj.cssLinks = [];
+  } else {
+    if (!Array.isArray(obj.cssLinks)) {
+      obj.cssLinks = [obj.cssLinks];
+    }
+  }
+  obj.cssLinks.push({
+    id: id,
+    link: link,
+  });
+  return obj;
+}
+
 const showdownFlavors = ['github', 'ghost', 'vanilla', 'original', 'allon'];
 const mermaidThemes = ['default', 'forest', 'dark', 'neutral'];
 const vegaThemes = ['excel', 'ggplot2', 'quartz', 'vox', 'dark'];
@@ -277,9 +294,9 @@ const showdowns = {
     }
     showdown.removeAsyncExtension(name);
   },
-  setCDN: function (cdnname, defScheme, distScheme) {
+  setCDN: function (cdnname, defScheme, distScheme, uriPath) {
     if (typeof cdnname === 'string' && cdnname) {
-      cdnjs.setCDN(cdnname, defScheme, distScheme);
+      cdnjs.setCDN(cdnname, defScheme, distScheme, uriPath);
     }
   },
   setShowdownFlavor: function (name) {
@@ -468,6 +485,10 @@ const showdowns = {
               sequence: sequenceCssLink,
             },
           };
+          if (abcCssLink) addCssLink(obj, abcCssLink, 'css-abc');
+          if (katexCssLink) addCssLink(obj, katexCssLink, 'css-katex');
+          if (railroadCssLink) addCssLink(obj, railroadCssLink, 'css-railroad');
+          if (sequenceCssLink) addCssLink(obj, sequenceCssLink, 'css-sequence');
           if (typeof callback === 'function' && callback) {
             callback(obj.cssTypes);
           }
@@ -487,7 +508,7 @@ const showdowns = {
             content += extras[i];
           }
         }
-        return { html: content, scripts: obj.scripts };
+        return { html: content, scripts: obj.scripts, cssLinks: obj.cssLinks };
       });
     }
     return Promise.reject(!content ? 'Content is empty.' : 'Converter is invaild.');

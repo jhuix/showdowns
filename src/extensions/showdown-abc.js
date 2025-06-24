@@ -240,7 +240,7 @@ function renderAbc(element, scripts) {
       return resolve(false);
     }
 
-    meta.cssLink = cdnjs.getSrc(cssCdnName);
+    meta.cssLink = cdnjs.getSrc(true, cssCdnName);
     onRenderAbc(resolve, scripts, meta);
   });
 }
@@ -251,7 +251,7 @@ function renderAbcElements(elements, scripts) {
     outer:[
       {
         name: 'ABCJS',
-        src: cdnjs.getSrc('ABCJS','jsdelivr')
+        src: cdnjs.getSrc(false, 'ABCJS','jsdelivr')
       }
     ],
     id: 'abcjs-ext',    
@@ -289,7 +289,7 @@ function showdownAbc() {
         }
 
         this.config = {
-          cssLink: cdnjs.getSrc(cssCdnName)
+          cssLink: cdnjs.getSrc(true, cssCdnName)
         };
         console.log(format(`Begin render ${extName} elements.`));
         return renderAbcElements(elements, obj.scripts).then(() => {

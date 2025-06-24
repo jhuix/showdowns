@@ -27,7 +27,12 @@ function showdownFootnotes() {
     {
       type: 'lang',
       filter: text =>
-        text.replace(/\[\^([\d\w]+)\]/m, (str, name) => `<a href="#footnote-${name}"><sup>[${name}]</sup></a>`)
+        text.replace(/([^\\])\[\^([\d\w]+)\]/gm, (str, preContent, name) => `${preContent}<a href="#footnote-${name}"><sup>[${name}]</sup></a>`)
+    },
+    {
+      type: 'lang',
+      filter: text =>
+        text.replace(/\\\[\^([\d\w]+)\]/gm, (str, name) => `[^${name}]`)
     }
   ];
 }

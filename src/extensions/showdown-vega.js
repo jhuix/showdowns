@@ -108,15 +108,15 @@ function renderVegaElements(vegaElements, vegaLiteElements, scripts, options) {
     outer: [
       {
         name: extName,
-        src: cdnjs.getSrc(extName,'jsdelivr')
+        src: cdnjs.getSrc(false, extName,'jsdelivr')
       },
       {
         name: 'vegaLite',
-        src: cdnjs.getSrc('vegaLite','jsdelivr')
+        src: cdnjs.getSrc(false, 'vegaLite','jsdelivr')
       },
       {
         name: 'vegaEmbed',
-        src: cdnjs.getSrc('vegaEmbed','jsdelivr')
+        src: cdnjs.getSrc(false, 'vegaEmbed','jsdelivr')
       }    
     ],
     inner: []

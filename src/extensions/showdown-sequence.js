@@ -35,7 +35,7 @@ if (typeof sequence === 'undefined' && typeof window !== 'undefined') {
 }
 
 function hasRaphael() {
-  return !!Raphael
+  return !!Raphael;
 }
 
 function hasSequence() {
@@ -55,7 +55,7 @@ function dyncLoadScript() {
       return sync;
     }
 
-    if (!sync) { 
+    if (!sync) {
       dync = true;
       cdnjs.loadStyleSheet(cssCdnName);
       cdnjs
@@ -119,8 +119,8 @@ function unloadScript() {
     }
     Raphael = null;
     window.Raphael = null;
-  }  
-  dync = false;  
+  }
+  dync = false;
 }
 
 /**
@@ -148,7 +148,7 @@ function renderSequence(element) {
     }
   }
   const sync = dyncLoadScript();
-  const cssLink = cdnjs.getSrc(cssCdnName);
+  const cssLink = cdnjs.getSrc(true, cssCdnName);
   const code = element.textContent.trim();
   const name = 'js-sequence' + (!diagramClass ? '' : ' ') + diagramClass;
   const id = 'sequence-' + Date.now() + '-' + Math.floor(Math.random() * 10000);
@@ -158,7 +158,7 @@ function renderSequence(element) {
     element.dataset.css = cssLink;
   }
   if (!sync && typeof window !== 'undefined' && window.dispatchEvent) {
-    Promise.resolve(id).then(elementid => {
+    Promise.resolve(id).then((elementid) => {
       // dispatch sequence custom event
       window.dispatchEvent(
         new CustomEvent('sequence', {
@@ -167,8 +167,8 @@ function renderSequence(element) {
             className: name,
             data: code,
             langattr: langattr,
-            cssLink: cssLink
-          }
+            cssLink: cssLink,
+          },
         })
       );
     });
@@ -195,7 +195,7 @@ function renderSequenceElements(elements) {
   if (!elements.length) {
     return false;
   }
-  elements.forEach(element => {
+  elements.forEach((element) => {
     renderSequence(element);
   });
   return true;
@@ -234,42 +234,45 @@ function onRenderSequence(element) {
 
 function showdownSequence() {
   let hasEvent = false;
-  const parser = new DOMParser();
-
   return [
     {
       type: 'output',
-      filter: function(html) {
-        // parse html
-        const doc = parser.parseFromString(html, 'text/html');
-        const wrapper = typeof doc.body !== 'undefined' ? doc.body : doc;
+      filter: function (html) {
+        if (typeof html === 'string') {
+          // parse html
+          const parser = new DOMParser();
+          const doc = parser.parseFromString(html, 'text/html');
+          const wrapper = typeof doc.body !== 'undefined' ? doc.body : doc;
 
-        // find the sequence in code blocks
-        const elements = wrapper.querySelectorAll('code.sequence.language-sequence');
-        if (elements.length) {
-          if (!hasEvent) {
-            if (typeof window !== 'undefined' && window.dispatchEvent) {
-              hasEvent = true;
-              // Listen sequence custom event
-              window.addEventListener('sequence', event => {
-                if (event.detail) {
-                  onRenderSequence(event.detail);
-                }
-              });              
+          // find the sequence in code blocks
+          const elements = wrapper.querySelectorAll('code.sequence.language-sequence');
+          if (elements.length) {
+            if (!hasEvent) {
+              if (typeof window !== 'undefined' && window.dispatchEvent) {
+                hasEvent = true;
+                // Listen sequence custom event
+                window.addEventListener('sequence', (event) => {
+                  if (event.detail) {
+                    onRenderSequence(event.detail);
+                  }
+                });
+              }
             }
-          }
 
-          this.config = {
-            cssLink: cdnjs.getSrc(cssCdnName)
-          };
+            this.config = {
+              cssLink: cdnjs.getSrc(true, cssCdnName),
+            };
+          }
+          if (!renderSequenceElements(elements)) {
+            return html;
+          }
+          // return html text content
+          return wrapper.innerHTML;
         }
-        if (!renderSequenceElements(elements)) {
-          return html;
-        }
-        // return html text content
-        return wrapper.innerHTML;
-      }
-    }
+
+        return html;
+      },
+    },
   ];
 }
 

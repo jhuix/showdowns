@@ -211,7 +211,8 @@ showdown.Converter.prototype.initConvertExtObj = function(flavor, asyncExtension
     const wrapper = typeof doc.body !== 'undefined' ? doc.body : doc;
     const options = this.getOptions();
     let scripts = [];
-    let result = Promise.resolve({ wrapper, options, globals, scripts });
+    let cssLinks = [];
+    let result = Promise.resolve({ wrapper, options, globals, scripts, cssLinks });
     //forEach写法
     outputs.forEach(function(ext) {
       result = result.then(obj => {
@@ -224,7 +225,7 @@ showdown.Converter.prototype.initConvertExtObj = function(flavor, asyncExtension
         const promise = callback(obj);
         if (promise instanceof Promise) {
           return promise.then(obj => {
-            return { html: obj.wrapper.innerHTML, extras: obj.extras, scripts: obj.scripts };
+            return { html: obj.wrapper.innerHTML, extras: obj.extras, scripts: obj.scripts, cssLinks: obj.cssLinks };
           });
         }
       }

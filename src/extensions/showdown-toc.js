@@ -6,6 +6,7 @@
 'use strict';
 
 import format from './log';
+import utils from './utils';
 
 function createHeadingElement(wrapper, element, toc, headingLevel, nexthead) {
   try {
@@ -317,47 +318,34 @@ function showdownToc() {
           return wrapper.innerHTML;
         }
 
-        const wrapper = html.wrapper;
-        if (!wrapper) {
+        if (typeof html !== 'object' || !html || !html.wrapper)
           return false;
-        }
 
+        const obj = html;
+        const wrapper = obj.wrapper;
         let element = wrapper.querySelector('#toc-svgs');
         if (!element) {
           return false;
         }
 
         element.parentNode.removeChild(element);
-        if (!html.extras) {
-          html.extras = [];
-        }
-        if (!Array.isArray(html.extras)) {
-          html.extras = [html.extras];
-        }
-        html.extras.push(element.outerHTML);
-
+        utils.addExtra(obj, element.outerHTML);
         element = wrapper.querySelector('#total-showdown-toc');
         if (!element) {
-          return html;
+          return obj;
         }
 
         element.parentNode.removeChild(element);
         element.classList.remove('hidden');
-        html.extras.push(element.outerHTML);
+        utils.addExtra(obj, element.outerHTML);
 
         element = wrapper.querySelector('#toc-switch-button');
         if (element) {
           element.parentNode.removeChild(element);
-          html.extras.push(element.outerHTML);
+          utils.addExtra(obj, element.outerHTML);
         }
        
         // 附加动态脚本
-        if (html.scripts) {
-           html.scripts = [];
-        }
-        if (!Array.isArray(html.scripts)) {
-          html.scripts = [html.scripts];
-        }
         const script = {
           inner: [
             {
@@ -367,8 +355,8 @@ function showdownToc() {
             }
           ],
         };
-        html.scripts.push(script);
-        return html;
+        utils.addScript(obj, script);
+        return obj;
       },
     },
   ];

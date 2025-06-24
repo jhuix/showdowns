@@ -136,7 +136,7 @@ function renderEchartsElements(elements, scripts, config) {
     outer: [
       {
         name: extName,
-        src: cdnjs.getSrc(extName,'jsdelivr')
+        src: cdnjs.getSrc(false, extName,'jsdelivr')
       }
     ],
     inner: []

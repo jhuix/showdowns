@@ -142,7 +142,7 @@ function renderKatex(element, config, isAsciimath) {
       return resolve(false);
     }
 
-    meta.cssLink = cdnjs.getSrc(cssCdnName);
+    meta.cssLink = cdnjs.getSrc(true, cssCdnName);
     meta.input = latex;
     meta.options = config;
     onRenderKatex(resolve, meta);
@@ -314,7 +314,7 @@ function showdownKatex(userConfig) {
 
         if (!latex.length && !asciimath.length) {
           if (inlineMathCount > 0) {
-            this.config.cssLink = cdnjs.getSrc(cssCdnName);
+            this.config.cssLink = cdnjs.getSrc(true, cssCdnName);
             const that = this;
             function asyncRenderKatex(resolve, render) {
               if (hasKatex()) {
@@ -340,7 +340,7 @@ function showdownKatex(userConfig) {
           return false;
         }
 
-        config.cssLink = cdnjs.getSrc(cssCdnName);
+        config.cssLink = cdnjs.getSrc(true, cssCdnName);
         console.log(format(`Begin render katex elements.`));
         return renderBlockElements(latex, asciimath, this.config).then(() => {
           console.log(format(`End render katex elements.`));

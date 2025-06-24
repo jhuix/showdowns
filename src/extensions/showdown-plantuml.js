@@ -15,7 +15,14 @@ let umlElementCount = 0;
 function renderPlantumlElement(element, config) {
   return new Promise(resolve => {
     const langattr = element.dataset.lang;
-    const langobj = langattr ? JSON.parse(langattr) : null;
+    let langobj = null;
+    if (langattr) {
+      try {
+        langobj = JSON.parse(langattr);
+      } catch {
+        console.log(`Error: parse plantuml data-lang ${langattr} failed.`);
+      }
+    }
     let diagramClass = '';
     if (langobj) {
       if (

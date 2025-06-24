@@ -79,7 +79,7 @@ function renderRailroad(element) {
     }
 
 
-    meta.cssLink = cdnjs.getSrc(cssCdnName);
+    meta.cssLink = cdnjs.getSrc(true, cssCdnName);
     onRenderRailroad(resolve, meta);
   });
 }
@@ -114,7 +114,7 @@ function showdownRailroad() {
         }
 
         this.config = {
-          cssLink: cdnjs.getSrc(cssCdnName)
+          cssLink: cdnjs.getSrc(true, cssCdnName)
         };
         console.log(format(`Begin render railroad elements.`));
         return renderRailroadElements(elements).then(() => {
