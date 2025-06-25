@@ -27,7 +27,7 @@ function showdownCss() {
 
         elements.forEach((e)=>{
           try {
-            if (e.href && e.href.substr(0, 4) === 'css:') {
+            if (e.href && typeof e.href === 'string' && e.href.substr(0, 4) === 'css:') {
               let cssLink = e.href.substr(4).trim();
               const hash = `${utils.hashString(cssLink)}`;
               utils.addCssLink(obj, cssLink, prefix + hash);             
