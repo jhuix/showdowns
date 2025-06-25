@@ -158,7 +158,7 @@ It's implemented in showdown-footnotes.js, use for reference the [showdown-footn
 
 [](css:<css-href>)
 
-或
+OR
 
 <a href="css:<css-href>" />
 
