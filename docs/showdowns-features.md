@@ -172,15 +172,25 @@ Which will be append a link element to head as:
 
 ```
 
+\<css-href> support format:
+
+    http(s)://jhuix.github.io/showdowns/dist/showdowns.min.css
+
+    file:///i:/showdowns.min.css
+
+    ../dist/showdowns.min.css
+
 #### CSS defined examples
 
-[](css:../dist/showdowns.min.css)
+```
+[](css:https://jhuix.github.io/showdowns/dist/showdowns.min.css)
+```
 
 Which will be append a link element to head as:
 
 ```
 
-<link rel="stylesheet" href="../dist/showdowns.min.css">
+<link rel="stylesheet" href="https://jhuix.github.io/showdowns/dist/showdowns.min.css">
 
 ```
 
