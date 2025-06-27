@@ -131,10 +131,19 @@ function renderTocElements(wrapper, config) {
         swtichToc.innerHTML = '<svg class="icon" aria-hidden="true"><use xlink:href="#icon-chapter-l"></use></svg>';
         element.parentNode.insertBefore(swtichToc, element);
 
+        let tocTitle = 'Table Of Contents'
+        let locale = document.children[0].lang;
+        if (locale) {
+          locale = locale.toLowerCase();
+          if (locale === 'zh-cn' || locale === 'zh-hans') {
+            tocTitle = '目录';
+          }
+        }
+
         showdownToc.id = 'total-showdown-toc';
         showdownToc.classList.add('total-toc');
         showdownToc.innerHTML =
-          '<div class="toc-pin"><span class="toc-pin-text">目录</span><div class="toc-fold-wrap"><div id="toc-fold-icon" class="toc-fold toc-icon" data-name="toc-expand"><svg class="icon" aria-hidden="true"><use xlink:href="#icon-toc"></use></svg></div><div id="toc-close-icon" class="toc-close toc-icon"><svg class="icon" aria-hidden="true"><use xlink:href="#icon-chapter-s"></use></svg></div></div></div>';
+          `<div class="toc-pin"><span class="toc-pin-text">${tocTitle}</span><div class="toc-fold-wrap"><div id="toc-fold-icon" class="toc-fold toc-icon" data-name="toc-expand"><svg class="icon" aria-hidden="true"><use xlink:href="#icon-toc"></use></svg></div><div id="toc-close-icon" class="toc-close toc-icon"><svg class="icon" aria-hidden="true"><use xlink:href="#icon-chapter-s"></use></svg></div></div></div>`;
       }
       let tocView = wrapper.ownerDocument.createElement('div');
       tocView.className = 'toc-view';
