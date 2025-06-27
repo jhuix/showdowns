@@ -5,7 +5,7 @@
  */
 'use strict';
 
-const extName = "echarts";
+const extName = 'echarts';
 
 if (typeof window === 'undefined') {
   throw Error(`The showdown ${extName} extension can only be used in browser environment!`);
@@ -33,7 +33,7 @@ function dyncLoadScript() {
 
     if (!sync) {
       dync = true;
-      cdnjs.loadScript(extName).then(name => {
+      cdnjs.loadScript(extName).then((name) => {
         echarts = utils.interopDefault(window[name]);
       });
     }
@@ -71,12 +71,12 @@ function onRenderEcharts(resolve, meta) {
     // chart.dispose();
     // chart = null;
     if (!meta.lang) {
-      meta.lang = {width:'400px', height:'300px'};
+      meta.lang = { width: '400px', height: '300px' };
     } else {
       if (!meta.lang.width) meta.lang.width = '400px';
       if (!meta.lang.height) meta.lang.height = '300px';
     }
-    const style = `width:${meta.lang.width}; height:${meta.lang.height};`;    
+    const style = `width:${meta.lang.width}; height:${meta.lang.height};`;
     node.outerHTML = `<div id="${container}" class="${name}" style="${style}"><div id="${id}" style="width:100%;height:100%;display:inline-block"></div></div>`;
     return resolve(true);
   }
@@ -85,7 +85,6 @@ function onRenderEcharts(resolve, meta) {
     onRenderEcharts(resolve, meta);
   }, 20);
 }
-
 
 /**
  * render echarts graphs
@@ -96,36 +95,78 @@ function renderEcharts(element, scripts, config) {
     return Promise.resolve(false);
   }
 
-  config = { ...config, ssr: false };
-  config = JSON.stringify(config);
-  let code = `(function() {
-    let el = document.getElementById('${meta.id}');
-    if (el){
-      let chart = echarts.getInstanceByDom(el);
-      if (!chart) {
-        el.innerHTML = '';
+  config = { ...config, ssr: false, width: meta.lang.width, height: meta.lang.height };
+  const echartRenderer = (meta, config) => {
+    const result = () => {
+      const wval = eval;
+      let el = document.getElementById(meta.id);
+      if (el) {
+        let chart = echarts.getInstanceByDom(el);
+        if (!chart) {
+          el.innerHTML = '';
+        }
+        chart = echarts.init(el, null, config);
+        if (
+          meta.lang &&
+          meta.lang.type &&
+          typeof meta.lang.type === 'string' &&
+          meta.lang.type.toLowerCase() == 'javascript'
+        ) {
+          const option = wval(`(function(){${meta.data}; return option;})();`);
+          chart.setOption(option);
+        } else {
+          // JSON string
+          const option = JSON.parse(meta.data);
+          chart.setOption(option);
+        }
       }
-      let config = JSON.parse('${config}');
-      chart = echarts.init(el, null, config);
-  `;
-  
-  if (meta.lang && meta.lang.type && typeof meta.lang.type === 'string'
-     && meta.lang.type.toLowerCase() == 'javascript') {
-    code += '    ' + meta.data;
-  } else { // JSON string
-    const data = JSON.stringify(JSON.parse(meta.data));
-    code += `    const option = JSON.parse(\`${data}\`);`;
-  }
-  code += `
-      chart.setOption(option);
-    }
-  })();`
+    };
+
+    result.toString = () => {
+      if (
+        meta.lang &&
+        meta.lang.type &&
+        typeof meta.lang.type === 'string' &&
+        meta.lang.type.toLowerCase() == 'javascript'
+      ) {
+        return `function(){
+          const config = ${JSON.stringify(config)};
+          let el = document.getElementById('${meta.id}');
+          if (el) {
+            let chart = echarts.getInstanceByDom(el);
+            if (!chart) {
+              el.innerHTML = '';
+            }
+            chart = echarts.init(el, null, config);
+            ${meta.data}
+            chart.setOption(option);            
+          }
+        }`;
+      }
+
+      return `function(){
+        const config = ${JSON.stringify(config)};
+        let el = document.getElementById('${meta.id}');
+        if (el) {
+          let chart = echarts.getInstanceByDom(el);
+          if (!chart) {
+            el.innerHTML = '';
+          }
+          chart = echarts.init(el, null, config);
+          const option = ${meta.data};
+          chart.setOption(option);
+        }
+      }`;
+    };
+    return result;
+  };
   const script = {
     id: meta.container,
-    code: code
-  }
+    code: echartRenderer(meta, config),
+    host: `#${meta.container}`,
+  };
   scripts.push(script);
-  return new Promise(resolve => {
+  return new Promise((resolve) => {
     onRenderEcharts(resolve, meta);
   });
 }
@@ -136,16 +177,16 @@ function renderEchartsElements(elements, scripts, config) {
     outer: [
       {
         name: extName,
-        src: cdnjs.getSrc(false, extName,'jsdelivr')
-      }
+        src: cdnjs.getSrc(false, extName, 'jsdelivr'),
+      },
     ],
-    inner: []
+    inner: [],
   };
-  scripts.push(script); 
+  scripts.push(script);
   dyncLoadScript();
-  return new Promise(resolve => {
+  return new Promise((resolve) => {
     const promiseArray = [];
-    elements.forEach(element => {
+    elements.forEach((element) => {
       promiseArray.push(renderEcharts(element, script.inner, config));
     });
     Promise.all(promiseArray).then(() => {
@@ -159,11 +200,11 @@ const getConfig = (config = {}) => ({
   renderer: 'svg',
   ssr: false,
   tooltip: {
-    show: true
+    show: true,
   },
   animation: true,
   useDirtyRect: false,
-  ...config
+  ...config,
 });
 
 function showdownEcharts(userConfig) {
@@ -189,8 +230,8 @@ function showdownEcharts(userConfig) {
           console.log(format(`End render ${extName} elements.`));
           return obj;
         });
-      }
-    }
+      },
+    },
   ];
 }
 

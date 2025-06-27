@@ -5,7 +5,7 @@
  */
 'use strict';
 
-const extName = "vega";
+const extName = 'vega';
 
 if (typeof window === 'undefined') {
   throw Error('The showdown vega extension can only be used in browser environment!');
@@ -31,7 +31,7 @@ function dyncLoadScript() {
       return sync;
     }
 
-    if (!sync) {   
+    if (!sync) {
       dync = true;
       cdnjs
         .loadScript(extName)
@@ -41,7 +41,7 @@ function dyncLoadScript() {
         .then(() => {
           return cdnjs.loadScript('vegaEmbed');
         })
-        .then(name => {
+        .then((name) => {
           vegaEmbed = utils.interopDefault(window[name]);
         });
     }
@@ -61,7 +61,7 @@ function unloadScript() {
   }
   vegaEmbed = null;
   window.vegaEmbed = null;
-  dync = false;  
+  dync = false;
 }
 
 /**
@@ -73,31 +73,63 @@ function renderVega(element, options, scripts, isVegaLite) {
     return Promise.resolve(false);
   }
 
-  const config = JSON.stringify(options);      
-  const data = JSON.stringify(JSON.parse(meta.data));
-  const id = meta.id;
   const container = meta.container;
-  let code = `(function() {
-    let el = document.getElementById('${id}');
-    if (el){
-  `;  
-  if (meta.lang && meta.lang.type && typeof meta.lang.type === 'string'
-      && meta.lang.type.toLowerCase() == 'javascript') {
-    code += '    ' + meta.data;
-  } else { // JSON string
-    const data = JSON.stringify(JSON.parse(meta.data));
-    code += `    const option = JSON.parse(\`${data}\`);`;
-  }
-  code += `
-      vegaEmbed(el, option, JSON.parse('${config}'));
-    }
-  })();`
+  const vegaRenderer = (meta, config) => {
+    const result = () => {
+      const wval = eval;
+      let el = document.getElementById(meta.id);
+      if (el) {
+        if (
+          meta.lang &&
+          meta.lang.type &&
+          typeof meta.lang.type === 'string' &&
+          meta.lang.type.toLowerCase() == 'javascript'
+        ) {
+          const option = wval(`(function(){${meta.data}; return option;})();`);
+          vegaEmbed(el, option, config);
+        } else {
+          // JSON string
+          const option = JSON.parse(meta.data);
+          vegaEmbed(el, option, config);
+        }
+      }
+    };
+
+    result.toString = () => {
+      if (
+        meta.lang &&
+        meta.lang.type &&
+        typeof meta.lang.type === 'string' &&
+        meta.lang.type.toLowerCase() == 'javascript'
+      ) {
+        return `function(){
+          let el = document.getElementById('${meta.id}');
+          if (el) {
+            ${meta.data};
+            const config = ${JSON.stringify(config)};
+            vegaEmbed(el, option, config);
+          }
+        }`;
+      }
+
+      return `function(){
+        let el = document.getElementById('${meta.id}');
+        if (el) {
+          const option = ${meta.data};
+          const config = ${JSON.stringify(config)};
+          vegaEmbed(el, option, config);
+        }
+      }`;
+    };
+    return result;
+  };
   const script = {
     id: container,
-    code: code
-  }
+    code: vegaRenderer(meta, options),
+    host: `#${container}`,
+  };
   scripts.push(script);
-  return new Promise(resolve => {
+  return new Promise((resolve) => {
     onRenderVega(resolve, meta);
   });
 }
@@ -108,27 +140,27 @@ function renderVegaElements(vegaElements, vegaLiteElements, scripts, options) {
     outer: [
       {
         name: extName,
-        src: cdnjs.getSrc(false, extName,'jsdelivr')
+        src: cdnjs.getSrc(false, extName, 'jsdelivr'),
       },
       {
         name: 'vegaLite',
-        src: cdnjs.getSrc(false, 'vegaLite','jsdelivr')
+        src: cdnjs.getSrc(false, 'vegaLite', 'jsdelivr'),
       },
       {
         name: 'vegaEmbed',
-        src: cdnjs.getSrc(false, 'vegaEmbed','jsdelivr')
-      }    
+        src: cdnjs.getSrc(false, 'vegaEmbed', 'jsdelivr'),
+      },
     ],
-    inner: []
+    inner: [],
   };
-  scripts.push(script); 
+  scripts.push(script);
   dyncLoadScript();
-  return new Promise(resolve => {
+  return new Promise((resolve) => {
     const promiseArray = [];
-    vegaElements.forEach(element => {
+    vegaElements.forEach((element) => {
       promiseArray.push(renderVega(element, options, script.inner, false));
     });
-    vegaLiteElements.forEach(element => {
+    vegaLiteElements.forEach((element) => {
       promiseArray.push(renderVega(element, options, script.inner, true));
     });
     Promise.all(promiseArray).then(() => {
@@ -143,7 +175,7 @@ const getOptions = (userOptions = {}) => ({
   theme: 'vox',
   tooltip: false,
   renderer: 'svg',
-  ...userOptions
+  ...userOptions,
 });
 
 function onRenderVega(resolve, meta) {
@@ -155,7 +187,7 @@ function onRenderVega(resolve, meta) {
     node.outerHTML = `<div id="${container}" class="${name}"><div id="${id}"></div></div>`;
     return resolve(true);
   }
-  
+
   setTimeout(() => {
     onRenderVega(resolve, meta);
   }, 10);
@@ -168,7 +200,7 @@ function showdownVega(userOptions) {
     {
       type: 'output',
       config: options,
-      filter: function(obj) {
+      filter: function (obj) {
         const wrapper = obj.wrapper;
         if (!wrapper) {
           return false;
@@ -186,8 +218,8 @@ function showdownVega(userOptions) {
           console.log(format(`End render vega elements.`));
           return obj;
         });
-      }
-    }
+      },
+    },
   ];
 }
 

@@ -48,14 +48,14 @@ const getAsyncExtensions = (options, extensions = {}) => {
     let obj = null;
     try {
       obj = showdown.extension(name);
-    }catch{
+    } catch {
       console.log(`Warning: not found ${name} extension.`);
     }
     return obj ? obj : def;
   };
 
   const asyncExtensions = {
-    'showdown-toc': getExtension('showdown-toc',showdownToc),
+    'showdown-toc': getExtension('showdown-toc', showdownToc),
     'showdown-plantuml': showdownPlantuml(plantumlOptions),
     'showdown-mermaid': showdownMermaid(mermaidOptions),
     'showdown-katex': showdownKatex(katexOptions),
@@ -196,6 +196,96 @@ function addCssLink(obj, link, id) {
   });
   return obj;
 }
+
+const opScript = function (script, root, promise) {
+  let host = root;
+  if (script.host && typeof script.host === 'string') {
+    host = document.querySelector(script.host);
+  }
+  if (!script.inner) {
+    if (!script.code) {
+      return false;
+    }
+
+    if (typeof script.code === 'function') {
+      const method = script.code;
+      if (promise) {
+        promise.then(() => {
+          method();
+        });
+        return true;
+      }
+
+      method();
+      return true;
+    }
+
+    if (promise) {
+      promise.then(() => {
+        loadScript(script.id, script.code, host);
+      });
+      return true;
+    }
+    return loadScript(script.id, script.code, host);
+  }
+
+  if (!showdown.helper.isArray(script.inner)) {
+    script.inner = [script.inner];
+  }
+  if (script.code) {
+    if (typeof script.code === 'function') {
+      const method = script.code;
+      if (promise) {
+        promise.then(() => {
+          method();
+        });
+      } else {
+        method();
+      }
+    } else {
+      if (promise) {
+        promise.then(() => {
+          if (!insertScript(script.id, script.code, host)) {
+            console.log(format('Args is invaild with insert script!'), script);
+          }
+        });
+      } else if (!insertScript(script.id, script.code, host)) {
+        console.log(format('Args is invaild with insert script!'), script);
+      }
+    }
+  }
+  if (script.inner.length > 0) {
+    for (let j = 0; j < script.inner.length; ++j) {
+      const s = script.inner[j];
+      if (!s.code) continue;
+
+      if (typeof s.code === 'function') {
+        const method = s.code;
+        if (promise) {
+          promise.then(() => {
+            method();
+          });
+        } else {
+          method();
+        }
+        continue;
+      }
+
+      let innerHost = host;
+      if (s.host && typeof s.host === 'string') {
+        innerHost = document.querySelector(s.host);
+      }
+      if (promise) {
+        promise.then(() => {
+          loadScript(s.id, s.code, innerHost);
+        });
+        continue;
+      }
+      loadScript(s.id, s.code, innerHost);
+    }
+  }
+  return true;
+};
 
 const showdownFlavors = ['github', 'ghost', 'vanilla', 'original', 'allon'];
 const mermaidThemes = ['default', 'forest', 'dark', 'neutral'];
@@ -440,24 +530,24 @@ const showdowns = {
       function _checkCssTypes(obj) {
         return new Promise((resolve) => {
           if (obj.cssLinks && Array.isArray(obj.cssLinks)) {
-            obj.cssTypes = {css:{}};
+            obj.cssTypes = { css: {} };
             obj.cssLinks.forEach((css) => {
               if (css.id === 'css-abc') {
                 obj.cssTypes.hasAbc = true;
                 obj.cssTypes.css.abc = css.link;
-                return
+                return;
               }
 
               if (css.id === 'css-katex') {
                 obj.cssTypes.hasKatex = true;
                 obj.cssTypes.css.katex = css.link;
-                return
+                return;
               }
 
               if (css.id === 'css-railroad') {
                 obj.cssTypes.hasRailroad = true;
                 obj.cssTypes.css.railroad = css.link;
-                return
+                return;
               }
 
               if (css.id === 'css-sequence') {
@@ -495,54 +585,6 @@ const showdowns = {
       scripts = [scripts];
     }
 
-    const opScript = function (script, root) {
-      let host = root;
-      if (script.host && typeof script.host === 'string') {
-        host = document.querySelector(script.host);
-      }
-      if (!script.inner) {
-        if (!script.code) {
-          return true;
-        }
-
-        if (typeof script.code === 'function') {
-          script.code();
-          return true;
-        }
-
-        return loadScript(script.id, script.code, host);
-      }
-
-      if (!showdown.helper.isArray(script.inner)) {
-        script.inner = [script.inner];
-      }
-      if (script.code) {
-        if (typeof script.code === 'function') {
-          script.code();
-        } else if (!insertScript(script.id, script.code, host)) {
-          console.log(format('Args is invaild with insert script!'), script);
-        }
-      }
-      if (script.inner.length > 0) {
-        for (let j = 0; j < script.inner.length; ++j) {
-          const s = script.inner[j];
-          if (!s.code) continue;
-
-          if (typeof s.code === 'function') {
-            s.code();
-            continue;
-          }
-
-          let innerHost = host;
-          if (s.host && typeof s.host === 'string') {
-            innerHost = document.querySelector(s.host);
-          }
-          loadScript(s.id, s.code, innerHost);
-        }
-      }
-      return true;
-    };
-
     return new Promise((revole, reject) => {
       if (typeof element === 'string') {
         element = document.querySelector(element);
@@ -556,14 +598,13 @@ const showdowns = {
           let o = script.outer[0];
           let result = appendScript(o.name, o.src);
           for (let k = 1; k < script.outer.length; ++k) {
+            o = script.outer[k];
             result = result.then(() => {
-              o = script.outer[k];              
               return appendScript(o.name, o.src);
             });
           }
-          result.then(() => {
-            opScript(script, element);
-          });
+
+          opScript(script, element, result);
           continue;
         }
 
