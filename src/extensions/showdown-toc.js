@@ -120,9 +120,16 @@ function renderTocElements(wrapper, config) {
     // And replace this element with out list that classname is 'showdown-toc'.
     if (element.textContent.trim().toLowerCase() == '[toc]') {
       // New table of contents container.
-      let showdownToc = wrapper.ownerDocument.createElement('div');
-      showdownToc.classList.add('showdown-toc');
+      let showdownToc = null;
       if (!firstHeadOne) {
+        // Filter duplicate definitions
+        if (totalToc) {
+          element.parentNode.removeChild(element);
+          continue;
+        }
+
+        showdownToc = wrapper.ownerDocument.createElement('div');
+        showdownToc.classList.add('showdown-toc');
         totalToc = showdownToc;
         config.extraDocs.push('<div id="divider" class="divider"></div>');
         const swtichToc = wrapper.ownerDocument.createElement('div');
@@ -144,6 +151,9 @@ function renderTocElements(wrapper, config) {
         showdownToc.classList.add('total-toc');
         showdownToc.innerHTML =
           `<div class="toc-pin"><span class="toc-pin-text">${tocTitle}</span><div class="toc-fold-wrap"><div id="toc-fold-icon" class="toc-fold toc-icon" data-name="toc-expand"><svg class="icon" aria-hidden="true"><use xlink:href="#icon-toc"></use></svg></div><div id="toc-close-icon" class="toc-close toc-icon"><svg class="icon" aria-hidden="true"><use xlink:href="#icon-chapter-s"></use></svg></div></div></div>`;
+      } else {
+        showdownToc = wrapper.ownerDocument.createElement('div');
+        showdownToc.classList.add('showdown-toc');
       }
       let tocView = wrapper.ownerDocument.createElement('div');
       tocView.className = 'toc-view';
