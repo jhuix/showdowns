@@ -16,6 +16,7 @@ import showdownViz from './extensions/showdown-viz.js';
 import showdownVega from './extensions/showdown-vega.js';
 import showdownAlign from './extensions/showdown-align.js';
 import showdownKatex from './extensions/showdown-katex.js';
+import showdownKroki from './extensions/showdown-kroki.js';
 import showdownEcharts from './extensions/showdown-echarts.js';
 import showdownMermaid from './extensions/showdown-mermaid.js';
 import showdownPlantuml from './extensions/showdown-plantuml.js';
@@ -42,6 +43,7 @@ const getAsyncExtensions = (options, extensions = {}) => {
   const mermaidOptions = options ? options.mermaid || {} : {};
   const plantumlOptions = options ? options.plantuml || {} : {};
   const katexOptions = options ? options.katex || {} : {};
+  const krokiOptions = options ? options.kroki || {} : {};
   const vegaOptions = options ? options.vega || {} : {};
 
   const getExtension = (name, def) => {
@@ -59,6 +61,7 @@ const getAsyncExtensions = (options, extensions = {}) => {
     'showdown-plantuml': showdownPlantuml(plantumlOptions),
     'showdown-mermaid': showdownMermaid(mermaidOptions),
     'showdown-katex': showdownKatex(katexOptions),
+    'showdown-kroki': showdownKroki(krokiOptions),
     'showdown-flowchart': showdownFlowchart,
     'showdown-viz': showdownViz,
     'showdown-vega': showdownVega(vegaOptions),
@@ -321,6 +324,7 @@ const showdowns = {
         plantuml: {},
         mermaid: {},
         katex: {},
+        kroki: {},
         vega: {},
       };
     }
@@ -452,6 +456,15 @@ const showdowns = {
       this.addAsyncExtension('showdown-katex', showdownKatex(this.defaultOptions.katex));
     }
     return this.defaultOptions.katex;
+  },
+  setKrokiOptions: function (options) {
+    this.initDefaultOptions();
+    if (typeof options !== 'object' || !options) options = {};
+    this.defaultOptions.kroki = Object.assign(this.defaultOptions.kroki || {}, options);
+    if (this.converter) {
+      this.addAsyncExtension('showdown-kroki', showdownKroki(this.defaultOptions.kroki));
+    }
+    return this.defaultOptions.kroki;
   },
   setVegaOptions: function (options) {
     this.initDefaultOptions();

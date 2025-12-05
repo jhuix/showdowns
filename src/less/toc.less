@@ -30,7 +30,7 @@
 }
 
 .toc-switch {
-  position: absolute;
+  position: fixed;
   z-index: 110;
   top: 0;
   right: 2rem;
@@ -48,9 +48,12 @@
 
 .total-toc {
   box-sizing: border-box;
-  overflow: hidden;
   display: flex;
   flex-direction: column;
+  flex-shrink: 0;
+  width: 100%;
+  order: -1;
+  page-break-after: always;
 
   .toc-view ul li div i:not(.toc-chapter) {
     cursor: pointer;
@@ -110,6 +113,7 @@
       position: relative;
       margin-left: 2rem;
       padding-left: 0;
+
       li {
         width: 100%;
         list-style: none;
@@ -137,7 +141,9 @@
             cursor: pointer;
           }
         }
+
         div:hover {
+
           i,
           a {
             color: #f59102;
@@ -147,7 +153,9 @@
             border-radius: 0.5rem;
           }
         }
+
         div:focus {
+
           i,
           a {
             color: rgb(0, 137, 255);
@@ -176,23 +184,72 @@
 }
 
 .main-toc-row {
-  .showdowns {
-    height: 100%;
+  display: flex;
+  flex-direction: column;
+  border-bottom: 1px solid #dfdfdf;
+  flex-grow: 1;
+
+  .toc-view {
+    flex-grow: 1;
+  }
+}
+
+.toc-view::-webkit-scrollbar-thumb {
+  background-color: #f59102;
+}
+
+@media not print {
+  .main-toc-row {
+    flex-direction: row;
   }
 
-  .divider {
-    display: flex;
-  }
-
-  .total-toc {
-    width: 30em;
-    height: 100%;
-    min-width: 8em;
+  .main-toc-row .total-toc {
+    z-index: 11;
+    white-space: nowrap;
+    box-sizing: border-box;
+    background: #ffffffd2;
+    border-radius: 10px;
+    width: 25%;
+    max-height: 100vh;
     max-width: 50%;
-    flex-shrink: 0;
-
-    .toc-view {
-      flex-grow: 1;
-    }
+    min-width: 256px;
+    min-height: 300px;
+    margin-right: 8px;
+    transition: all .3s;
+    position: fixed;
+    top: 0;
+    right: 0;
+    overflow: hidden;
+    box-shadow: 0 5px 11px #3333;
   }
+
+  .main-toc-row .toc-view {
+    overflow: auto;
+  }
+}
+
+@media print {
+  .main-toc-row .total-toc {
+    max-width: unset !important;
+    width: 100% !important;
+    overflow: unset !important;
+    order: -1 !important;
+  }
+}
+
+.showdown-toc .toc-view {
+  width: 100%;
+  display: flex;
+
+  .toc-main {
+    margin-left: 1rem;
+    flex-grow: 1;
+  }
+}
+
+.main-toc-column {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  flex-grow: 1;
 }

@@ -8,6 +8,9 @@
 import format from './log';
 import utils from './utils';
 
+const heading = ['h1','h2','h3','h4','h5','h6'];
+const test = new RegExp('^([\\[【]Table[ -]Of[ -]Contents[\\]】]|[\\[【]目录[\\]】]|[\\[【]TOC[\\]】]|\\{\\{TOC\\}\\})$', 'i')
+
 function createHeadingElement(wrapper, element, toc, headingLevel, nexthead) {
   try {
     if (nexthead) {
@@ -113,12 +116,9 @@ function renderTocElements(wrapper, config) {
   const elements = wrapper.querySelectorAll('p,h1,h2,h3,h4,h5,h6');
   for (let i = 0; i < elements.length; i++) {
     element = elements[i];
-    if (!firstHeadOne && element.tagName.toLowerCase() == 'h1') {
-      firstHeadOne = true;
-    }
     // Match the element text is [toc].
     // And replace this element with out list that classname is 'showdown-toc'.
-    if (element.textContent.trim().toLowerCase() == '[toc]') {
+    if (test.test(element.textContent.trim())) {
       // New table of contents container.
       let showdownToc = null;
       if (!firstHeadOne) {
@@ -131,7 +131,7 @@ function renderTocElements(wrapper, config) {
         showdownToc = wrapper.ownerDocument.createElement('div');
         showdownToc.classList.add('showdown-toc');
         totalToc = showdownToc;
-        config.extraDocs.push('<div id="divider" class="divider"></div>');
+        // config.extraDocs.push('<div id="divider" class="divider"></div>');
         const swtichToc = wrapper.ownerDocument.createElement('div');
         swtichToc.id = 'toc-switch-button';
         swtichToc.classList.add('toc-switch', 'hidden');
@@ -202,6 +202,10 @@ function renderTocElements(wrapper, config) {
       continue;
     }
 
+    if (!firstHeadOne && heading.includes(element.tagName.toLowerCase())) {
+      firstHeadOne = true;
+    }
+
     // That's going to be what we use as contents entries
     // for this table of contents.
     if (element['tagName']) {
@@ -245,54 +249,6 @@ function renderTocElements(wrapper, config) {
 function loadTocEvent() {
   const totalToc = document.querySelector('#total-showdown-toc');
   if (!totalToc) return;
-
-  // 分隔条事件
-  const divider = document.getElementById('divider');
-  if (divider) {
-    // 初始宽度
-    let startX = 0;
-    let startWidth = 0;
-    function onDrag(e) {
-      if (startX > 0) {
-        // 计算移动的距离
-        const moveX = e.clientX - startX;
-        if (moveX != 0) {
-          // 计算新的宽度
-          const newWidth = startWidth - moveX;
-          // 确保分割条宽度在合理范围内
-          if (newWidth >= 5 && newWidth <= document.documentElement.clientWidth - 5) {
-            // 调整右侧分割栏的flex值以保持比例
-            totalToc.style.width = `${newWidth}px`;
-          }
-        }
-      }
-    }
-
-    function stopDragging() {
-      // 移除鼠标移动事件监听器
-      document.removeEventListener('mousemove', onDrag);
-      // 移除鼠标释放事件监听器
-      document.removeEventListener('mouseup', stopDragging);
-      // 恢复文本选中
-      document.body.style.userSelect = '';
-      startX = 0;
-    }
-
-    function startDragging(e) {
-      // 鼠标按下时的位置
-      startX = e.clientX;
-      // 分割条的初始宽度
-      startWidth = totalToc.clientWidth;
-      // 防止文本选中
-      document.body.style.userSelect = 'none';
-      // 添加鼠标移动事件监听器
-      document.addEventListener('mousemove', onDrag);
-      // 添加鼠标释放事件监听器
-      document.addEventListener('mouseup', stopDragging);
-    }
-
-    divider.addEventListener('mousedown', startDragging);
-  }
 
   // if (totalShowdownToc.parentNode)
   //   totalShowdownToc.parentNode.classList.add('main-toc-row');
