@@ -63,6 +63,10 @@ function renderPlantumlElement(element, config) {
         window
           .fetch(src)
           .then(response => {
+            if (typeof response === 'string') {
+              return response;
+            }
+
             if (response.ok) {
               return response.text();
             }

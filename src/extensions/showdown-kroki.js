@@ -8,27 +8,27 @@
 import format from './log';
 import utils from './utils';
 
-const krokiWeb = 'kroki.io'
-const graphsCache = {}
+const krokiWeb = 'kroki.io';
+const graphsCache = {};
 
 function clearCache() {
-  Object.keys(graphsCache).forEach((key) => {
+  Object.keys(graphsCache).forEach(key => {
     if (!document.querySelector(`[id*="-${key}-"]`)) {
       delete graphsCache[key];
     }
-  })
+  });
 }
 
 function renderKrokiElement(element, config) {
   return new Promise(resolve => {
     const langattr = element.dataset.lang;
     const code = element.textContent.trim();
-    const checksum = utils.hashString(langattr + code)
-    const diagramInCache = graphsCache[checksum]
+    const checksum = utils.hashString(langattr + code);
+    const diagramInCache = graphsCache[checksum];
     if (diagramInCache) {
-      element.parentNode.outerHTML = diagramInCache
+      element.parentNode.outerHTML = diagramInCache;
       resolve(true);
-      return
+      return;
     }
 
     let langobj = null;
@@ -62,12 +62,13 @@ function renderKrokiElement(element, config) {
     if (element.classList.length > 0) {
       const classname = element.classList[0];
       const names = classname.split('-');
-      diagramType = names[names.length - 1]
+      diagramType = names[names.length - 1];
     }
 
     const classnames =
       (element.classList.length > 0 ? element.classList[0] : '') +
-      (!element.className || !diagramClass ? '' : ' ') + diagramClass;
+      (!element.className || !diagramClass ? '' : ' ') +
+      diagramClass;
     if (diagramType.length > 0 && typeof window !== 'undefined' && window.fetch) {
       const id = `${diagramType}-${checksum}-` + Date.now() + '-' + Math.floor(Math.random() * 10000);
       const imageFormat = config.imageFormat;
@@ -80,14 +81,18 @@ function renderKrokiElement(element, config) {
           headers: { Accept: `*/*`, 'Content-Type': 'text/plain; charset=utf-8' }
         })
         .then(response => {
+          if (typeof response === 'string') {
+            return response;
+          }
+
           if (response.ok) {
             return response.text();
           }
         })
         .then(svgData => {
-          const outerHTML = `<div id="${id}" class="${classnames}">${svgData}</div>`
+          const outerHTML = `<div id="${id}" class="${classnames}">${svgData}</div>`;
           element.parentNode.outerHTML = outerHTML;
-          graphsCache[checksum] = outerHTML
+          graphsCache[checksum] = outerHTML;
           resolve(true);
         });
     }
@@ -119,7 +124,7 @@ function showdownKroki(userConfig) {
     {
       type: 'output',
       config: config,
-      filter: function (obj) {
+      filter: function(obj) {
         const wrapper = obj.wrapper;
         if (!wrapper) {
           return false;
@@ -130,10 +135,10 @@ function showdownKroki(userConfig) {
           return false;
         }
 
-        obj.scripts.push( {
+        obj.scripts.push({
           id: 'kroki-cache',
           code: clearCache
-        })
+        });
         console.log(format(`Begin render kroki elements.`));
         return renderKrokiElements(elements, this.config).then(() => {
           console.log(format(`End render kroki elements.`));
