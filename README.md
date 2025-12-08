@@ -256,6 +256,8 @@ Table header can be eliminated.
 
 [ABCJS](https://github.com/jhuix/showdowns/blob/master/docs/showdowns-features.md#abc)
 
+[Kroki](https://github.com/jhuix/showdowns/blob/master/docs/showdowns-features.md#kroki)
+
 See more information, refer to the following document:
 
 [Extensions Examples](https://github.com/jhuix/showdowns/blob/master/docs/showdowns-features.md)
@@ -377,7 +379,7 @@ Put the following line into your HTML page \<header> or \<body>:
 
 #### defaultOptions
 
-Type: {showdown: object, plantuml: object, mermaid: object, vega: object }
+Type: {showdown: object, plantuml: object, mermaid: object, katex: object, kroki: object, vega: object }
 
 Default options is described below:
 
@@ -399,6 +401,7 @@ Default options is described below:
         { left: '@@', right: '@@', display: true, asciimath: true },
         { left: "\\$", right: "\\$", display: false, asciimath: true }
       ]},
+      kroki: { serverUrl: 'kroki.io' },
       vega: { theme: 'vox' }
     };
 
@@ -450,6 +453,15 @@ Default options is described below:
         }
       }
 
+- kroki: kroki options object
+
+  For more kroki options:
+
+      {
+        serverUrl: "kroki.io",
+        imageFormat: "svg"
+      }
+
 - vega: vega-embed options object
 
   For more vega-embed options, refer to the following document:
@@ -481,9 +493,11 @@ Type: Array of showdown async extensions
 Default async extensions is described below:
 
     defaultAsyncExtensions = {
+      'showdown-toc': getExtension('showdown-toc', showdownToc),
       'showdown-plantuml': showdownPlantuml(plantumlOptions),
       'showdown-mermaid': showdownMermaid(mermaidOptions),
       'showdown-katex': showdownKatex(katexOptions),
+      'showdown-kroki': showdownKroki(krokiOptions),
       'showdown-flowchart': showdownFlowchart,
       'showdown-viz': showdownViz,
       'showdown-vega': showdownVega(vegaOptions),
@@ -491,6 +505,8 @@ Default async extensions is described below:
       'showdown-railroad': showdownRailroad,
       'showdown-abc': showdownAbc,
       'showdown-echarts': showdownEcharts,
+      'showdown-sequence': getExtension('showdown-sequence', showdownSequence),
+      'showdow-css': showdownCss,
     }
 
 ### Properties
@@ -604,6 +620,14 @@ Type: (options: object) => object
 A function to set default options of katex extension. When showdown.convertor instance be created, it can reset katex extension using the new default options.
 
 See [katex options of defaultOptions](#defaultoptions).
+
+#### setKrokiOptions
+
+Type: (options: object) => object
+
+A function to set default options of kroki extension. When showdown.convertor instance be created, it can reset kroki extension using the new default options.
+
+See [Kroki options of defaultOptions](#defaultoptions).
 
 #### setVegaOptions
 
