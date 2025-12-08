@@ -69,33 +69,48 @@ function renderKrokiElement(element, config) {
       (element.classList.length > 0 ? element.classList[0] : '') +
       (!element.className || !diagramClass ? '' : ' ') +
       diagramClass;
-    if (diagramType.length > 0 && typeof window !== 'undefined' && window.fetch) {
+    if (diagramType.length > 0 && !!window && window.fetch) {
       const id = `${diagramType}-${checksum}-` + Date.now() + '-' + Math.floor(Math.random() * 10000);
       const imageFormat = config.imageFormat;
       const website = 'https://' + config.serverUrl;
       const src = `${website}/${diagramType}/${imageFormat}`;
-      window
-        .fetch(src, {
+      try{
+        window.fetch(src, {
           method: 'POST',
           body: code,
           headers: { Accept: `*/*`, 'Content-Type': 'text/plain; charset=utf-8' }
-        })
-        .then(response => {
-          if (typeof response === 'string') {
-            return response;
+        }).then((res) => {
+          if (typeof res === 'string') {
+            return res;
           }
 
-          if (response.ok) {
-            return response.text();
+          if (res.ok) {
+            return res.text();
           }
-        })
-        .then(svgData => {
-          const outerHTML = `<div id="${id}" class="${classnames}">${svgData}</div>`;
+
+          return new Error(`RequestError: ${res.status}-${res.statusText}`);
+        }).then((svg) => {
+          if (typeof svg === 'Error') {
+            console.log(`kroki to ${imageFormat} of ${diagramType} failed:`, svg.toString());
+            resolve(false);
+            return;
+          }
+
+          const outerHTML = `<div id="${id}" class="${classnames}">${svg}</div>`;
           element.parentNode.outerHTML = outerHTML;
           graphsCache[checksum] = outerHTML;
           resolve(true);
+        }).catch((err) => {
+          console.log(`kroki to ${imageFormat} of ${diagramType} failed:`, err.toString());
+          resolve(false);
         });
+      } catch(err) {
+        console.log(`kroki to ${imageFormat} of ${diagramType} failed:`, err.toString());
+        resolve(false);
+      }
+      return;
     }
+    resolve(false);
   });
 }
 
@@ -124,7 +139,7 @@ function showdownKroki(userConfig) {
     {
       type: 'output',
       config: config,
-      filter: function(obj) {
+      filter: function (obj) {
         const wrapper = obj.wrapper;
         if (!wrapper) {
           return false;

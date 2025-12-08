@@ -54,37 +54,57 @@ function renderPlantumlElement(element, config) {
           element.parentNode.outerHTML = `<div id="${id}" class="${name}">${svgData}</div>`;
           resolve(true);
         });
-      } else if (typeof window !== 'undefined' && window.fetch && window.dispatchEvent) {
-        const protocol = window && window.location.protocol;
+        return;
+      }
+      if (!!window && window.fetch) {
+        const protocol = window.location && window.location.protocol;
         const website = (protocol === 'http:' || protocol === 'https:' ? '//' : 'https://') + config.umlWebSite;
         const imageExtension = imageFormat !== defaultImageFormat ? `.${imageFormat}` : '';
         const uml = plantumlcodec.encodeuml(code);
         const src = `${website}/${imageFormat}/${uml}${imageExtension}`;
-        window
-          .fetch(src)
-          .then(response => {
-            if (typeof response === 'string') {
-              return response;
-            }
+        try {
+          window
+            .fetch(src)
+            .then((res) => {
+              if (typeof res === 'string') {
+                return res;
+              }
 
-            if (response.ok) {
-              return response.text();
-            }
-          })
-          .then(svgData => {
-            element.parentNode.outerHTML = `<div id="${id}" class="${name}">${svgData}</div>`;
-            resolve(true);
-          });
+              if (res.ok) {
+                return res.text();
+              }
+
+              return new Error(`RequestError: ${res.status}-${res.statusText}`);
+            })
+            .then((svg) => {
+              if (typeof svg === 'Error') {
+                console.log('render remote plantuml failed: ', svg.toString());
+                resolve(false);
+                return;
+              }
+
+              element.parentNode.outerHTML = `<div id="${id}" class="${name}">${svg}</div>`;
+              resolve(true);
+            }).catch((err) => {
+              console.log('render remote plantuml failed: ', err.toString());
+              resolve(false);
+            });
+        } catch (err) {
+          console.log('render remote plantuml failed: ', err.toString());
+          resolve(false);
+        }
+        return;
       }
-    } else {
-      const protocol = window && window.location.protocol;
-      const website = (protocol === 'http:' || protocol === 'https:' ? '//' : 'https://') + config.umlWebSite;
-      const imageExtension = imageFormat !== defaultImageFormat ? `.${imageFormat}` : '';
-      const uml = plantumlcodec.encodeuml(code);
-      const src = `${website}/${imageFormat}/${uml}${imageExtension}`;
-      element.parentNode.outerHTML = `<div class="${name}"><img src='${src}' alt=''></img></div>`;
-      return resolve(true);
+      resolve(false);
+      return;
     }
+    const protocol = window && window.location.protocol;
+    const website = (protocol === 'http:' || protocol === 'https:' ? '//' : 'https://') + config.umlWebSite;
+    const imageExtension = imageFormat !== defaultImageFormat ? `.${imageFormat}` : '';
+    const uml = plantumlcodec.encodeuml(code);
+    const src = `${website}/${imageFormat}/${uml}${imageExtension}`;
+    element.parentNode.outerHTML = `<div class="${name}"><img src='${src}' alt=''></img></div>`;
+    return resolve(true);
   });
 }
 
@@ -117,7 +137,7 @@ function showdownPlantuml(userConfig) {
     {
       type: 'output',
       config: config,
-      filter: function(obj) {
+      filter: function (obj) {
         const wrapper = obj.wrapper;
         if (!wrapper) {
           return false;

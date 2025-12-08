@@ -5,7 +5,7 @@
 import path from 'path';
 
 // 帮助寻找node_modules里的包
-import resolve from '@rollup/plugin-node-resolve';
+import nodeResolve from '@rollup/plugin-node-resolve';
 // rollup 的 babel 插件，ES6转ES5
 import babel from '@rollup/plugin-babel';
 // 将非ES6语法的包转为ES6可用
@@ -81,18 +81,22 @@ const config = {
   },
   // 作用：指出应将哪些模块视为外部模块，否则会被打包进最终的代码里
   external: [
-    'abcjs',
-    'mermaid',
-    'katex',
-    'raphael',
-    'flowchart.js',
-    '@viz-js/viz',
-    'wavedrom',
-    'vega',
-    'vega-lite',
-    'vega-embed',
     '@rokt33r/js-sequence-diagrams',
-    'katex/dist/contrib/auto-render'
+    '@viz-js/viz',
+    'abcjs',
+    'echarts',
+    'flowchart.js',
+    'katex',
+    'katex/dist/contrib/auto-render',
+    'mermaid',
+    'railroad-diagrams',
+    'raphael',
+    'snapsvg',
+    'underscore',
+    'vega',
+    'vega-embed',
+    'vega-lite',
+    'wavedrom'
   ],
   plugins: [
     json(),
@@ -134,7 +138,7 @@ if (isFormatCJS) {
       exclude: '**/node_modules/**',
       babelHelpers: 'bundled'
     }),
-    resolve({
+    nodeResolve({
       browser: true,
       preferBuiltins: true,
       // 选择module目录传递给解析插件
@@ -156,7 +160,7 @@ if (isMinBuild) {
         pure_getters: true,
         unsafe: true,
         unsafe_comps: true,
-        drop_console: !isDemoBuild
+        drop_console: false
       }
     })
   );
