@@ -150,12 +150,9 @@ function showdownKroki(userConfig) {
           return false;
         }
 
-        obj.scripts.push({
-          id: 'kroki-cache',
-          code: clearCache
-        });
         console.log(format(`Begin render kroki elements.`));
         return renderKrokiElements(elements, this.config).then(() => {
+          clearCache();
           console.log(format(`End render kroki elements.`));
           return obj;
         });
