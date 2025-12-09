@@ -39,7 +39,7 @@ let currFlavor = 'vanilla',
  * @param {object|function=} ext
  * @returns {*}
  */
-showdown.asyncExtension = function(name, ext) {
+showdown.asyncExtension = function (name, ext) {
   'use strict';
 
   if (!showdown.helper.isString(name)) {
@@ -54,22 +54,21 @@ showdown.asyncExtension = function(name, ext) {
       throw Error('Async Extension named ' + name + ' is not registered!');
     }
     return _asyncExtensions[name];
+  }
 
-    // Setter
-  } else {
-    // Expand extension if it's wrapped in a function
-    if (typeof ext === 'function') {
-      ext = ext();
-    }
+  // Setter
+  // Expand extension if it's wrapped in a function
+  if (typeof ext === 'function') {
+    ext = ext();
+  }
 
-    // Ensure extension is an array
-    if (!showdown.helper.isArray(ext)) {
-      ext = [ext];
-    }
+  // Ensure extension is an array
+  if (!showdown.helper.isArray(ext)) {
+    ext = [ext];
+  }
 
-    if (showdown.validateExtension(ext)) {
-      _asyncExtensions[name] = ext;
-    }
+  if (showdown.validateExtension(ext)) {
+    _asyncExtensions[name] = ext;
   }
 };
 
@@ -77,7 +76,7 @@ showdown.asyncExtension = function(name, ext) {
  * Remove an async extension
  * @param {string} name
  */
-showdown.removeAsyncExtension = function(name) {
+showdown.removeAsyncExtension = function (name) {
   'use strict';
   name = showdown.helper.stdExtName(name);
   delete _asyncExtensions[name];
@@ -86,7 +85,7 @@ showdown.removeAsyncExtension = function(name) {
 /**
  * Removes all async extensions
  */
-showdown.resetAsyncExtensions = function() {
+showdown.resetAsyncExtensions = function () {
   'use strict';
   _asyncExtensions = {};
 };
@@ -95,7 +94,7 @@ showdown.resetAsyncExtensions = function() {
  * Remove an extension
  * @param {string} name
  */
-showdown.removeExtension = function(name) {
+showdown.removeExtension = function (name) {
   'use strict';
   name = showdown.helper.stdExtName(name);
   delete showdown.getAllExtensions[name];
@@ -108,7 +107,7 @@ const orgGetFlavorOptions = showdown.getFlavorOptions;
  * Set the flavor showdown should use as default
  * @param {string} name
  */
-showdown.setFlavor = function(name) {
+showdown.setFlavor = function (name) {
   'use strict';
 
   try {
@@ -132,12 +131,13 @@ showdown.setFlavor = function(name) {
  * Get the currently set flavor
  * @returns {string}
  */
-showdown.getFlavor = function() {
+showdown.getFlavor = function () {
   'use strict';
   return currFlavor;
 };
 
-showdown.setFlavorOptions = function(name, options) {
+showdown.setFlavorOptions = function (name, options) {
+  'use strict';
   if (options) {
     flavors[name] = Object.assign(flavors[name] || {}, options);
   }
@@ -148,7 +148,7 @@ showdown.setFlavorOptions = function(name, options) {
  * @param {string} name Name of the flavor
  * @returns {{}|undefined}
  */
-showdown.getFlavorOptions = function(name) {
+showdown.getFlavorOptions = function (name) {
   'use strict';
   const flavor = orgGetFlavorOptions(name);
   if (!showdown.helper.isUndefined(flavor)) {

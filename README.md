@@ -387,6 +387,7 @@ Default options is described below:
       showdown: {
         flavor: 'github',
       },
+      toc: { chapterNumber: true, title: '', toc: '[\\[【]Table[ -]Of[ -]Contents[\\]】]|[\\[【]目录[\\]】]|[\\[【]TOC[\\]】]|\\{\\{TOC\\}\\}' },
       plantuml: { imageFormat: 'svg' },
       mermaid: { theme: 'default' },
       katex: { mathDelimiters: [
@@ -411,6 +412,21 @@ Default options is described below:
 
   [Showdown Options](https://github.com/showdownjs/showdown/blob/master/README.md#options)
 
+- toc: table of content options object
+
+  For more toc options:
+
+      {
+        chapterNumber: true,
+        title: '',
+        toc: '[\\[【]Table[ -]Of[ -]Contents[\\]】]|[\\[【]目录[\\]】]|[\\[【]TOC[\\]】]|\\{\\{TOC\\}\\}'
+      }
+
+  `chapterNumber` - Whether show chapter number such as '1.1.', default is true.
+  `title` - Custom defined text content of title, default is empty string indicates auto recognition based on the language(such as '目录' on chinese, 'Table Of Contents' on other language).
+  `toc` - Custom defined regex string of test for table of contents.
+
+
 - plantuml: plantuml options object
 
   For more plantuml options:
@@ -433,7 +449,7 @@ Default options is described below:
   [Katex AutoRender Options](https://katex.org/docs/autorender.html#api)
   [Katex Render Options](https://katex.org/docs/options.html)
 
-  In addition, mathDelimiters is another format::
+  In addition, mathDelimiters is another format:
 
       {
         mathDelimiters: {
@@ -475,11 +491,11 @@ Type: Array of showdown extensions
 Default extensions is described below:
 
     defaultExtensions = {
-      'showdown-toc': showdownToc,
-      'showdown-align': showdownAlign,
-      'showdown-footnotes': showdownFootnotes,
-      'showdown-container': showdownContainer,
-      'showdown-sequence': showdownSequence
+      'showdown-toc': showdownToc(),
+      'showdown-align': showdownAlign(),
+      'showdown-footnotes': showdownFootnotes(),
+      'showdown-container': showdownContainer(),
+      'showdown-sequence': showdownSequence()
     }
 
 For more showdown extensions, refer to the following document:
@@ -494,19 +510,19 @@ Default async extensions is described below:
 
     defaultAsyncExtensions = {
       'showdown-toc': getExtension('showdown-toc', showdownToc),
-      'showdown-plantuml': showdownPlantuml(plantumlOptions),
-      'showdown-mermaid': showdownMermaid(mermaidOptions),
-      'showdown-katex': showdownKatex(katexOptions),
-      'showdown-kroki': showdownKroki(krokiOptions),
-      'showdown-flowchart': showdownFlowchart,
-      'showdown-viz': showdownViz,
+      'showdown-plantuml': showdownPlantuml(plantumlOptions()),
+      'showdown-mermaid': showdownMermaid(mermaidOptions()),
+      'showdown-katex': showdownKatex(katexOptions()),
+      'showdown-kroki': showdownKroki(krokiOptions()),
+      'showdown-flowchart': showdownFlowchart(),
+      'showdown-viz': showdownViz(),
       'showdown-vega': showdownVega(vegaOptions),
-      'showdown-wavedrom': showdownWavedrom,
-      'showdown-railroad': showdownRailroad,
-      'showdown-abc': showdownAbc,
-      'showdown-echarts': showdownEcharts,
+      'showdown-wavedrom': showdownWavedrom(),
+      'showdown-railroad': showdownRailroad(),
+      'showdown-abc': showdownAbc(),
+      'showdown-echarts': showdownEcharts(),
       'showdown-sequence': getExtension('showdown-sequence', showdownSequence),
-      'showdow-css': showdownCss,
+      'showdow-css': showdownCss(),
     }
 
 ### Properties
@@ -592,6 +608,16 @@ Type: (options: object) => object
 A function to set default options of showdown. When showdown.convertor instance be created, it can update options of the showdown and convertor.convertor.
 
 See [showdown options of defaultOptions](#defaultoptions).
+
+#### setExtensionlOptions
+
+Type: (name: string, options: object) => boolean
+
+A function to set default options of extension. It can reset new options of extension.
+
+- Parameter `name` is suffix name of extension name, such as `showdown-[name]`.
+
+See [options of extension](#defaultoptions).
 
 #### setPlantumlOptions
 

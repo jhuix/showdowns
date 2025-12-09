@@ -11,9 +11,9 @@ import utils from './utils';
 const krokiWeb = 'kroki.io';
 const graphsCache = {};
 
-function clearCache() {
+function clearCache(doc) {
   Object.keys(graphsCache).forEach(key => {
-    if (!document.querySelector(`[id*="-${key}-"]`)) {
+    if (!doc.querySelector(`[id*="-${key}-"]`)) {
       delete graphsCache[key];
     }
   });
@@ -26,7 +26,7 @@ function renderKrokiElement(element, config) {
     const checksum = utils.hashString(langattr + code);
     const diagramInCache = graphsCache[checksum];
     if (diagramInCache) {
-      element.parentNode.outerHTML = diagramInCache;
+      element.parentNode.replaceWith(diagramInCache);
       resolve(true);
       return;
     }
@@ -73,7 +73,7 @@ function renderKrokiElement(element, config) {
       const id = `${diagramType}-${checksum}-` + Date.now() + '-' + Math.floor(Math.random() * 10000);
       const imageFormat = config.imageFormat;
       const website = 'https://' + config.serverUrl;
-      const src = `${website}/${diagramType}/${imageFormat}`;
+      const src = `${website}/${diagramType}/${imageFormat}/png`;
       try{
         window.fetch(src, {
           method: 'POST',
@@ -88,18 +88,19 @@ function renderKrokiElement(element, config) {
             return res.text();
           }
 
-          return new Error(`RequestError: ${res.status}-${res.statusText}`);
+          throw new Error(`RequestError: ${res.status}`);
         }).then((svg) => {
-          if (typeof svg === 'Error') {
-            console.log(`kroki to ${imageFormat} of ${diagramType} failed:`, svg.toString());
+          if (!svg) {
             resolve(false);
-            return;
+          } else {
+            const krokiElement = element.ownerDocument.createElement('div');
+            krokiElement.id = id;
+            krokiElement.className = classnames;
+            krokiElement.innerHTML = svg;
+            element.parentNode.replaceWith(krokiElement);
+            graphsCache[checksum] = krokiElement;
+            resolve(true);
           }
-
-          const outerHTML = `<div id="${id}" class="${classnames}">${svg}</div>`;
-          element.parentNode.outerHTML = outerHTML;
-          graphsCache[checksum] = outerHTML;
-          resolve(true);
         }).catch((err) => {
           console.log(`kroki to ${imageFormat} of ${diagramType} failed:`, err.toString());
           resolve(false);
@@ -152,7 +153,7 @@ function showdownKroki(userConfig) {
 
         console.log(format(`Begin render kroki elements.`));
         return renderKrokiElements(elements, this.config).then(() => {
-          clearCache();
+          clearCache(wrapper);
           console.log(format(`End render kroki elements.`));
           return obj;
         });

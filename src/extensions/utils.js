@@ -219,6 +219,43 @@ function hashString(str) {
   return hash >>> 0; // 确保无符号整数
 }
 
+/**
+ * Check is object
+ *
+ * @param {object} item
+ *     A object
+ * @returns {boolean}
+ *     Object is true, otherwise is false
+ */
+function isObject(item) {
+  return item && typeof item === 'object' && !Array.isArray(item)
+}
+
+/**
+ * Merge object with deepth
+ *
+ * @param {object} target
+ *     Target object
+ * @param {object[]} sources
+ *     Source object or objects
+ * @returns {object}
+ *     Meraged Object
+ */
+export function deepMerge(target, ...sources) {
+  for (const source of sources) {
+    for (const [key, val] of Object.entries(source)) {
+      // @ts-ignore
+      if (isObject(val) && isObject(target[key])) {
+        // @ts-ignore
+        deepMerge(target[key], val)
+      } else {
+        Object.assign(target, { [key]: val })
+      }
+    }
+  }
+  return target
+}
+
 const utils = {
   interopDefault,
   loadStyle,
@@ -232,6 +269,7 @@ const utils = {
   addScript,
   addExtra,
   hashString,
+  deepMerge
 };
 
 export default utils;

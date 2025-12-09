@@ -160,7 +160,7 @@ if (isMinBuild) {
         pure_getters: true,
         unsafe: true,
         unsafe_comps: true,
-        drop_console: false
+        drop_console: !isDemoBuild
       }
     })
   );

@@ -74,15 +74,9 @@ function renderPlantumlElement(element, config) {
                 return res.text();
               }
 
-              return new Error(`RequestError: ${res.status}-${res.statusText}`);
+              throw new Error(`RequestError: ${res.status}`);
             })
             .then((svg) => {
-              if (typeof svg === 'Error') {
-                console.log('render remote plantuml failed: ', svg.toString());
-                resolve(false);
-                return;
-              }
-
               element.parentNode.outerHTML = `<div id="${id}" class="${name}">${svg}</div>`;
               resolve(true);
             }).catch((err) => {

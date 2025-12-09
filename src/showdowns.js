@@ -30,6 +30,7 @@ import showdownFlowchart from './extensions/showdown-flowchart.js';
 import * as zlibcodec from './utils/zlib-codec.js';
 import cdnjs from './extensions/cdn';
 import format from './extensions/log';
+import { deepMerge } from './extensions/utils.js';
 
 //////////////////////////////////////////////////////////////////////
 const getOptions = (options = {}) => {
@@ -39,6 +40,26 @@ const getOptions = (options = {}) => {
   };
 };
 
+const getExtension = (name, def) => {
+  let obj = null;
+  try {
+    obj = showdown.extension(name);
+  } catch {
+    console.log(`Warning: not found ${name} extension.`);
+  }
+  return obj ? obj : def;
+};
+
+const getAsyncExtension = (name, def) => {
+  let obj = null;
+  try {
+    obj = showdown.asyncExtension(name);
+  } catch {
+    console.log(`Warning: not found ${name} async extension.`);
+  }
+  return obj ? obj : def;
+};
+
 const getAsyncExtensions = (options, extensions = {}) => {
   const mermaidOptions = options ? options.mermaid || {} : {};
   const plantumlOptions = options ? options.plantuml || {} : {};
@@ -46,32 +67,22 @@ const getAsyncExtensions = (options, extensions = {}) => {
   const krokiOptions = options ? options.kroki || {} : {};
   const vegaOptions = options ? options.vega || {} : {};
 
-  const getExtension = (name, def) => {
-    let obj = null;
-    try {
-      obj = showdown.extension(name);
-    } catch {
-      console.log(`Warning: not found ${name} extension.`);
-    }
-    return obj ? obj : def;
-  };
-
   const asyncExtensions = {
     'showdown-toc': getExtension('showdown-toc', showdownToc),
     'showdown-plantuml': showdownPlantuml(plantumlOptions),
     'showdown-mermaid': showdownMermaid(mermaidOptions),
     'showdown-katex': showdownKatex(katexOptions),
     'showdown-kroki': showdownKroki(krokiOptions),
-    'showdown-flowchart': showdownFlowchart,
-    'showdown-viz': showdownViz,
+    'showdown-flowchart': showdownFlowchart(),
+    'showdown-viz': showdownViz(),
     'showdown-vega': showdownVega(vegaOptions),
-    'showdown-wavedrom': showdownWavedrom,
-    'showdown-railroad': showdownRailroad,
-    'showdown-abc': showdownAbc,
-    'showdown-echarts': showdownEcharts,
+    'showdown-wavedrom': showdownWavedrom(),
+    'showdown-railroad': showdownRailroad(),
+    'showdown-abc': showdownAbc(),
+    'showdown-echarts': showdownEcharts(),
     'showdown-sequence': getExtension('showdown-sequence', showdownSequence),
     ...extensions,
-    'showdow-css': showdownCss,
+    'showdow-css': showdownCss(),
   };
 
   let extnames = [];
@@ -86,11 +97,11 @@ const getAsyncExtensions = (options, extensions = {}) => {
 
 const getExtensions = (options, extensions = {}) => {
   const nativeExtensions = {
-    'showdown-toc': showdownToc,
-    'showdown-align': showdownAlign,
-    'showdown-footnotes': showdownFootnotes,
-    'showdown-container': showdownContainer,
-    'showdown-sequence': showdownSequence,
+    'showdown-toc': showdownToc(options.toc),
+    'showdown-align': showdownAlign(),
+    'showdown-footnotes': showdownFootnotes(),
+    'showdown-container': showdownContainer(),
+    'showdown-sequence': showdownSequence(),
     ...extensions,
   };
 
@@ -307,9 +318,11 @@ const showdowns = {
   converter: null,
   defaultOptions: {
     showdown: getOptions(),
+    toc: {},
     plantuml: { imageFormat: 'svg' },
     mermaid: { theme: 'default' },
     katex: {},
+    kroki: {},
     vega: { theme: 'vox' },
   },
   defaultExtensions: {},
@@ -321,6 +334,7 @@ const showdowns = {
     if (!this.defaultOptions) {
       this.defaultOptions = {
         showdown: {},
+        toc: {},
         plantuml: {},
         mermaid: {},
         katex: {},
@@ -422,66 +436,99 @@ const showdowns = {
     this.addOptions(this.defaultOptions.showdown);
     return this.defaultOptions.showdown;
   },
+  setExtensionOptions: function (name, options) {
+    if (!options || typeof options !== 'object') {
+      return false;
+    }
+
+    name = `showdown-${name}`;
+    let extensions = getExtension(name);
+    if (!extensions) {
+      extensions = getAsyncExtension(name)
+      if (!extensions) {
+        return false;
+      }
+    }
+
+    if (!extensions.length) {
+      return false;
+    }
+
+    for(let i=0; i < extensions.length; i++) {
+      const extension = extensions[i];
+      if (extension && extension.type === 'output' && extension.config) {
+        deepMerge(extension.config, options);
+        return true;
+      }
+    }
+
+    return false;
+  },
   setPlantumlOptions: function (options) {
-    this.initDefaultOptions();
-    if (typeof options !== 'object' || !options) options = {};
-    this.defaultOptions.plantuml = Object.assign(this.defaultOptions.plantuml || {}, options);
-    const imageFormat = this.defaultOptions.plantuml.imageFormat;
-    if (imageFormat && plantumlImgFmts.indexOf(imageFormat) === -1) {
-      this.defaultOptions.plantuml.imageFormat = 'png';
-    }
-    if (this.converter) {
-      this.addAsyncExtension('showdown-plantuml', showdownPlantuml(this.defaultOptions.plantuml));
-    }
-    return this.defaultOptions.plantuml;
+    return this.setExtensionOptions('plantuml', options);
+    // this.initDefaultOptions();
+    // if (typeof options !== 'object' || !options) options = {};
+    // this.defaultOptions.plantuml = Object.assign(this.defaultOptions.plantuml || {}, options);
+    // const imageFormat = this.defaultOptions.plantuml.imageFormat;
+    // if (imageFormat && plantumlImgFmts.indexOf(imageFormat) === -1) {
+    //   this.defaultOptions.plantuml.imageFormat = 'png';
+    // }
+    // if (this.converter) {
+    //   this.addAsyncExtension('showdown-plantuml', showdownPlantuml(this.defaultOptions.plantuml));
+    // }
+    // return this.defaultOptions.plantuml;
   },
   setMermaidOptions: function (options) {
-    this.initDefaultOptions();
-    if (typeof options !== 'object' || !options) options = {};
-    this.defaultOptions.mermaid = Object.assign(this.defaultOptions.mermaid || {}, options);
-    const theme = this.defaultOptions.mermaid.theme;
-    if (theme && mermaidThemes.indexOf(theme) === -1) {
-      this.defaultOptions.mermaid.theme = 'default';
-    }
-    if (this.converter) {
-      this.addAsyncExtension('showdown-mermaid', showdownMermaid(this.defaultOptions.mermaid));
-    }
-    return this.defaultOptions.mermaid;
+    return this.setExtensionOptions('mermaid', options);
+    // this.initDefaultOptions();
+    // if (typeof options !== 'object' || !options) options = {};
+    // this.defaultOptions.mermaid = Object.assign(this.defaultOptions.mermaid || {}, options);
+    // const theme = this.defaultOptions.mermaid.theme;
+    // if (theme && mermaidThemes.indexOf(theme) === -1) {
+    //   this.defaultOptions.mermaid.theme = 'default';
+    // }
+    // if (this.converter) {
+    //   this.addAsyncExtension('showdown-mermaid', showdownMermaid(this.defaultOptions.mermaid));
+    // }
+    // return this.defaultOptions.mermaid;
   },
   setKatexOptions: function (options) {
-    this.initDefaultOptions();
-    if (typeof options !== 'object' || !options) options = {};
-    this.defaultOptions.katex = Object.assign(this.defaultOptions.katex || {}, options);
-    if (this.converter) {
-      this.addAsyncExtension('showdown-katex', showdownKatex(this.defaultOptions.katex));
-    }
-    return this.defaultOptions.katex;
+    return this.setExtensionOptions('katex', options);
+    // this.initDefaultOptions();
+    // if (typeof options !== 'object' || !options) options = {};
+    // this.defaultOptions.katex = Object.assign(this.defaultOptions.katex || {}, options);
+    // if (this.converter) {
+    //   this.addAsyncExtension('showdown-katex', showdownKatex(this.defaultOptions.katex));
+    // }
+    // return this.defaultOptions.katex;
   },
   setKrokiOptions: function (options) {
-    this.initDefaultOptions();
-    if (typeof options !== 'object' || !options) options = {};
-    this.defaultOptions.kroki = Object.assign(this.defaultOptions.kroki || {}, options);
-    if (this.converter) {
-      this.addAsyncExtension('showdown-kroki', showdownKroki(this.defaultOptions.kroki));
-    }
-    return this.defaultOptions.kroki;
+    return this.setExtensionOptions('kroki', options);
+    // this.initDefaultOptions();
+    // if (typeof options !== 'object' || !options) options = {};
+    // this.defaultOptions.kroki = Object.assign(this.defaultOptions.kroki || {}, options);
+    // if (this.converter) {
+    //   this.addAsyncExtension('showdown-kroki', showdownKroki(this.defaultOptions.kroki));
+    // }
+    // return this.defaultOptions.kroki;
   },
   setVegaOptions: function (options) {
-    this.initDefaultOptions();
-    if (typeof options !== 'object' || !options) options = {};
-    this.defaultOptions.vega = Object.assign(this.defaultOptions.vega || {}, options);
-    const theme = this.defaultOptions.vega.theme;
-    if (theme && vegaThemes.indexOf(theme) === -1) {
-      this.defaultOptions.vega.theme = 'vox';
-    }
-    const renderer = this.defaultOptions.vega.renderer;
-    if (renderer && vegaRenderers.indexOf(renderer) === -1) {
-      this.defaultOptions.vega.renderer = 'canvas';
-    }
-    if (this.converter) {
-      this.addAsyncExtension('showdown-vega', showdownVega(this.defaultOptions.vega));
-    }
-    return this.defaultOptions.vega;
+    return this.setExtensionOptions('vega', options);
+    // this.initDefaultOptions();
+    // if (typeof options !== 'object' || !options) options = {};
+    // this.defaultOptions.vega = Object.assign(this.defaultOptions.vega || {}, options);
+    // const theme = this.defaultOptions.vega.theme;
+    // if (theme && vegaThemes.indexOf(theme) === -1) {
+    //   this.defaultOptions.vega.theme = 'vox';
+    // }
+    // const renderer = this.defaultOptions.vega.renderer;
+    // if (renderer && vegaRenderers.indexOf(renderer) === -1) {
+    //   this.defaultOptions.vega.renderer = 'canvas';
+    // }
+    // if (this.converter) {
+    //   this.addAsyncExtension('showdown-vega', showdownVega(this.defaultOptions.vega));
+    // }
+    // return this.defaultOptions.vega;
   },
   init: function (reset) {
     if (!this.converter) {
