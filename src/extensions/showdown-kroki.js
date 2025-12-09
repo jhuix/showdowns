@@ -73,7 +73,7 @@ function renderKrokiElement(element, config) {
       const id = `${diagramType}-${checksum}-` + Date.now() + '-' + Math.floor(Math.random() * 10000);
       const imageFormat = config.imageFormat;
       const website = 'https://' + config.serverUrl;
-      const src = `${website}/${diagramType}/${imageFormat}/png`;
+      const src = `${website}/${diagramType}/${imageFormat}`;
       try{
         window.fetch(src, {
           method: 'POST',
