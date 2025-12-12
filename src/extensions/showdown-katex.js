@@ -37,7 +37,7 @@ function dyncLoadScript(callback) {
       return sync;
     }
 
-    if (!sync) {    
+    if (!sync) {
       dync = true;
       cdnjs.loadStyleSheet(cssCdnName);
       cdnjs
@@ -73,8 +73,8 @@ function unloadScript() {
   katex = null;
   window.katex = null;
   RenderMathInElement = null;
-  window.renderMathInElement = null;  
-  dync = false;  
+  window.renderMathInElement = null;
+  dync = false;
 }
 
 function onRenderKatex(resolve, res) {
@@ -110,11 +110,12 @@ function onRenderKatex(resolve, res) {
       RenderMathInElement(doc.body, config);
     }
     resolve(true);
-  } else {
-    setTimeout(() => {
-      onRenderKatex(resolve, res);
-    }, 10);
+    return;
   }
+
+  setTimeout(() => {
+    onRenderKatex(resolve, res);
+  }, 10);
 }
 
 function renderKatex(element, config, isAsciimath) {
@@ -178,6 +179,7 @@ function escapeRegExp(str) {
 // katex config
 const getConfig = (userConfig = {}) => {
   let config = {
+    engine: 'katex',
     displayMode: true,
     throwOnError: false, // fail silently
     errorColor: '#ff0000',
@@ -224,7 +226,7 @@ const getConfig = (userConfig = {}) => {
           { left: "\\begin{align}", right: "\\end{align}", display: true },
           { left: "\\begin{alignat}", right: "\\end{alignat}", display: true },
           { left: "\\begin{gather}", right: "\\end{gather}", display: true },
-          { left: "\\begin{CD}", right: "\\end{CD}", display: true }          
+          { left: "\\begin{CD}", right: "\\end{CD}", display: true }
         ]
       )
       .concat(
@@ -250,7 +252,7 @@ const getConfig = (userConfig = {}) => {
       { left: "\\begin{align}", right: "\\end{align}", display: true },
       { left: "\\begin{alignat}", right: "\\end{alignat}", display: true },
       { left: "\\begin{gather}", right: "\\end{gather}", display: true },
-      { left: "\\begin{CD}", right: "\\end{CD}", display: true },      
+      { left: "\\begin{CD}", right: "\\end{CD}", display: true },
       { left: '\\(', right: '\\)', display: false },
       { left: '@@', right: '@@', display: true, asciimath: true },
       { left: "\\$", right: "\\$", display: false, asciimath: true }
@@ -263,7 +265,7 @@ function showdownKatex(userConfig) {
   let inlineMathCount = 0;
   const config = getConfig(userConfig);
   const mathDelimiters = config.delimiters.map(({ left, right, display, asciimath }) => {
-    const test = new RegExp(`${escapeRegExp(left)}(.+?)${escapeRegExp(right)}`, 'g');
+    const test = new RegExp(`${escapeRegExp(left)}([\\s\\S]+?)${escapeRegExp(right)}`, 'g');
     const replacer = (match, math) => {
       ++inlineMathCount;
       if (asciimath) {
@@ -281,35 +283,43 @@ function showdownKatex(userConfig) {
     {
       type: 'output',
       config: config,
-      filter: function(obj) {
+      filter: function (obj) {
         inlineMathCount = 0;
         const wrapper = obj.wrapper;
         if (!wrapper) {
           return false;
         }
 
-        if (mathDelimiters.length) {
+        if (this.config.engine === 'katex' && mathDelimiters.length) {
           // convert inline math to inline latex
           // ignore anything in code and pre elements
           wrapper.querySelectorAll(':not(code):not(pre)').forEach(el => {
-            /** @type Text[] */
-            const textNodes = [...el.childNodes].filter(
-              // skip "empty" text nodes
-              node => node.nodeName === '#text' && node.nodeValue.trim()
-            );
+            // /** @type Text[] */
+            // const textNodes = [...el.childNodes].filter(
+            //   // skip "empty" text nodes
+            //   node => node.nodeName === '#text' && node.nodeValue.trim()
+            // );
 
-            textNodes.forEach(node => {
+            // textNodes.forEach(node => {
+            //   const newText = mathDelimiters.reduce(
+            //     (acc, { test, replacer }) => acc.replace(test, replacer),
+            //     node.nodeValue
+            //   );
+            //   node.nodeValue = newText;
+            // });
+            const content = el.textContent
+            if (content.length > 0) {
               const newText = mathDelimiters.reduce(
                 (acc, { test, replacer }) => acc.replace(test, replacer),
-                node.nodeValue
+                content
               );
-              node.nodeValue = newText;
-            });
+              el.textContent = newText;
+            }
           });
         }
 
         // find the math in code blocks
-        const latex = wrapper.querySelectorAll('code.latex.language-latex');
+        let latex = wrapper.querySelectorAll('code.latex.language-latex');
         const asciimath = wrapper.querySelectorAll('code.asciimath.language-asciimath');
 
         if (!latex.length && !asciimath.length) {

@@ -23,6 +23,7 @@ const cdnSrc = {
     katex: '../node_modules/katex/dist/katex.min.js',
     katexCSS: '../node_modules/katex/dist/katex.min.css',
     renderMathInElement: '../node_modules/katex/dist/contrib/auto-render.js',
+    MathJax: '../node_modules/mathjax/tex-mml-svg.js',
     railroad: '../node_modules/railroad-diagrams/railroad-diagrams.js',
     railroadCSS: '../node_modules/railroad-diagrams/railroad-diagrams.css',
     Snap: '../node_modules/snapsvg/dist/snap.svg-min.js',
@@ -51,6 +52,7 @@ const cdnSrc = {
     katex: scheme + 'cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.22/katex.min.js',
     katexCSS: scheme + 'cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.22/katex.min.css',
     renderMathInElement: scheme + 'cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.22/contrib/auto-render.js',
+    MathJax: scheme + 'cdnjs.cloudflare.com/ajax/libs/mathjax/4.0.0/tex-mml-svg.js',
     railroad: scheme + 'cdnjs.cloudflare.com/ajax/libs/railroad-diagrams/1.0.0/railroad-diagrams.js',
     railroadCSS: scheme + 'cdnjs.cloudflare.com/ajax/libs/railroad-diagrams/1.0.0/railroad-diagrams.css',
     Snap: scheme + 'cdnjs.cloudflare.com/ajax/libs/snap.svg/0.5.1/snap.svg-min.js',
@@ -79,6 +81,7 @@ const cdnSrc = {
     katex: scheme + 'cdn.jsdelivr.net/npm/katex@0/dist/katex.min.js',
     katexCSS: scheme + 'cdn.jsdelivr.net/npm/katex@0/dist/katex.min.css',
     renderMathInElement: scheme + 'cdn.jsdelivr.net/npm/katex@0/dist/contrib/auto-render.js',
+    MathJax: scheme + 'cdn.jsdelivr.net/npm/mathjax@4/tex-mml-svg.js',
     railroad: scheme + 'cdn.jsdelivr.net/npm/railroad-diagrams@1/railroad-diagrams.js',
     railroadCSS: scheme + 'cdn.jsdelivr.net/npm/railroad-diagrams@1/railroad-diagrams.css',
     Snap: scheme + 'cdn.jsdelivr.net/npm/snapsvg@0/dist/snap.svg-min.js',
@@ -197,13 +200,16 @@ function getSrc(native, name, src, def) {
   return def;
 }
 
-function loadScript(name, src) {
+function loadScript(name, src, defer) {
   return new Promise((resovle, reject) => {
     if (!name || typeof document === 'undefined') {
       reject('Args is invaild!');
     }
 
     if (typeof src === 'undefined') {
+      src = '';
+    } else if (typeof src === 'boolean') {
+      defer = src;
       src = '';
     }
 
@@ -222,6 +228,9 @@ function loadScript(name, src) {
     script = document.createElement('script');
     script.src = src;
     script.id = id;
+    if (defer) {
+      script.defer = true;
+    }
     script.onload = () => {
       resovle(name);
     };

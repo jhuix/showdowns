@@ -97,6 +97,8 @@
         showdowns.setCDN("local");
         showdowns.init();
         showdowns.setMermaidOptions({theme:"forest"});
+        // showdowns.setMathEngine('katex');
+        // showdowns.setExtensionOptions('toc', {chapterNumber: false, title: 'Markdown特性'})
         // showdowns.setKatexOptions({delimiters:{
         //    // texmath: {
         //    //  inline: [{ left: "\\@", right: "\\@"},{ left: "$@", right: "@$"}]
@@ -130,15 +132,17 @@
             // md = md + `\n\n# Showdown's Markdown syntax\n\n` + text;
             md = text;
             showdowns
-              .makeHtml(md, csstypes => {
+              .makeHtml({content: md, output: 'dom'}, csstypes => {
                 cssTypes = csstypes;
               })
               .then(res => {
-                if (typeof res === 'object') {
-                  element.innerHTML = res.html;
-                  showdowns.completedHtml(res.scripts, '.showdowns');
-                } else {
+                if (typeof res === 'string') {
                   element.innerHTML = res;
+                }else if (Array.isArray(res.html)) {
+                  res.html.forEach((e)=>{
+                    element.appendChild(e);
+                  })
+                  showdowns.completedHtml(res.scripts, '.showdowns');
                 }
               })
               .catch(err => {
@@ -149,15 +153,17 @@
             console.log(error);
             if (md) {
               showdowns
-                .makeHtml(md, csstypes => {
+                .makeHtml({content: md, output: 'dom'}, csstypes => {
                   cssTypes = csstypes;
                 })
                 .then(res => {
-                  if (typeof res === 'object') {
-                    element.innerHTML = res.html;
-                    showdowns.completedHtml(res.scripts, '.showdowns');
-                  } else {
+                  if (typeof res === 'string') {
                     element.innerHTML = res;
+                  }else if (Array.isArray(res.html)) {
+                    res.html.forEach((e)=>{
+                      element.appendChild(e);
+                    })
+                    showdowns.completedHtml(res.scripts, '.showdowns');
                   }
                 })
                 .catch(err => {

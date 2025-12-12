@@ -17,6 +17,7 @@ import showdownVega from './extensions/showdown-vega.js';
 import showdownAlign from './extensions/showdown-align.js';
 import showdownKatex from './extensions/showdown-katex.js';
 import showdownKroki from './extensions/showdown-kroki.js';
+import showdownMathJax from './extensions/showdown-mathjax.js';
 import showdownEcharts from './extensions/showdown-echarts.js';
 import showdownMermaid from './extensions/showdown-mermaid.js';
 import showdownPlantuml from './extensions/showdown-plantuml.js';
@@ -36,6 +37,7 @@ import { deepMerge } from './extensions/utils.js';
 const getOptions = (options = {}) => {
   return {
     flavor: 'github',
+    mathEngine: 'mathjax',
     ...options,
   };
 };
@@ -63,6 +65,7 @@ const getAsyncExtension = (name, def) => {
 const getAsyncExtensions = (options, extensions = {}) => {
   const mermaidOptions = options ? options.mermaid || {} : {};
   const plantumlOptions = options ? options.plantuml || {} : {};
+  const mathjaxOptions = options ? options.mathjax || {} : {};
   const katexOptions = options ? options.katex || {} : {};
   const krokiOptions = options ? options.kroki || {} : {};
   const vegaOptions = options ? options.vega || {} : {};
@@ -71,6 +74,7 @@ const getAsyncExtensions = (options, extensions = {}) => {
     'showdown-toc': getExtension('showdown-toc', showdownToc),
     'showdown-plantuml': showdownPlantuml(plantumlOptions),
     'showdown-mermaid': showdownMermaid(mermaidOptions),
+    'showdown-mathjax': showdownMathJax(mathjaxOptions),
     'showdown-katex': showdownKatex(katexOptions),
     'showdown-kroki': showdownKroki(krokiOptions),
     'showdown-flowchart': showdownFlowchart(),
@@ -306,6 +310,7 @@ const mermaidThemes = ['default', 'forest', 'dark', 'neutral'];
 const vegaThemes = ['excel', 'ggplot2', 'quartz', 'vox', 'dark'];
 const vegaRenderers = ['canvas', 'svg'];
 const plantumlImgFmts = ['svg', 'png', 'jpg'];
+const mathEngines = ['mathjax', 'katex'];
 
 // defaultOptions.vega is embedOptions of vega-embed;
 // defaultOptions.katex is config of katex,
@@ -321,6 +326,7 @@ const showdowns = {
     toc: {},
     plantuml: { imageFormat: 'svg' },
     mermaid: { theme: 'default' },
+    mathjax: {},
     katex: {},
     kroki: {},
     vega: { theme: 'vox' },
@@ -337,6 +343,7 @@ const showdowns = {
         toc: {},
         plantuml: {},
         mermaid: {},
+        mathjax: {},
         katex: {},
         kroki: {},
         vega: {},
@@ -351,7 +358,7 @@ const showdowns = {
   },
   addOptions: function (options) {
     for (const key in options) {
-      if (key !== 'flavor') {
+      if (key !== 'flavor' && key !== 'mathEngine') {
         this.showdown.setOption(key, options[key]);
         if (this.converter) {
           this.converter.setOption(key, options[key]);
@@ -428,11 +435,23 @@ const showdowns = {
       this.setFlavor(name);
     }
   },
+  setMathEngine: function (engineName) {
+    this.initDefaultOptions();
+    if (engineName) {
+      if (mathEngines.indexOf(engineName) === -1) {
+        engineName = 'mathjax';
+      }
+      this.defaultOptions.showdown.mathEngine = engineName;
+      this.setExtensionOptions('katex', { engine: engineName });
+      this.setExtensionOptions('mathjax', { engine: engineName });
+    }
+  },
   setShowdownOptions: function (options) {
     this.initDefaultOptions();
     if (typeof options !== 'object' || !options) options = {};
     this.defaultOptions.showdown = Object.assign(this.defaultOptions.showdown || {}, options);
     this.setShowdownFlavor(this.defaultOptions.showdown.flavor);
+    this.setMathEngine(this.defaultOptions.showdown.mathEngine);
     this.addOptions(this.defaultOptions.showdown);
     return this.defaultOptions.showdown;
   },
@@ -454,7 +473,7 @@ const showdowns = {
       return false;
     }
 
-    for(let i=0; i < extensions.length; i++) {
+    for (let i = 0; i < extensions.length; i++) {
       const extension = extensions[i];
       if (extension && extension.type === 'output' && extension.config) {
         deepMerge(extension.config, options);
@@ -537,6 +556,7 @@ const showdowns = {
       const extensions = getExtensions(this.defaultOptions, this.defaultExtensions);
       const asyncExtensions = getAsyncExtensions(this.defaultOptions, this.defaultAsyncExtensions);
       this.setFlavor(options.flavor);
+      this.setMathEngine(options.mathEngine);
       // converter instance of showdown
       this.converter = new showdown.Converter({
         extensions: extensions,
@@ -553,12 +573,16 @@ const showdowns = {
         if (resetOptions.hasOwnProperty('option') && resetOptions.option) {
           const showdownOptions = this.defaultOptions ? this.defaultOptions.showdown || {} : {};
           const options = getOptions(showdownOptions);
+          this.setFlavor(options.flavor);
+          this.setMathEngine(options.mathEngine);
           this.addOptions(options);
         }
         if (resetOptions.hasOwnProperty('extension') && resetOptions.extension) {
-          this.addAsyncExtension('showdown-plantuml', showdownPlantuml(this.defaultOptions.plantuml));
-          this.addAsyncExtension('showdown-mermaid', showdownMermaid(this.defaultOptions.mermaid));
-          this.addAsyncExtension('showdown-vega', showdownVega(this.defaultOptions.vega));
+          for (let [key, val] in this.defaultOptions) {
+            if (key !== 'showdown') {
+              this.setExtensionOptions(key, val);
+            }
+          }
         }
       }
     }
@@ -566,6 +590,7 @@ const showdowns = {
   },
   makeHtml: function (doc, callback) {
     let content = '';
+    let output = 'html';
     if (typeof doc === 'object') {
       if (typeof doc.content === 'string') {
         if (typeof doc.type === 'string') {
@@ -580,6 +605,9 @@ const showdowns = {
         } else {
           content = doc.content;
         }
+      }
+      if (doc.output === 'dom') {
+        output = 'dom';
       }
     } else {
       content = doc;
@@ -624,7 +652,33 @@ const showdowns = {
       }
 
       return this.converter.asyncMakeHtml(content, _checkCssTypes).then((obj) => {
-        content = `<div class='showdowns'>${obj.html}</div>`;
+        if (typeof obj.html !== 'string') {
+          if (typeof document !== 'undefined' && output === 'dom') {
+            let doms = [obj.html];
+            if (obj.extras) {
+              let extraContent = '';
+              let extras = obj.extras;
+              if (!showdown.helper.isArray(extras)) {
+                extras = [extras];
+              }
+              for (let i = 0; i < extras.length; ++i) {
+                if (typeof extras[i] !== 'string') continue;
+                extraContent += extras[i];
+              }
+              if (extraContent.length > 0) {
+                const div = document.createElement('div');
+                div.innerHTML = extraContent;
+                doms.push(...div.childNodes);
+                div.replaceChildren();
+              }
+            }
+            return { html: doms, scripts: obj.scripts, cssLinks: obj.cssLinks };
+          }
+
+          content = obj.html.outerHTML;
+        } else {
+          content = obj.html;
+        }
         if (obj.extras) {
           let extras = obj.extras;
           if (!showdown.helper.isArray(extras)) {

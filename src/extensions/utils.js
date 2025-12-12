@@ -228,7 +228,7 @@ function hashString(str) {
  *     Object is true, otherwise is false
  */
 function isObject(item) {
-  return item && typeof item === 'object' && !Array.isArray(item)
+  return item && typeof item !== 'function' && typeof item === 'object' && !Array.isArray(item)
 }
 
 /**

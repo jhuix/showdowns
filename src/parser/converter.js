@@ -196,7 +196,7 @@ showdown.Converter.prototype.initConvertExtObj = function(flavor, asyncExtension
    * @returns {*}
    */
   this.asyncMakeHtml = function(text, callback) {
-    const content = this.makeHtml(text);
+    const content = `<div class='showdowns'>${this.makeHtml(text)}</div>`;
     const outputs = this.extObj.getAsyncExtensions();
     if (!outputs.length) {
       return Promise.resolve({html: content});
@@ -208,7 +208,8 @@ showdown.Converter.prototype.initConvertExtObj = function(flavor, asyncExtension
     };
     const parser = new DOMParser();
     const doc = parser.parseFromString(content, 'text/html');
-    const wrapper = typeof doc.body !== 'undefined' ? doc.body : doc;
+    const body = typeof doc.body !== 'undefined' ? doc.body : doc;
+    const wrapper = body.firstChild;
     const options = this.getOptions();
     let scripts = [];
     let cssLinks = [];
@@ -225,11 +226,13 @@ showdown.Converter.prototype.initConvertExtObj = function(flavor, asyncExtension
         const promise = callback(obj);
         if (promise instanceof Promise) {
           return promise.then(obj => {
-            return { html: obj.wrapper.innerHTML, extras: obj.extras, scripts: obj.scripts, cssLinks: obj.cssLinks };
+            body.replaceChildren();
+            return { html: obj.wrapper, extras: obj.extras, scripts: obj.scripts, cssLinks: obj.cssLinks };
           });
         }
       }
-      return { html: obj.wrapper.innerHTML, extras: obj.extras, scripts: obj.scripts, cssLinks: obj.cssLinks };
+      body.replaceChildren();
+      return { html: obj.wrapper, extras: obj.extras, scripts: obj.scripts, cssLinks: obj.cssLinks };
     });
   };
 

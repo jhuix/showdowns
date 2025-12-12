@@ -89,6 +89,7 @@ const config = {
     'katex',
     'katex/dist/contrib/auto-render',
     'mermaid',
+    'mathjax',
     'railroad-diagrams',
     'raphael',
     'snapsvg',

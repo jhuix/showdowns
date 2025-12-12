@@ -19,112 +19,117 @@ function clearCache(doc) {
   });
 }
 
-function renderKrokiElement(element, config) {
-  return new Promise(resolve => {
-    const langattr = element.dataset.lang;
-    const code = element.textContent.trim();
-    const checksum = utils.hashString(langattr + code);
-    const diagramInCache = graphsCache[checksum];
-    if (diagramInCache) {
-      element.parentNode.replaceWith(diagramInCache);
-      resolve(true);
+function markKrokiElement(element, kroki) {
+  const langattr = element.dataset.lang;
+  const code = element.textContent.trim();
+  const checksum = utils.hashString(langattr + code);
+  const diagramInCache = graphsCache[checksum];
+  if (diagramInCache) {
+    element.parentNode.replaceWith(diagramInCache);
+    return;
+  }
+
+  let langobj = null;
+  if (langattr) {
+    try {
+      langobj = JSON.parse(langattr);
+    } catch {
+      console.log(`Error: parse kroki data-lang ${langattr} failed.`);
+    }
+  }
+  let diagramClass = '';
+  if (langobj) {
+    if (
+      (typeof langobj.codeblock === 'boolean' && langobj.codeblock) ||
+      (typeof langobj.codeblock === 'string' && langobj.codeblock.toLowerCase() === 'true')
+    ) {
       return;
     }
 
-    let langobj = null;
-    if (langattr) {
-      try {
-        langobj = JSON.parse(langattr);
-      } catch {
-        console.log(`Error: parse kroki data-lang ${langattr} failed.`);
+    if (langobj.align) {
+      //default left
+      if (langobj.align === 'center') {
+        diagramClass = 'diagram-center';
+      } else if (langobj.align === 'right') {
+        diagramClass = 'diagram-right';
       }
     }
-    let diagramClass = '';
-    if (langobj) {
-      if (
-        (typeof langobj.codeblock === 'boolean' && langobj.codeblock) ||
-        (typeof langobj.codeblock === 'string' && langobj.codeblock.toLowerCase() === 'true')
-      ) {
-        return resolve(false);
-      }
+  }
 
-      if (langobj.align) {
-        //default left
-        if (langobj.align === 'center') {
-          diagramClass = 'diagram-center';
-        } else if (langobj.align === 'right') {
-          diagramClass = 'diagram-right';
-        }
-      }
+  let diagramType = '';
+  if (element.classList.length > 0) {
+    const classname = element.classList[0];
+    const names = classname.split('-');
+    diagramType = names[names.length - 1];
+  }
+  const classnames =
+    (element.classList.length > 0 ? element.classList[0] : '') +
+    (!element.className || !diagramClass ? '' : ' ') +
+    diagramClass;
+  if (diagramType.length > 0 && !!window && window.fetch) {
+    const id = `${diagramType}-${checksum}-` + Date.now() + '-' + Math.floor(Math.random() * 10000);
+    element.id = id;
+    element.className = classnames;
+    if (kroki) {
+      kroki.elements = kroki.elements ?? []
+      kroki.elements.push({ type: diagramType, id: id });
     }
+  }
+}
 
-    let diagramType = '';
-    if (element.classList.length > 0) {
-      const classname = element.classList[0];
-      const names = classname.split('-');
-      diagramType = names[names.length - 1];
-    }
-
-    const classnames =
-      (element.classList.length > 0 ? element.classList[0] : '') +
-      (!element.className || !diagramClass ? '' : ' ') +
-      diagramClass;
-    if (diagramType.length > 0 && !!window && window.fetch) {
-      const id = `${diagramType}-${checksum}-` + Date.now() + '-' + Math.floor(Math.random() * 10000);
-      const imageFormat = config.imageFormat;
-      const website = 'https://' + config.serverUrl;
-      const src = `${website}/${diagramType}/${imageFormat}`;
-      try{
-        window.fetch(src, {
-          method: 'POST',
-          body: code,
-          headers: { Accept: `*/*`, 'Content-Type': 'text/plain; charset=utf-8' }
-        }).then((res) => {
-          if (typeof res === 'string') {
-            return res;
-          }
-
-          if (res.ok) {
-            return res.text();
-          }
-
-          throw new Error(`RequestError: ${res.status}`);
-        }).then((svg) => {
-          if (!svg) {
-            resolve(false);
-          } else {
-            const krokiElement = element.ownerDocument.createElement('div');
-            krokiElement.id = id;
-            krokiElement.className = classnames;
-            krokiElement.innerHTML = svg;
-            element.parentNode.replaceWith(krokiElement);
-            graphsCache[checksum] = krokiElement;
-            resolve(true);
-          }
-        }).catch((err) => {
-          console.log(`kroki to ${imageFormat} of ${diagramType} failed:`, err.toString());
-          resolve(false);
-        });
-      } catch(err) {
-        console.log(`kroki to ${imageFormat} of ${diagramType} failed:`, err.toString());
-        resolve(false);
-      }
-      return;
-    }
-    resolve(false);
+function markKrokiElements(elements, kroki) {
+  elements.forEach(element => {
+    markKrokiElement(element, kroki);
   });
 }
 
-function renderKrokiElements(elements, config) {
-  return new Promise(resolve => {
-    const promiseArray = [];
-    elements.forEach(element => {
-      promiseArray.push(renderKrokiElement(element, config));
-    });
-    Promise.all(promiseArray).then(() => {
-      resolve(true);
-    });
-  });
+function renderKrokiElements() {
+  const kroki = window.Kroki ?? {};
+  if (!kroki.elements || !Array.isArray(kroki.elements) || kroki.elements.length === 0) {
+    return;
+  }
+
+  const imageFormat = kroki.imageFormat ?? 'svg';
+  const website = 'https://' + (kroki.serverUrl ?? 'kroki.io');
+  kroki.elements.forEach(({ type, id }) => {
+    const element = document.querySelector(`#${id}`);
+    if (!element) return;
+
+    const langattr = element.dataset.lang;
+    const code = element.textContent.trim();
+    const checksum = utils.hashString(langattr + code);
+    const src = `${website}/${type}/${imageFormat}`;
+    try {
+      window.fetch(src, {
+        method: 'POST',
+        body: code,
+        headers: { Accept: `*/*`, 'Content-Type': 'text/plain; charset=utf-8' }
+      }).then((res) => {
+        if (typeof res === 'string') {
+          return res;
+        }
+
+        if (res.ok) {
+          return res.text();
+        }
+
+        throw new Error(`RequestError: ${res.status}`);
+      }).then((svg) => {
+        if (svg) {
+          const krokiElement = document.createElement('div');
+          krokiElement.id = element.id;
+          krokiElement.className = element.className;
+          krokiElement.innerHTML = svg;
+          element.parentNode.replaceWith(krokiElement);
+          graphsCache[checksum] = krokiElement;
+        }
+      }).catch((err) => {
+        console.log(`kroki to ${imageFormat} of ${type} failed:`, err.toString());
+      });
+    } catch (err) {
+      console.log(`kroki to ${imageFormat} of ${type} failed:`, err.toString());
+    }
+  })
 }
 
 const getConfig = (config = {}) => ({
@@ -151,12 +156,19 @@ function showdownKroki(userConfig) {
           return false;
         }
 
+        window.Kroki = window.Kroki ?? {}
+        window.Kroki.serverUrl = this.config.serverUrl;
+        window.Kroki.imageFormat = this.config.imageFormat;
+        obj.scripts.push({
+          id: 'showdown-kroki',
+          code: renderKrokiElements,
+          once: true
+        })
         console.log(format(`Begin render kroki elements.`));
-        return renderKrokiElements(elements, this.config).then(() => {
-          clearCache(wrapper);
-          console.log(format(`End render kroki elements.`));
-          return obj;
-        });
+        markKrokiElements(elements, window.Kroki)
+        clearCache(wrapper);
+        console.log(format(`End render kroki elements.`));
+        return obj;
       }
     }
   ];
