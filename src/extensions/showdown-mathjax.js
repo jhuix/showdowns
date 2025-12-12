@@ -212,7 +212,6 @@ function loadMathJax(callback) {
       if (typeof callback === 'function' && callback) {
         callback(window.MathJax);
       }
-      unloadScript();
     }).catch((err) => {
       console.error('MathJax typeset failed:', err);
     });
