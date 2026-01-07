@@ -41,7 +41,12 @@ function renderPlantumlElement(element, config) {
         }
       }
     }
+
     const code = element.textContent.trim();
+    if (code.length === 0) {
+      return resolve(false);
+    }
+
     const name =
       (element.classList.length > 0 ? element.classList[0] : '') +
       (!element.className || !diagramClass ? '' : ' ') +

@@ -68,6 +68,7 @@ const config = {
       katex: 'katex',
       wavedrom: 'WaveDrom',
       vega: 'vega',
+      MathJax: 'MathJax',
       'vega-lite': 'vegaLite',
       'vega-embed': 'vegaEmbed',
       '@rokt33r/js-sequence-diagrams': 'Diagram',

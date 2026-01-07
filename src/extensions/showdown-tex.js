@@ -8,7 +8,7 @@
 import format from './log';
 import utils from './utils';
 
-const krokiWeb = 'kroki.io';
+const texWeb = 'tex.io';
 const graphsCache = {};
 
 function clearCache(doc) {
@@ -19,7 +19,7 @@ function clearCache(doc) {
   });
 }
 
-function markKrokiElement(element, kroki) {
+function markTexElement(element, tex) {
   const code = element.textContent.trim();
   if (code.length === 0) {
     return;
@@ -38,7 +38,7 @@ function markKrokiElement(element, kroki) {
     try {
       langobj = JSON.parse(langattr);
     } catch {
-      console.log(`Error: parse kroki data-lang ${langattr} failed.`);
+      console.log(`Error: parse tex data-lang ${langattr} failed.`);
     }
   }
   let diagramClass = '';
@@ -60,51 +60,50 @@ function markKrokiElement(element, kroki) {
     }
   }
 
-  let diagramType = '';
+  let buildType = tex.config.buildType ?? 'pdflatex';
   if (element.classList.length > 0) {
     const classname = element.classList[0];
     const names = classname.split('-');
     if (names.length > 1) {
-      diagramType = names[names.length - 1];
+      buildType = names[names.length - 1];
     }
   }
   const classnames =
     (element.classList.length > 0 ? element.classList[0] : '') +
     (!element.className || !diagramClass ? '' : ' ') +
     diagramClass;
-  if (diagramType.length > 0 && !!window && window.fetch) {
-    const id = `${diagramType}-${checksum}-` + Date.now() + '-' + Math.floor(Math.random() * 10000);
+  if (buildType.length > 0 && !!window && window.fetch) {
+    const id = `${buildType}-${checksum}-` + Date.now() + '-' + Math.floor(Math.random() * 10000);
     element.id = id;
     element.className = classnames;
-    if (kroki) {
-      kroki.elements = kroki.elements ?? []
-      kroki.elements.push({ type: diagramType, id: id });
+    if (tex) {
+      tex.elements = tex.elements ?? []
+      tex.elements.push({ type: buildType, id: id });
     }
   }
 }
 
-function markKrokiElements(elements, kroki) {
+function markTexElements(elements, tex) {
   elements.forEach(element => {
-    markKrokiElement(element, kroki);
+    markTexElement(element, tex);
   });
 }
 
-function renderKrokiElements() {
-  const kroki = window.Kroki ?? {};
-  if (!kroki.elements || !Array.isArray(kroki.elements) || kroki.elements.length === 0) {
+function renderTexElements() {
+  const tex = window.Tex ?? {};
+  if (!tex.elements || !Array.isArray(tex.elements) || tex.elements.length === 0) {
     return;
   }
 
-  const imageFormat = kroki.imageFormat ?? 'svg';
-  const website = 'https://' + (kroki.serverUrl ?? 'kroki.io');
-  kroki.elements.forEach(({ type, id }) => {
+  const website = 'https://' + (tex.serverUrl ?? 'tex.io');
+  tex.elements.forEach(({ type, id }) => {
     const element = document.querySelector(`#${id}`);
     if (!element) return;
 
     const langattr = element.dataset.lang;
     const code = element.textContent.trim();
     const checksum = utils.hashString(langattr + code);
-    const src = `${website}/${type}/${imageFormat}`;
+    const src = `${website}/${type}/svg`;
     try {
       window.fetch(src, {
         method: 'POST',
@@ -122,29 +121,29 @@ function renderKrokiElements() {
         throw new Error(`RequestError: ${res.status}`);
       }).then((svg) => {
         if (svg) {
-          const krokiElement = document.createElement('div');
-          krokiElement.id = element.id;
-          krokiElement.className = element.className;
-          krokiElement.innerHTML = svg;
-          element.parentNode.replaceWith(krokiElement);
-          graphsCache[checksum] = krokiElement;
+          const texElement = document.createElement('div');
+          texElement.id = element.id;
+          texElement.className = element.className;
+          texElement.innerHTML = svg;
+          element.parentNode.replaceWith(texElement);
+          graphsCache[checksum] = texElement;
         }
       }).catch((err) => {
-        console.log(`kroki to ${imageFormat} of ${type} failed:`, err.toString());
+        console.log(`tex to svg of ${type} failed:`, err.toString());
       });
     } catch (err) {
-      console.log(`kroki to ${imageFormat} of ${type} failed:`, err.toString());
+      console.log(`tex to svg of ${type} failed:`, err.toString());
     }
   })
 }
 
 const getConfig = (config = {}) => ({
-  serverUrl: krokiWeb,
-  imageFormat: 'svg',
+  serverUrl: texWeb,
+  buildType: 'pdflatex',
   ...config
 });
 
-function showdownKroki(userConfig) {
+function showdownTex(userConfig) {
   const config = getConfig(userConfig);
 
   return [
@@ -157,27 +156,26 @@ function showdownKroki(userConfig) {
           return false;
         }
         // find the plantuml in code blocks
-        const elements = wrapper.querySelectorAll('code[class*="language-kroki-"]');
+        const elements = wrapper.querySelectorAll('code.tex.language-tex');
         if (!elements.length) {
           return false;
         }
 
-        window.Kroki = window.Kroki ?? {}
-        window.Kroki.serverUrl = this.config.serverUrl;
-        window.Kroki.imageFormat = this.config.imageFormat;
+        window.Tex = window.Tex ?? {}
+        window.Tex.config = this.config;
         obj.scripts.push({
-          id: 'showdown-kroki',
-          code: renderKrokiElements,
+          id: 'showdown-tex',
+          code: renderTexElements,
           once: true
         })
-        console.log(format(`Begin render kroki elements.`));
-        markKrokiElements(elements, window.Kroki)
+        console.log(format(`Begin render tex elements.`));
+        markTexElements(elements, window.Tex)
         clearCache(wrapper);
-        console.log(format(`End render kroki elements.`));
+        console.log(format(`End render tex elements.`));
         return obj;
       }
     }
   ];
 }
 
-export default showdownKroki;
+export default showdownTex;

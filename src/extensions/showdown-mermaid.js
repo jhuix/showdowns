@@ -53,8 +53,8 @@ function unloadScript() {
   cdnjs.unloadScript(extName);
   katex = null;
   window.mermaid = null;
-  mermaid = null; 
-  dync = false;  
+  mermaid = null;
+  dync = false;
 }
 
 
@@ -82,7 +82,7 @@ function onRenderMermaid(resolve, res) {
 function renderMermaid(element) {
   return new Promise(resolve => {
     const meta = utils.createElementMeta(extName, element);
-    if (!meta) {
+    if (!meta || meta.data.length === 0) {
       return resolve(false);
     }
 

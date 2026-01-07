@@ -91,7 +91,7 @@ function onRenderEcharts(resolve, meta) {
  */
 function renderEcharts(element, scripts, config) {
   const meta = utils.createElementMeta(extName, element);
-  if (!meta) {
+  if (!meta || meta.data.length === 0) {
     return Promise.resolve(false);
   }
 
@@ -139,7 +139,7 @@ function renderEcharts(element, scripts, config) {
             }
             chart = echarts.init(el, null, config);
             ${meta.data}
-            chart.setOption(option);            
+            chart.setOption(option);
           }
         }`;
       }

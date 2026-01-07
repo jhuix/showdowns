@@ -264,7 +264,7 @@ function onRenderAbc(resolve, scripts, meta) {
 function renderAbc(element, scripts) {
   return new Promise((resolve) => {
     let meta = utils.createElementMeta(extName, element);
-    if (!meta) {
+    if (!meta || meta.data.length === 0) {
       return resolve(false);
     }
 

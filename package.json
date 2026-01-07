@@ -24,13 +24,14 @@
     "url": "git+https://github.com/jhuix/showdowns.git"
   },
   "keywords": [
-    "showdowns",
-    "showdown",
+    "kroki",
+    "mathjax",
     "markdown",
-    "html",
     "mermaid",
     "plantuml",
-    "katex",
+    "showdown",
+    "showdowns",
+    "tikz",
     "toc"
   ],
   "files": [
@@ -80,6 +81,7 @@
     "katex": "^0.16.22",
     "mathjax": "^4.0.0",
     "mermaid": "^11.6.0",
+    "node-tikzjax": "^1.0.3",
     "railroad-diagrams": "^1.0.0",
     "raphael": "^2.3.0",
     "showdown": "^2.1.0",

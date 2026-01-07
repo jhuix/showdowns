@@ -33,7 +33,7 @@ function dyncLoadScript() {
       return sync;
     }
 
-    if (!sync) {  
+    if (!sync) {
       dync = true;
       cdnjs.loadScript('Viz').then(name => {
         Viz = utils.interopDefault(window[name]);
@@ -48,7 +48,7 @@ function unloadScript() {
   cdnjs.unloadScript('Viz');
   Viz = null;
   window.Viz = null;
-  dync = false;  
+  dync = false;
 }
 
 function onRenderViz(resolve, res) {
@@ -56,6 +56,10 @@ function onRenderViz(resolve, res) {
     const id = res.id;
     const name = res.className;
     const data = res.data;
+    if (!data || data.length === 0) {
+      return resolve(false);
+    }
+
     const el = res.element;
     const langattr = res.element.dataset.lang;
     let engine = 'dot';
@@ -84,10 +88,10 @@ function onRenderViz(resolve, res) {
 function renderViz(element) {
   return new Promise(resolve => {
     const meta = utils.createElementMeta("viz", element);
-    if (!meta) {
+    if (!meta || meta.data.length === 0) {
       return resolve(false);
     }
- 
+
     onRenderViz(resolve, meta);
   });
 }

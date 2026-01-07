@@ -54,7 +54,7 @@ function dyncLoadScript(config) {
         utils.deepMerge(window.MathJax, window.MathJaxConfig);
       }
       cdnjs.loadScript('MathJax', true).then(name => {
-          MathJax = utils.interopDefault(window[name]);
+        MathJax = utils.interopDefault(window[name]);
       }).catch(e => {
         console.log('load script error: ' + e);
       });
@@ -114,7 +114,7 @@ function onRenderMathJax(resolve, res) {
 function renderMathJax(element, options) {
   return new Promise(resolve => {
     const meta = utils.createElementMeta('MathJax', element);
-    if (!meta) {
+    if (!meta || meta.data.length === 0) {
       return resolve(false);
     }
 
@@ -198,13 +198,18 @@ const getConfig = (userConfig = {}) => {
 };
 
 function loadMathJax(callback) {
-  if (!window.MathJax) {
+  if (!hasMathJax()) {
+    setTimeout(() => {
+      loadMathJax(callback);
+    }, 10);
     return;
   }
 
   const doc = document.querySelector('.showdowns');
   if (doc) {
-    window.MathJax.startup.document.clearMathItemsWithin([doc]);
+    if (window.MathJax.startup.document) {
+      window.MathJax.startup.document.clearMathItemsWithin([doc]);
+    }
     window.MathJax.texReset();
     window.MathJax.typesetPromise().then(() => {
       console.log('MathJax be reset rendered completed.')
@@ -246,7 +251,7 @@ function showdownMathJax(userConfig) {
             }
           });
           if (!options.tex) {
-            options.tex = {inlineMath:{}, displayMath: {}};
+            options.tex = { inlineMath: {}, displayMath: {} };
           }
           options.tex.inlineMath = options.tex.inlineMath ?? {}
           options.tex.displayMath = options.tex.displayMath ?? {}
@@ -260,15 +265,21 @@ function showdownMathJax(userConfig) {
 
         let bodyRender = false;
         if (this.config.engine === 'mathjax') {
-          const content = wrapper.textContent;
-          if (content.match(/(?:@@|\$\$|\\\$|\\\(|\\\[|\\begin\{.*?})/)) {
-            obj.scripts.push({
-              id: 'showdown-mathjax',
-              code: loadMathJax,
-              once: true
-            })
-            dyncLoadScript(this.config.mathJax)
-            bodyRender = true;
+          const qes = wrapper.querySelectorAll(':not(code):not(pre)');
+          if (qes.length > 0) {
+            for(let i = 0; i < qes.length; i++) {
+              const content = qes[i].textContent
+              if (content.match(/(?:@@|\$\$|\\\$|\\\(|\\\[|\\begin\{.*?})/)) {
+                obj.scripts.push({
+                  id: 'showdown-mathjax',
+                  code: loadMathJax,
+                  once: true
+                })
+                dyncLoadScript(this.config.mathJax)
+                bodyRender = true;
+                break;
+              }
+            }
           }
         }
 

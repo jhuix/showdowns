@@ -30,7 +30,7 @@ function dyncLoadScript(skin) {
     return sync;
   }
 
-  if (!sync) { 
+  if (!sync) {
     dync = true;
     if (typeof window !== 'undefined') {
       cdnjs
@@ -52,7 +52,7 @@ function unloadScript(skin) {
   cdnjs.unloadScript({ WaveDromSkin: skin });
   WaveDrom = null;
   window.WaveDrom = null;
-  dync = false;  
+  dync = false;
 }
 
 function onRenderWavedrom(resolve, res) {
@@ -61,6 +61,10 @@ function onRenderWavedrom(resolve, res) {
     const id = res.id;
     const name = res.className;
     const data = res.data;
+    if (!data || data.length === 0) {
+      return resolve(false);
+    }
+
     let element = res.element;
     const doc = element.ownerDocument;
     element.parentNode.outerHTML = utils.renderCacheElement(doc, id + index, name, el => {
@@ -76,7 +80,7 @@ function onRenderWavedrom(resolve, res) {
     });
     return resolve(true);
   }
-  
+
   setTimeout(() => {
     onRenderWavedrom(resolve, res);
   }, 10);
@@ -94,7 +98,7 @@ function renderWavedrom(element) {
         (typeof langobj.codeblock === 'boolean' && langobj.codeblock) ||
         (typeof langobj.codeblock === 'string' && langobj.codeblock.toLowerCase() === 'true')
       ) {
-        return;
+        return resolve(false);
       }
 
       if (langobj.align) {
@@ -107,6 +111,10 @@ function renderWavedrom(element) {
       }
     }
     const code = element.textContent.trim();
+    if (code.length === 0) {
+      return resolve(false);
+    }
+
     const name =
       (element.classList.length > 0 ? element.classList[0] : '') +
       (!element.className || !diagramClass ? '' : ' ') +

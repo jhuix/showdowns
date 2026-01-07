@@ -29,7 +29,7 @@ function dyncLoadScript() {
       return sync;
     }
 
-    if (!sync) {    
+    if (!sync) {
       dync = true;
       cdnjs.loadStyleSheet(cssCdnName);
       cdnjs.loadScript(extName).then(() => {
@@ -45,7 +45,7 @@ function unloadScript() {
   cdnjs.unloadScript(extName);
   cdnjs.unloadStyleSheet(cssCdnName);
   railroad = false;
-  dync = false; 
+  dync = false;
 }
 
 function onRenderRailroad(resolve, res) {
@@ -62,7 +62,7 @@ function onRenderRailroad(resolve, res) {
     railroadElement.addTo(doc.getElementById(id));
     return resolve(true);
   }
-  
+
   setTimeout(() => {
     onRenderRailroad(resolve, res);
   }, 10);
@@ -74,7 +74,7 @@ function onRenderRailroad(resolve, res) {
 function renderRailroad(element) {
   return new Promise(resolve => {
     const meta = utils.createElementMeta(extName, element);
-    if (!meta) {
+    if (!meta || meta.data.length === 0) {
       return resolve(false);
     }
 

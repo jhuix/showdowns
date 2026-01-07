@@ -69,7 +69,7 @@ function unloadScript() {
  */
 function renderVega(element, options, scripts, isVegaLite) {
   const meta = utils.createElementMeta(extName, element);
-  if (!meta) {
+  if (!meta || meta.data.length === 0) {
     return Promise.resolve(false);
   }
 

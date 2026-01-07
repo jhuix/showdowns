@@ -200,7 +200,7 @@ function getSrc(native, name, src, def) {
   return def;
 }
 
-function loadScript(name, src, defer) {
+function loadScript(name, src, defer, module) {
   return new Promise((resovle, reject) => {
     if (!name || typeof document === 'undefined') {
       reject('Args is invaild!');
@@ -209,6 +209,7 @@ function loadScript(name, src, defer) {
     if (typeof src === 'undefined') {
       src = '';
     } else if (typeof src === 'boolean') {
+      module = defer
       defer = src;
       src = '';
     }
@@ -230,6 +231,9 @@ function loadScript(name, src, defer) {
     script.id = id;
     if (defer) {
       script.defer = true;
+    }
+    if (module) {
+      script.type = 'module';
     }
     script.onload = () => {
       resovle(name);

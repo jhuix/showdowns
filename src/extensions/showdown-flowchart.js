@@ -94,6 +94,10 @@ function onRenderFlowchart(resolve, res) {
     const id = res.id;
     const name = res.className;
     const data = res.data;
+    if (!data || data.length === 0) {
+      return resolve(false);
+    }
+
     const options = res.options;
     const doc = res.element.ownerDocument;
     res.element.parentNode.outerHTML = utils.renderCacheElement(doc, id, name, el => {
@@ -102,7 +106,7 @@ function onRenderFlowchart(resolve, res) {
     resolve(true);
     return;
   }
-  
+
   setTimeout(() => {
     onRenderFlowchart(resolve, res);
   }, 10);
@@ -114,7 +118,7 @@ function onRenderFlowchart(resolve, res) {
 function renderFlowchart(element, options) {
   return new Promise(resolve => {
     const meta = utils.createElementMeta('flowchart', element);
-    if (!meta) {
+    if (!meta || meta.data.length === 0) {
       return resolve(false);
     }
 

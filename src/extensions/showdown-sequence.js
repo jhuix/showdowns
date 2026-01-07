@@ -206,6 +206,10 @@ function onRenderSequence(element) {
     const id = element.id;
     const name = element.className;
     const data = element.data;
+    if (!data || data.length === 0) {
+      return;
+    }
+
     const cssLink = element.cssLink;
     let theme = 'hand';
     const langattr = element.langattr;

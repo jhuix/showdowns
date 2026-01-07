@@ -13,6 +13,7 @@ import showdownAbc from './extensions/showdown-abc.js';
 import showdownToc from './extensions/showdown-toc.js';
 import showdownCss from './extensions/showdown-css.js';
 import showdownViz from './extensions/showdown-viz.js';
+import showdownTex from './extensions/showdown-tex.js';
 import showdownVega from './extensions/showdown-vega.js';
 import showdownAlign from './extensions/showdown-align.js';
 import showdownKatex from './extensions/showdown-katex.js';
@@ -66,6 +67,7 @@ const getAsyncExtensions = (options, extensions = {}) => {
   const mermaidOptions = options ? options.mermaid || {} : {};
   const plantumlOptions = options ? options.plantuml || {} : {};
   const mathjaxOptions = options ? options.mathjax || {} : {};
+  const texOptions = options ? options.tex || {} : {};
   const katexOptions = options ? options.katex || {} : {};
   const krokiOptions = options ? options.kroki || {} : {};
   const vegaOptions = options ? options.vega || {} : {};
@@ -75,6 +77,7 @@ const getAsyncExtensions = (options, extensions = {}) => {
     'showdown-plantuml': showdownPlantuml(plantumlOptions),
     'showdown-mermaid': showdownMermaid(mermaidOptions),
     'showdown-mathjax': showdownMathJax(mathjaxOptions),
+    'showdown-tex': showdownTex(texOptions),
     'showdown-katex': showdownKatex(katexOptions),
     'showdown-kroki': showdownKroki(krokiOptions),
     'showdown-flowchart': showdownFlowchart(),
