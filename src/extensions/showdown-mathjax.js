@@ -88,6 +88,9 @@ function onRenderMathJax(resolve, res) {
       if (cssLink.length > 0) {
         jax.dataset.css = cssLink;
       }
+      if (element.style.cssText.length > 0) {
+        jax.style = element.style.cssText;
+      }
       jax.appendChild(output);
       element.parentNode.replaceWith(jax);
       --mathJaxElementCount;

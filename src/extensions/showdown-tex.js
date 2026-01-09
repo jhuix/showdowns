@@ -10,6 +10,7 @@ import utils from './utils';
 
 const texWeb = 'tex.io';
 const graphsCache = {};
+const latexEngines = ['pdflatex', 'xelatex', 'lualatex'];
 
 function clearCache(doc) {
   Object.keys(graphsCache).forEach(key => {
@@ -20,66 +21,26 @@ function clearCache(doc) {
 }
 
 function markTexElement(element, tex) {
-  const code = element.textContent.trim();
-  if (code.length === 0) {
+  const meta = utils.createElementMeta('Tex', element);
+  if (!meta || meta.data.length === 0) {
     return;
   }
 
   const langattr = element.dataset.lang;
-  const checksum = utils.hashString(langattr + code);
+  const checksum = utils.hashString(langattr + meta.data);
   const diagramInCache = graphsCache[checksum];
   if (diagramInCache) {
     element.parentNode.replaceWith(diagramInCache);
     return;
   }
 
-  let langobj = null;
-  if (langattr) {
-    try {
-      langobj = JSON.parse(langattr);
-    } catch {
-      console.log(`Error: parse tex data-lang ${langattr} failed.`);
-    }
-  }
-  let diagramClass = '';
-  if (langobj) {
-    if (
-      (typeof langobj.codeblock === 'boolean' && langobj.codeblock) ||
-      (typeof langobj.codeblock === 'string' && langobj.codeblock.toLowerCase() === 'true')
-    ) {
-      return;
-    }
-
-    if (langobj.align) {
-      //default left
-      if (langobj.align === 'center') {
-        diagramClass = 'diagram-center';
-      } else if (langobj.align === 'right') {
-        diagramClass = 'diagram-right';
-      }
-    }
-  }
-
   let buildType = tex.config.buildType ?? 'pdflatex';
-  if (element.classList.length > 0) {
-    const classname = element.classList[0];
-    const names = classname.split('-');
-    if (names.length > 1) {
-      buildType = names[names.length - 1];
-    }
+  if (meta.lang.engine && latexEngines.includes(meta.lang.engine.toLowerCase())) {
+    buildType = meta.lang.engine.toLowerCase();
   }
-  const classnames =
-    (element.classList.length > 0 ? element.classList[0] : '') +
-    (!element.className || !diagramClass ? '' : ' ') +
-    diagramClass;
-  if (buildType.length > 0 && !!window && window.fetch) {
-    const id = `${buildType}-${checksum}-` + Date.now() + '-' + Math.floor(Math.random() * 10000);
-    element.id = id;
-    element.className = classnames;
-    if (tex) {
-      tex.elements = tex.elements ?? []
-      tex.elements.push({ type: buildType, id: id });
-    }
+  if (!!window && window.fetch && tex) {
+    tex.elements = tex.elements ?? []
+    tex.elements.push({ type: buildType, id: meta.id });
   }
 }
 
@@ -103,7 +64,17 @@ function renderTexElements() {
     const langattr = element.dataset.lang;
     const code = element.textContent.trim();
     const checksum = utils.hashString(langattr + code);
-    const src = `${website}/${type}/svg`;
+    const params = []
+    if (meta.lang.width.length > 0) {
+      params.push(`width=${meta.lang.width}`);
+    }
+    if (meta.lang.height.length > 0) {
+      params.push(`height=${meta.lang.height}`);
+    }
+    if (meta.lang.zoom > 0) {
+      params.push(`zoom=${meta.lang.zoom}`);
+    }
+    const src = `${website}/${type}/svg` + (params.length > 0 ? `?${params.join('&')}` : '');
     try {
       window.fetch(src, {
         method: 'POST',
@@ -124,6 +95,9 @@ function renderTexElements() {
           const texElement = document.createElement('div');
           texElement.id = element.id;
           texElement.className = element.className;
+          if (element.style.cssText.length > 0) {
+            texElement.style = element.style.cssText;
+          }
           texElement.innerHTML = svg;
           element.parentNode.replaceWith(texElement);
           graphsCache[checksum] = texElement;
@@ -155,8 +129,8 @@ function showdownTex(userConfig) {
         if (!wrapper) {
           return false;
         }
-        // find the plantuml in code blocks
-        const elements = wrapper.querySelectorAll('code.tex.language-tex');
+        // find the latex in code blocks
+        const elements = wrapper.querySelectorAll('code.tex.language-tex,code.latex.language-latex');
         if (!elements.length) {
           return false;
         }

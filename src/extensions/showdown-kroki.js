@@ -20,44 +20,17 @@ function clearCache(doc) {
 }
 
 function markKrokiElement(element, kroki) {
-  const code = element.textContent.trim();
-  if (code.length === 0) {
+  const meta = utils.createElementMeta('Tex', element);
+  if (!meta || meta.data.length === 0) {
     return;
   }
 
   const langattr = element.dataset.lang;
-  const checksum = utils.hashString(langattr + code);
+  const checksum = utils.hashString(langattr + meta.data);
   const diagramInCache = graphsCache[checksum];
   if (diagramInCache) {
     element.parentNode.replaceWith(diagramInCache);
     return;
-  }
-
-  let langobj = null;
-  if (langattr) {
-    try {
-      langobj = JSON.parse(langattr);
-    } catch {
-      console.log(`Error: parse kroki data-lang ${langattr} failed.`);
-    }
-  }
-  let diagramClass = '';
-  if (langobj) {
-    if (
-      (typeof langobj.codeblock === 'boolean' && langobj.codeblock) ||
-      (typeof langobj.codeblock === 'string' && langobj.codeblock.toLowerCase() === 'true')
-    ) {
-      return;
-    }
-
-    if (langobj.align) {
-      //default left
-      if (langobj.align === 'center') {
-        diagramClass = 'diagram-center';
-      } else if (langobj.align === 'right') {
-        diagramClass = 'diagram-right';
-      }
-    }
   }
 
   let diagramType = '';
@@ -68,18 +41,9 @@ function markKrokiElement(element, kroki) {
       diagramType = names[names.length - 1];
     }
   }
-  const classnames =
-    (element.classList.length > 0 ? element.classList[0] : '') +
-    (!element.className || !diagramClass ? '' : ' ') +
-    diagramClass;
-  if (diagramType.length > 0 && !!window && window.fetch) {
-    const id = `${diagramType}-${checksum}-` + Date.now() + '-' + Math.floor(Math.random() * 10000);
-    element.id = id;
-    element.className = classnames;
-    if (kroki) {
-      kroki.elements = kroki.elements ?? []
-      kroki.elements.push({ type: diagramType, id: id });
-    }
+  if (diagramType.length > 0 && !!window && window.fetch && kroki) {
+    kroki.elements = kroki.elements ?? []
+    kroki.elements.push({ type: diagramType, id: meta.id });
   }
 }
 
@@ -125,6 +89,9 @@ function renderKrokiElements() {
           const krokiElement = document.createElement('div');
           krokiElement.id = element.id;
           krokiElement.className = element.className;
+          if (element.style.cssText.length > 0) {
+            krokiElement.style = element.style.cssText;
+          }
           krokiElement.innerHTML = svg;
           element.parentNode.replaceWith(krokiElement);
           graphsCache[checksum] = krokiElement;
@@ -156,7 +123,7 @@ function showdownKroki(userConfig) {
         if (!wrapper) {
           return false;
         }
-        // find the plantuml in code blocks
+        // find the kroki in code blocks
         const elements = wrapper.querySelectorAll('code[class*="language-kroki-"]');
         if (!elements.length) {
           return false;

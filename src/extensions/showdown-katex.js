@@ -120,10 +120,10 @@ function onRenderKatex(resolve, res) {
 
 function renderKatex(element, config, isAsciimath) {
   return new Promise(resolve => {
-    let latex;
+    let mathcode;
     const meta = utils.createElementMeta('katex', element, code => {
       let data;
-      latex = code;
+      mathcode = code;
       const codes = code.split(/\n[ \f\r\t\v]*\n/);
       if (codes.length > 1) {
         data = new Array();
@@ -135,7 +135,7 @@ function renderKatex(element, config, isAsciimath) {
           data.push(code);
         });
       } else {
-        data = isAsciimath ? asciimathToTex(latex) : latex;
+        data = isAsciimath ? asciimathToTex(mathcode) : mathcode;
       }
       return data;
     });
@@ -144,18 +144,18 @@ function renderKatex(element, config, isAsciimath) {
     }
 
     meta.cssLink = cdnjs.getSrc(true, cssCdnName);
-    meta.input = latex;
+    meta.input = mathcode;
     meta.options = config;
     onRenderKatex(resolve, meta);
   });
 }
 
-function renderBlockElements(latex, asciimath, config) {
-  katexElementCount = latex.length + asciimath.length;
+function renderBlockElements(latexmath, asciimath, config) {
+  katexElementCount = latexmath.length + asciimath.length;
   dyncLoadScript();
   return new Promise(resolve => {
     const promiseArray = [];
-    latex.forEach(element => {
+    latexmath.forEach(element => {
       promiseArray.push(renderKatex(element, config, false));
     });
     asciimath.forEach(element => {
@@ -319,10 +319,10 @@ function showdownKatex(userConfig) {
         }
 
         // find the math in code blocks
-        let latex = wrapper.querySelectorAll('code.latex.language-latex');
+        let latexmath = wrapper.querySelectorAll('code.katex.language-katex');
         const asciimath = wrapper.querySelectorAll('code.asciimath.language-asciimath');
 
-        if (!latex.length && !asciimath.length) {
+        if (!latexmath.length && !asciimath.length) {
           if (inlineMathCount > 0) {
             this.config.cssLink = cdnjs.getSrc(true, cssCdnName);
             const that = this;
@@ -353,7 +353,7 @@ function showdownKatex(userConfig) {
         this.config.cssLink = cdnjs.getSrc(true, cssCdnName);
         utils.addCssLink(obj, this.config.cssLink, 'css-katex');
         console.log(format(`Begin render katex elements.`));
-        return renderBlockElements(latex, asciimath, this.config).then(() => {
+        return renderBlockElements(latexmath, asciimath, this.config).then(() => {
           console.log(format(`End render katex elements.`));
           return obj;
         });

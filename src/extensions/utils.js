@@ -117,14 +117,50 @@ function renderElement(doc, id, name) {
   return el;
 }
 
+
+function parseLangAttr(langattr) {
+  if (!langattr || typeof langattr !== 'string') {
+    return null;
+  }
+
+  try {
+    return JSON.parse(langattr);
+  } catch (e) {
+    let obj = null;
+    const code = langattr.replace(/^\{(.*)\}$/, '$1');
+    const pairs = code.split(',');
+    pairs.forEach(pair => {
+      const kv = pair.split('=');
+      if (kv.length === 2) {
+        if (!obj) {
+          obj = {};
+        }
+        const key = kv[0].trim();
+        let value = kv[1].trim();
+        if (value.toLowerCase() === 'true') {
+          value = true;
+        } else if (value.toLowerCase() === 'false') {
+          value = false;
+        } else if (!isNaN(value)) {
+          value = Number(value);
+        } else {
+          value = value.replace(/^"(.*)"$/, '$1');
+        }
+        obj[key] = value;
+      }
+    });
+    return obj;
+  }
+}
+
 function createElementMeta(name, element, callback) {
-  const langattr = element.dataset.lang;
-  const langobj = langattr ? JSON.parse(langattr) : null;
-  let diagramClass = '';
+  const langobj = parseLangAttr(element.dataset.lang);
+  let diagramClass = 'diagram-left';
   if (langobj) {
+    const codeblock = langobj.codeblock || langobj.code_block;
     if (
-      (typeof langobj.codeblock === 'boolean' && langobj.codeblock) ||
-      (typeof langobj.codeblock === 'string' && langobj.codeblock.toLowerCase() === 'true')
+      (typeof codeblock === 'boolean' && codeblock) ||
+      (typeof codeblock === 'string' && codeblock.toLowerCase() === 'true')
     ) {
       return false;
     }
@@ -141,11 +177,13 @@ function createElementMeta(name, element, callback) {
       if (typeof langobj.width !== 'string') {
         langobj.width = langobj.width + 'px';
       }
+      element.style.width = langobj.width;
     }
     if (langobj.height) {
       if (typeof langobj.height !== 'string') {
         langobj.height = langobj.height + 'px';
       }
+      element.style.height = langobj.height;
     }
   }
 
@@ -159,6 +197,7 @@ function createElementMeta(name, element, callback) {
     diagramClass;
   const id = name.toLowerCase() + '-' + Date.now() + '-' + Math.floor(Math.random() * 10000);
   element.id = id;
+  element.className = className;
   return {
     id: id,
     container: id + '-container',

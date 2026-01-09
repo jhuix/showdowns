@@ -221,23 +221,32 @@ function renderTocElements(wrapper, config) {
       // for this table of contents.
       headingLevel = parseInt(element['tagName'].substr(1));
       // adding chapter numbering
-      if (config.chapterNumber && headingLevel > 1) {
-        if (currHeadingLevel !== headingLevel) {
-          currHeadingLevel = headingLevel;
-          let i = currHeadingLevel;
+      if (config.chapterNumber) {
+        if (headingLevel > 1) {
+          if (currHeadingLevel !== headingLevel) {
+            currHeadingLevel = headingLevel;
+            let i = currHeadingLevel;
+            while (i < numbering.length) {
+              numbering[i] = 0;
+              i++;
+            }
+          }
+          let prefix = '';
+          let i = 1;
+          numbering[currHeadingLevel - 1]++;
+          while (i < headingLevel) {
+            prefix += `${numbering[i]}.`;
+            i++;
+          }
+          element.textContent = prefix + ' ' + element.textContent;
+        } else {
+          // Reset numbering for top level heading
+          let i = 0;
           while (i < numbering.length) {
             numbering[i] = 0;
             i++;
           }
         }
-        let prefix = '';
-        let i = 1;
-        numbering[currHeadingLevel - 1]++;
-        while (i < headingLevel) {
-          prefix += `${numbering[i]}.`;
-          i++;
-        }
-        element.textContent = prefix + ' ' + element.textContent;
       }
       if (currTocNode) {
         currTocNode = appendTocElement(wrapper, element, currTocNode, headingLevel);

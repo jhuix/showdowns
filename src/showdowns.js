@@ -18,6 +18,7 @@ import showdownVega from './extensions/showdown-vega.js';
 import showdownAlign from './extensions/showdown-align.js';
 import showdownKatex from './extensions/showdown-katex.js';
 import showdownKroki from './extensions/showdown-kroki.js';
+import showdownShiki from './extensions/showdown-shiki.js';
 import showdownMathJax from './extensions/showdown-mathjax.js';
 import showdownEcharts from './extensions/showdown-echarts.js';
 import showdownMermaid from './extensions/showdown-mermaid.js';
@@ -89,6 +90,7 @@ const getAsyncExtensions = (options, extensions = {}) => {
     'showdown-echarts': showdownEcharts(),
     'showdown-sequence': getExtension('showdown-sequence', showdownSequence),
     ...extensions,
+    'showdown-shiki': showdownShiki(),
     'showdow-css': showdownCss(),
   };
 
@@ -488,69 +490,18 @@ const showdowns = {
   },
   setPlantumlOptions: function (options) {
     return this.setExtensionOptions('plantuml', options);
-    // this.initDefaultOptions();
-    // if (typeof options !== 'object' || !options) options = {};
-    // this.defaultOptions.plantuml = Object.assign(this.defaultOptions.plantuml || {}, options);
-    // const imageFormat = this.defaultOptions.plantuml.imageFormat;
-    // if (imageFormat && plantumlImgFmts.indexOf(imageFormat) === -1) {
-    //   this.defaultOptions.plantuml.imageFormat = 'png';
-    // }
-    // if (this.converter) {
-    //   this.addAsyncExtension('showdown-plantuml', showdownPlantuml(this.defaultOptions.plantuml));
-    // }
-    // return this.defaultOptions.plantuml;
   },
   setMermaidOptions: function (options) {
     return this.setExtensionOptions('mermaid', options);
-    // this.initDefaultOptions();
-    // if (typeof options !== 'object' || !options) options = {};
-    // this.defaultOptions.mermaid = Object.assign(this.defaultOptions.mermaid || {}, options);
-    // const theme = this.defaultOptions.mermaid.theme;
-    // if (theme && mermaidThemes.indexOf(theme) === -1) {
-    //   this.defaultOptions.mermaid.theme = 'default';
-    // }
-    // if (this.converter) {
-    //   this.addAsyncExtension('showdown-mermaid', showdownMermaid(this.defaultOptions.mermaid));
-    // }
-    // return this.defaultOptions.mermaid;
   },
   setKatexOptions: function (options) {
     return this.setExtensionOptions('katex', options);
-    // this.initDefaultOptions();
-    // if (typeof options !== 'object' || !options) options = {};
-    // this.defaultOptions.katex = Object.assign(this.defaultOptions.katex || {}, options);
-    // if (this.converter) {
-    //   this.addAsyncExtension('showdown-katex', showdownKatex(this.defaultOptions.katex));
-    // }
-    // return this.defaultOptions.katex;
   },
   setKrokiOptions: function (options) {
     return this.setExtensionOptions('kroki', options);
-    // this.initDefaultOptions();
-    // if (typeof options !== 'object' || !options) options = {};
-    // this.defaultOptions.kroki = Object.assign(this.defaultOptions.kroki || {}, options);
-    // if (this.converter) {
-    //   this.addAsyncExtension('showdown-kroki', showdownKroki(this.defaultOptions.kroki));
-    // }
-    // return this.defaultOptions.kroki;
   },
   setVegaOptions: function (options) {
     return this.setExtensionOptions('vega', options);
-    // this.initDefaultOptions();
-    // if (typeof options !== 'object' || !options) options = {};
-    // this.defaultOptions.vega = Object.assign(this.defaultOptions.vega || {}, options);
-    // const theme = this.defaultOptions.vega.theme;
-    // if (theme && vegaThemes.indexOf(theme) === -1) {
-    //   this.defaultOptions.vega.theme = 'vox';
-    // }
-    // const renderer = this.defaultOptions.vega.renderer;
-    // if (renderer && vegaRenderers.indexOf(renderer) === -1) {
-    //   this.defaultOptions.vega.renderer = 'canvas';
-    // }
-    // if (this.converter) {
-    //   this.addAsyncExtension('showdown-vega', showdownVega(this.defaultOptions.vega));
-    // }
-    // return this.defaultOptions.vega;
   },
   init: function (reset) {
     if (!this.converter) {

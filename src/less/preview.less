@@ -398,16 +398,33 @@
     background-color: #f9f9f9;
   }
 
-  .diagram-center:not(.asciimath):not(.latex):not(.mermaid) {
+  .diagram-left:not(.asciimath):not(.katex):not(.mermaid):not(.abc) {
+    display: flex;
+    justify-content: left;
+  }
+
+  .diagram-center:not(.asciimath):not(.katex):not(.mermaid):not(.abc) {
     display: flex;
     justify-content: center;
     margin: auto;
   }
 
-  .diagram-right:not(.asciimath):not(.latex):not(.mermaid) {
+  .diagram-right:not(.asciimath):not(.katex):not(.mermaid):not(.abc) {
     display: flex;
     justify-content: right;
     margin: auto 0 auto auto;
+  }
+
+  .diagram-center.abc {
+    margin: auto;
+  }
+
+  .diagram-right.abc {
+    margin: auto 0 auto auto;
+  }
+
+  .diagram-left.mermaid {
+    text-align: left;
   }
 
   .diagram-center.mermaid {
@@ -419,7 +436,7 @@
   }
 
   .asciimath:not(.diagram-center):not(.diagram-right),
-  .latex:not(.diagram-center):not(.diagram-right) {
+  .katex:not(.diagram-center):not(.diagram-right) {
     .katex-display,
     .katex {
       text-align: unset;
@@ -427,7 +444,7 @@
   }
 
   .asciimath.diagram-center,
-  .latex.diagram-center {
+  .katex.diagram-center {
     .katex-display,
     .katex {
       text-align: center;
@@ -435,7 +452,7 @@
   }
 
   .asciimath.diagram-right,
-  .latex.diagram-right {
+  .katex.diagram-right {
     .katex-display,
     .katex {
       text-align: right;

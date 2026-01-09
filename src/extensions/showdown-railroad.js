@@ -56,9 +56,13 @@ function onRenderRailroad(resolve, res) {
     const cssLink = res.cssLink;
     const railroadElement = window.eval(data).format();
     const doc = res.element.ownerDocument;
+    let style = res.element.style.cssText;
+    if (style.length > 0) {
+      style = ` style="${style}"`;
+    }
     res.element.parentNode.outerHTML = cssLink
-      ? `<div id="${id}" class="${name} css-railroad" data-css="${cssLink}"></div>`
-      : `<div id="${id}" class="${name}"></div>`;
+      ? `<div id="${id}" class="${name} css-railroad" data-css="${cssLink}"${style}></div>`
+      : `<div id="${id}" class="${name}"${style}></div>`;
     railroadElement.addTo(doc.getElementById(id));
     return resolve(true);
   }

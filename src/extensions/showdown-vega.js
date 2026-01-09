@@ -184,7 +184,11 @@ function onRenderVega(resolve, meta) {
     const name = meta.className;
     const container = meta.container;
     const node = meta.element.parentNode;
-    node.outerHTML = `<div id="${container}" class="${name}"><div id="${id}"></div></div>`;
+    let style = meta.element.style.cssText;
+    if (style.length > 0) {
+      style = ` style="${style}"`;
+    }
+    node.outerHTML = `<div id="${container}" class="${name}"${style}><div id="${id}"></div></div>`;
     return resolve(true);
   }
 

@@ -6,6 +6,7 @@
 'use strict';
 
 import format from './log';
+import utils from './utils';
 import plantumlcodec from '../utils/plantuml-codec.js';
 
 const defaultUmlWebsite = 'www.plantuml.com/plantuml';
@@ -14,49 +15,20 @@ const defaultImageFormat = 'img';
 let umlElementCount = 0;
 function renderPlantumlElement(element, config) {
   return new Promise(resolve => {
-    const langattr = element.dataset.lang;
-    let langobj = null;
-    if (langattr) {
-      try {
-        langobj = JSON.parse(langattr);
-      } catch {
-        console.log(`Error: parse plantuml data-lang ${langattr} failed.`);
-      }
-    }
-    let diagramClass = '';
-    if (langobj) {
-      if (
-        (typeof langobj.codeblock === 'boolean' && langobj.codeblock) ||
-        (typeof langobj.codeblock === 'string' && langobj.codeblock.toLowerCase() === 'true')
-      ) {
-        return resolve(false);
-      }
-
-      if (langobj.align) {
-        //default left
-        if (langobj.align === 'center') {
-          diagramClass = 'diagram-center';
-        } else if (langobj.align === 'right') {
-          diagramClass = 'diagram-right';
-        }
-      }
-    }
-
-    const code = element.textContent.trim();
-    if (code.length === 0) {
+    const meta = utils.createElementMeta('PlantUML', element);
+    if (!meta || meta.data.length === 0) {
       return resolve(false);
     }
 
-    const name =
-      (element.classList.length > 0 ? element.classList[0] : '') +
-      (!element.className || !diagramClass ? '' : ' ') +
-      diagramClass;
+    let style = element.style.cssText;
+    if (style.length > 0) {
+      style = ` style="${style}"`;
+    }
     const imageFormat = config.imageFormat;
     if (imageFormat === 'svg') {
-      const id = 'plantuml-' + Date.now() + '-' + Math.floor(Math.random() * 10000);
       if (typeof config.svgRender === 'function' && config.svgRender) {
-        config.svgRender(id, name, code, umlElementCount).then(svgData => {
-          element.parentNode.outerHTML = `<div id="${id}" class="${name}">${svgData}</div>`;
+        config.svgRender(id, meta.className, meta.data, umlElementCount).then(svgData => {
+          element.parentNode.outerHTML = `<div id="${meta.id}" class="${meta.className}"${style}>${svgData}</div>`;
           resolve(true);
         });
         return;
@@ -65,7 +37,7 @@ function renderPlantumlElement(element, config) {
         const protocol = window.location && window.location.protocol;
         const website = (protocol === 'http:' || protocol === 'https:' ? '//' : 'https://') + config.umlWebSite;
         const imageExtension = imageFormat !== defaultImageFormat ? `.${imageFormat}` : '';
-        const uml = plantumlcodec.encodeuml(code);
+        const uml = plantumlcodec.encodeuml(meta.data);
         const src = `${website}/${imageFormat}/${uml}${imageExtension}`;
         try {
           window
@@ -82,7 +54,7 @@ function renderPlantumlElement(element, config) {
               throw new Error(`RequestError: ${res.status}`);
             })
             .then((svg) => {
-              element.parentNode.outerHTML = `<div id="${id}" class="${name}">${svg}</div>`;
+              element.parentNode.outerHTML = `<div id="${meta.id}" class="${meta.className}"${style}>${svg}</div>`;
               resolve(true);
             }).catch((err) => {
               console.log('render remote plantuml failed: ', err.toString());
@@ -102,7 +74,7 @@ function renderPlantumlElement(element, config) {
     const imageExtension = imageFormat !== defaultImageFormat ? `.${imageFormat}` : '';
     const uml = plantumlcodec.encodeuml(code);
     const src = `${website}/${imageFormat}/${uml}${imageExtension}`;
-    element.parentNode.outerHTML = `<div class="${name}"><img src='${src}' alt=''></img></div>`;
+    element.parentNode.outerHTML = `<div id="${meta.id}" class="${meta.className}"${style}><img src='${src}' alt=''></img></div>`;
     return resolve(true);
   });
 }

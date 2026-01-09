@@ -60,18 +60,19 @@ function onRenderViz(resolve, res) {
       return resolve(false);
     }
 
-    const el = res.element;
-    const langattr = res.element.dataset.lang;
+    const element = res.element;
+    const lang = res.lang;
     let engine = 'dot';
-    if (langattr) {
-      const obj = JSON.parse(langattr);
-      if (obj && obj.engine && engines.indexOf(obj.engine) != -1) {
-        engine = obj.engine;
-      }
+    if (lang && lang.engine && engines.indexOf(lang.engine) != -1) {
+      engine = lang.engine;
+    }
+    let style = element.style.cssText;
+    if (style.length > 0) {
+      style = ` style="${style}"`;
     }
     Viz.instance().then(viz => {
       const svg = viz.renderString(data, { format: 'svg', engine: engine });
-      el.parentNode.outerHTML = `<div id="${id}" class="${name}">${svg}</div>`;
+      element.parentNode.outerHTML = `<div id="${id}" class="${name}"${style}>${svg}</div>`;
       resolve(true)
     });
     return;
@@ -114,7 +115,7 @@ function showdownViz() {
   return [
     {
       type: 'output',
-      filter: function(obj) {
+      filter: function (obj) {
         const wrapper = obj.wrapper;
         if (!wrapper) {
           return false;

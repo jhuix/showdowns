@@ -64,8 +64,13 @@ function onRenderMermaid(resolve, res) {
     const name = res.className;
     const data = res.data;
     const node = res.element.parentNode;
+    const element = res.element;
     mermaid.render(id, data).then(m =>{
-      node.outerHTML = `<div class="${name}">${m.svg}</div>`;
+      let style = element.style.cssText;
+      if (style.length > 0) {
+        style = ` style="${style}"`;
+      }
+      node.outerHTML = `<div class="${name}"${style}>${m.svg}</div>`;
       resolve(true);
     });
     return;

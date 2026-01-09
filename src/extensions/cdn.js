@@ -40,6 +40,7 @@ const cdnSrc = {
     vega: '../node_modules/vega/build/vega.min.js',
     vegaLite: '../node_modules/vega-lite/build/vega-lite.min.js',
     vegaEmbed: '../node_modules/vega-embed/build/vega-embed.min.js',
+    shiki: 'https://esm.sh/shiki@3.21.0',
   },
   cdnjs: {
     ABCJS: scheme + 'cdnjs.cloudflare.com/ajax/libs/abcjs/6.5.1/abcjs-basic-min.js',
@@ -69,6 +70,7 @@ const cdnSrc = {
     vega: scheme + 'cdnjs.cloudflare.com/ajax/libs/vega/6.1.2/vega.min.js',
     vegaLite: scheme + 'cdnjs.cloudflare.com/ajax/libs/vega-lite/6.1.0/vega-lite.min.js',
     vegaEmbed: scheme + 'cdnjs.cloudflare.com/ajax/libs/vega-embed/7.0.2/vega-embed.min.js',
+    shiki: scheme + 'esm.sh/shiki@3.21.0',
   },
   jsdelivr: {
     ABCJS: scheme + 'cdn.jsdelivr.net/npm/abcjs@6/dist/abcjs-basic-min.js',
@@ -98,6 +100,7 @@ const cdnSrc = {
     vega: scheme + 'cdn.jsdelivr.net/npm/vega@6/build/vega.min.js',
     vegaLite: scheme + 'cdn.jsdelivr.net/npm/vega-lite@6/build/vega-lite.min.js',
     vegaEmbed: scheme + 'cdn.jsdelivr.net/npm/vega-embed@7/build/vega-embed.min.js',
+    shiki: scheme + 'cdn.jsdelivr.net/npm/shiki@3.21.0/+esm',
   },
 };
 
@@ -227,17 +230,23 @@ function loadScript(name, src, defer, module) {
 
     const head = document.head || document.getElementsByTagName('head')[0];
     script = document.createElement('script');
-    script.src = src;
     script.id = id;
     if (defer) {
       script.defer = true;
     }
     if (module) {
       script.type = 'module';
+      const nativeName = getName(name);
+      script.textContent = `import * as ${nativeName} from '${src}';
+window['${nativeName}'] = ${nativeName};`;
+      head.appendChild(script);
+      return resovle(name);
     }
+
     script.onload = () => {
       resovle(name);
     };
+    script.src = src;
     head.appendChild(script);
   });
 }
