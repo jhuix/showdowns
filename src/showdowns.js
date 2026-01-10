@@ -72,6 +72,7 @@ const getAsyncExtensions = (options, extensions = {}) => {
   const katexOptions = options ? options.katex || {} : {};
   const krokiOptions = options ? options.kroki || {} : {};
   const vegaOptions = options ? options.vega || {} : {};
+  const shikiOptions = options ? options.shiki || {} : {};
 
   const asyncExtensions = {
     'showdown-toc': getExtension('showdown-toc', showdownToc),
@@ -90,7 +91,7 @@ const getAsyncExtensions = (options, extensions = {}) => {
     'showdown-echarts': showdownEcharts(),
     'showdown-sequence': getExtension('showdown-sequence', showdownSequence),
     ...extensions,
-    'showdown-shiki': showdownShiki(),
+    'showdown-shiki': showdownShiki(shikiOptions),
     'showdow-css': showdownCss(),
   };
 
@@ -335,6 +336,7 @@ const showdowns = {
     katex: {},
     kroki: {},
     vega: { theme: 'vox' },
+    shiki: {},
   },
   defaultExtensions: {},
   defaultAsyncExtensions: {},
@@ -352,6 +354,7 @@ const showdowns = {
         katex: {},
         kroki: {},
         vega: {},
+        shiki: {},
       };
     }
   },
@@ -451,6 +454,13 @@ const showdowns = {
       this.setExtensionOptions('mathjax', { engine: engineName });
     }
   },
+  setLanuageTheme: function (theme) {
+    this.initDefaultOptions();
+    if (theme) {
+      this.defaultOptions.shiki.theme = theme;
+      this.setExtensionOptions('shiki', { theme: theme });
+    }
+  },
   setShowdownOptions: function (options) {
     this.initDefaultOptions();
     if (typeof options !== 'object' || !options) options = {};
@@ -466,9 +476,9 @@ const showdowns = {
     }
 
     name = `showdown-${name}`;
-    let extensions = getExtension(name);
+    let extensions = getAsyncExtension(name);
     if (!extensions) {
-      extensions = getAsyncExtension(name)
+      extensions = getExtension(name);
       if (!extensions) {
         return false;
       }

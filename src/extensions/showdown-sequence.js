@@ -153,6 +153,7 @@ function renderSequence(element) {
   const name = 'js-sequence' + (!diagramClass ? '' : ' ') + diagramClass;
   const id = 'sequence-' + Date.now() + '-' + Math.floor(Math.random() * 10000);
   element.id = id;
+  element.classList.remove('language-sequence');
   if (cssLink) {
     element.className = element.className + (!element.className ? '' : ' ') + 'css-sequence';
     element.dataset.css = cssLink;

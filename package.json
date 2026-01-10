@@ -84,6 +84,7 @@
     "node-tikzjax": "^1.0.3",
     "railroad-diagrams": "^1.0.0",
     "raphael": "^2.3.0",
+    "shiki": "^3.21.0",
     "showdown": "^2.1.0",
     "snapsvg": "^0.5.1",
     "underscore": "^1.13.7",

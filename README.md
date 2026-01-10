@@ -386,6 +386,7 @@ Default options is described below:
     defaultOptions = {
       showdown: {
         flavor: 'github',
+        mathEngine: 'mathjax',
       },
       toc: { chapterNumber: true, title: '', toc: '[\\[【]Table[ -]Of[ -]Contents[\\]】]|[\\[【]目录[\\]】]|[\\[【]TOC[\\]】]|\\{\\{TOC\\}\\}' },
       plantuml: { imageFormat: 'svg' },
@@ -408,6 +409,10 @@ Default options is described below:
 
 - showdown: showdown options object
 
+  `flavor` - [Flavor of showdown](https://github.com/showdownjs/showdown/blob/master/README.md#flavors), default is 'github'.
+
+  `mathEngine` - Math render engine for 'mathjax' or 'katex', default is 'mathjax'.
+  
   For more showdown options, refer to the following document:
 
   [Showdown Options](https://github.com/showdownjs/showdown/blob/master/README.md#options)

@@ -51,6 +51,7 @@ function onRenderShiki(resolve, element, options) {
     const code = element.textContent.trim();
     const language = element.classList[0];
     shiki.codeToHtml(code, {lang: language, theme: options.theme}).then((output) => {
+      output = output.replace(/<pre(.*)><code/g, '<pre' + '$1' +` data-language="${language}" data-theme="${options.theme}"><code` );
       element.parentNode.outerHTML = output;
       resolve(true);
     }).catch((err) => {
