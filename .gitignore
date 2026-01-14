@@ -4,8 +4,7 @@ node_modules
 /lib
 /testdemo
 *-lock.json
-test.html
-test*.md
+test*
 
 # local env files
 .env.local
