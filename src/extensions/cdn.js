@@ -70,7 +70,7 @@ const cdnSrc = {
     vega: scheme + 'cdnjs.cloudflare.com/ajax/libs/vega/6.1.2/vega.min.js',
     vegaLite: scheme + 'cdnjs.cloudflare.com/ajax/libs/vega-lite/6.1.0/vega-lite.min.js',
     vegaEmbed: scheme + 'cdnjs.cloudflare.com/ajax/libs/vega-embed/7.0.2/vega-embed.min.js',
-    Shiki: scheme + 'esm.sh/shiki@3.21.0',
+    Shiki: 'https://esm.sh/shiki@3.21.0',
   },
   jsdelivr: {
     ABCJS: scheme + 'cdn.jsdelivr.net/npm/abcjs@6/dist/abcjs-basic-min.js',
@@ -100,7 +100,7 @@ const cdnSrc = {
     vega: scheme + 'cdn.jsdelivr.net/npm/vega@6/build/vega.min.js',
     vegaLite: scheme + 'cdn.jsdelivr.net/npm/vega-lite@6/build/vega-lite.min.js',
     vegaEmbed: scheme + 'cdn.jsdelivr.net/npm/vega-embed@7/build/vega-embed.min.js',
-    Shiki: scheme + 'cdn.jsdelivr.net/npm/shiki@3.21.0/+esm',
+    Shiki: 'https://cdn.jsdelivr.net/npm/shiki@3.21.0/+esm',
   },
 };
 
@@ -238,9 +238,14 @@ function loadScript(name, src, defer, module) {
     if (module) {
       script.type = 'module';
       if (!(typeof module === 'string' && module === 'link')) {
-        script.textContent = `import * as ${nativeName} from '${src}';
+        const lowerName = nativeName.toLowerCase();
+        script.textContent = `import * as ${lowerName} from '${src}';
 if (!('${nativeName}' in window)) {
-  window['${nativeName}'] = ('default' in ${nativeName}) ? ${nativeName}['default'] : ${nativeName};
+  if ('default' in ${lowerName} && ${lowerName}['default']) {
+    window['${nativeName}'] = ${lowerName}['default']
+  } else {
+    window['${nativeName}'] = ${lowerName};
+  }
 }`;
         head.appendChild(script);
         return resovle(name);

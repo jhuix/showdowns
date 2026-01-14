@@ -186,6 +186,7 @@ function createCodeTools(doc) {
 
         tools.themes.options.style.top = (tools.root.clientHeight - 1) + 'px';
         tools.themes.options.style.right = 0;
+        tools.themes.options.classList.remove('hidden');
         if (activeOption) {
           activeOption.scrollIntoView({ container: "nearest" });
         }
@@ -244,22 +245,27 @@ function onRenderShiki(resolve, element, options) {
         if (tools) {
           const currContainer = e.target;
           tools.currContainer = currContainer;
-          tools.langSelect.selector.dataset.language = currContainer.dataset.language;
-          tools.langSelect.selector.dataset.title = currContainer.dataset.langName;
-          tools.langSelect.content.textContent = currContainer.dataset.langName;
 
-          tools.themeSelect.selector.dataset.theme = currContainer.dataset.theme;
-          tools.themeSelect.selector.dataset.title = currContainer.dataset.themeName;
-          tools.themeSelect.content.textContent = currContainer.dataset.themeName;
+          if (tools.timer) {
+            clearTimeout(tools.timer);
+            tools.timer = null;
+          }
+          tools.timer = setTimeout(() => {
+            tools.langSelect.selector.dataset.language = currContainer.dataset.language;
+            tools.langSelect.selector.dataset.title = currContainer.dataset.langName;
+            tools.langSelect.content.textContent = currContainer.dataset.langName;
 
-          const rect = currContainer.getBoundingClientRect();
+            tools.themeSelect.selector.dataset.theme = currContainer.dataset.theme;
+            tools.themeSelect.selector.dataset.title = currContainer.dataset.themeName;
+            tools.themeSelect.content.textContent = currContainer.dataset.themeName;
 
-          tools.themes.options.style = '';
-          tools.root.style.top = (rect.top + window.scrollY) + 'px';
-          tools.root.style.width = '400px';
-          tools.root.style.right = (document.body.offsetWidth - rect.right) + 'px';
-          // tools.root.classList.remove('hidden');
-          if (refContainer === 1) {
+            const rect = currContainer.getBoundingClientRect();
+
+            tools.themes.options.style = '';
+            tools.themes.options.classList.add('hidden');
+            tools.root.style.top = (rect.top + window.scrollY) + 'px';
+            tools.root.style.width = '400px';
+            tools.root.style.right = (document.body.offsetWidth - rect.right) + 'px';
             if (!tools.parent) {
               const showdowns = document.querySelector('.showdowns');
               if (showdowns) {
@@ -269,14 +275,20 @@ function onRenderShiki(resolve, element, options) {
               }
             }
             tools.parent.appendChild(tools.root);
-          }
+            tools.timer = null;
+          }, 1500);
         }
       });
       container.addEventListener('mouseleave', function (e) {
         refContainer--;
+        if (tools.timer) {
+          clearTimeout(tools.timer);
+          tools.timer = null;
+        }
         if (e.relatedTarget?.closest('.codeblock-tools') === tools.root) return;
-        if (refContainer <= 0 && tools && tools.parent) {
+        if (tools && tools.parent) {
           tools.themes.options.style = '';
+          tools.themes.options.classList.add('hidden');
           tools.parent.removeChild(tools.root);
         }
       });
@@ -290,7 +302,7 @@ function onRenderShiki(resolve, element, options) {
 
   setTimeout(() => {
     onRenderShiki(resolve, element, options);
-  }, 10);
+  }, 100);
 }
 
 function renderShiki(element, options) {

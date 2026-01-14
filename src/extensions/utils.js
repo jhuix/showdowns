@@ -79,7 +79,7 @@ function loadScript(id, code, element) {
 }
 
 function interopDefault(ex) {
-  return ex && typeof ex === 'object' && 'default' in ex ? ex['default'] : ex;
+  return ex && typeof ex === 'object' && 'default' in ex ? ex['default'] ? ex['default'] : ex : ex;
 }
 
 function renderCacheElement(doc, id, name, callback) {

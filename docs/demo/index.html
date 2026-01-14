@@ -114,12 +114,18 @@
           .then(function(text) {
             md = md + `\n\n# Showdown's Markdown syntax\n\n` + text;
             showdowns
-              .makeHtml(md, csstypes => {
+              .makeHtml({content: md, output: 'dom'}, csstypes => {
                 mdCssTypes = csstypes;
               })
               .then(res => {
                 if (typeof res === 'object') {
-                  element.innerHTML = res.html;
+                  if (typeof res.html === 'string') {
+                    element.innerHTML = res.html;
+                  } else {
+                    res.html.forEach((e)=>{
+                      element.appendChild(e);
+                    });
+                  }
                   showdowns.completedHtml(res.scripts);
                 } else {
                   element.innerHTML = res;
@@ -138,7 +144,13 @@
                 })
                 .then(res => {
                   if (typeof res === 'object') {
-                    element.innerHTML = res.html;
+                    if (typeof res.html === 'string') {
+                      element.innerHTML = res.html;
+                    } else {
+                      res.html.forEach((e)=>{
+                        element.appendChild(e);
+                      });
+                    }
                     showdowns.completedHtml(res.scripts, '.showdowns');
                   } else {
                     element.innerHTML = res;
