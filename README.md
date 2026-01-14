@@ -236,6 +236,8 @@ Table header can be eliminated.
 
 [LaTeX math and AsciiMath](https://github.com/jhuix/showdowns/blob/master/docs/showdowns-features.md#latex-math-and-asciimath)
 
+[Code Block Theme](https://github.com/jhuix/showdowns/blob/master/docs/showdowns-features.md#code-block-theme)
+
 [Mermaid](https://github.com/jhuix/showdowns/blob/master/docs/showdowns-features.md#mermaid)
 
 [Plantuml](https://github.com/jhuix/showdowns/blob/master/docs/showdowns-features.md#plantuml)
@@ -257,6 +259,8 @@ Table header can be eliminated.
 [ABCJS](https://github.com/jhuix/showdowns/blob/master/docs/showdowns-features.md#abc)
 
 [Kroki](https://github.com/jhuix/showdowns/blob/master/docs/showdowns-features.md#kroki)
+
+[Tex](https://github.com/jhuix/showdowns/blob/master/docs/showdowns-features.md#tex)
 
 See more information, refer to the following document:
 
@@ -379,7 +383,7 @@ Put the following line into your HTML page \<header> or \<body>:
 
 #### defaultOptions
 
-Type: {showdown: object, plantuml: object, mermaid: object, katex: object, kroki: object, vega: object }
+Type: {showdown: object, plantuml: object, mermaid: object, katex: object, kroki: object, vega: object, toc: object, shiki: object }
 
 Default options is described below:
 
@@ -488,6 +492,17 @@ Default options is described below:
   For more vega-embed options, refer to the following document:
 
   [Vega-embed Options](https://github.com/vega/vega-embed#options)
+
+- shiki: shiki options object
+
+  For more shiki options:
+
+      {
+        theme: "ayu-dark"
+      }
+
+  The theme of shiki see [ShiKi Style](https://shiki.style/themes).
+
 
 #### defaultExtensions
 
@@ -612,7 +627,15 @@ Type: (options: object) => object
 
 A function to set default options of showdown. When showdown.convertor instance be created, it can update options of the showdown and convertor.convertor.
 
-See [showdown options of defaultOptions](#defaultoptions).
+See [showdown options of defaultOptions](https://shiki.style/themes).
+
+#### setLanuageTheme
+
+Type: (theme: string) => object
+
+A function to set default theme of [ShiKi](https://github.com/shikijs/shiki). When showdown.convertor instance be created, it can update options of the showdown and convertor.convertor.
+
+See [ShiKi Style](https://shiki.style/themes).
 
 #### setExtensionlOptions
 
@@ -691,18 +714,18 @@ Type: interface script {
     ]
 }
 
-Type: ({type:'zip', content: string} | string,
+Type: ({type:'zip', content: string, output: 'dom'} | string,
        (csstypes?: {
           hasKatex: boolean;
           hasRailroad: boolean;
           hasSequence: boolean
-       }) => void) => Promise\<{html: string, scripts: [script]}>
+       }) => void) => Promise\<{html: string | HTMLElement[], scripts: script[]}>
 
 A async function to make markdown to html that showdown.convertor converte it in current showdowns instance.
 
 #### completedHtml
 
-Type: ( scripts?: [script] | string, scriptContainer?: HTMLElement | string) => Promise\<boolean>
+Type: ( scripts?: script[] | string, scriptContainer?: HTMLElement | string) => Promise\<boolean>
 
 A async function to completed markdown to html that append scripts to dom.
 
