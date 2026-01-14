@@ -6,6 +6,7 @@
 
 import './less/preview.less';
 import './less/container.less';
+import './less/codetools.less';
 import './less/toc.less';
 
 import showdown from './parser/showdown.js';
@@ -626,7 +627,10 @@ const showdowns = {
                 extras = [extras];
               }
               for (let i = 0; i < extras.length; ++i) {
-                if (typeof extras[i] !== 'string') continue;
+                if (typeof extras[i] !== 'string') {
+                  doms.push(extras[i]);
+                  continue
+                };
                 extraContent += extras[i];
               }
               if (extraContent.length > 0) {
@@ -649,7 +653,10 @@ const showdowns = {
             extras = [extras];
           }
           for (let i = 0; i < extras.length; ++i) {
-            if (typeof extras[i] !== 'string') continue;
+            if (typeof extras[i] !== 'string'){
+               content += extras.outerHTML;
+               continue
+            };
             content += extras[i];
           }
         }

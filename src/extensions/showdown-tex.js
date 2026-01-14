@@ -35,12 +35,16 @@ function markTexElement(element, tex) {
   }
 
   let buildType = tex.config.buildType ?? 'pdflatex';
-  if (meta.lang.engine && latexEngines.includes(meta.lang.engine.toLowerCase())) {
+  if (meta.lang?.engine && latexEngines.includes(meta.lang.engine.toLowerCase())) {
     buildType = meta.lang.engine.toLowerCase();
   }
   if (!!window && window.fetch && tex) {
     tex.elements = tex.elements ?? []
-    tex.elements.push({ type: buildType, id: meta.id });
+    const context = { type: buildType, id: meta.id };
+    if (meta.lang) {
+      context.lang = meta.lang;
+    }
+    tex.elements.push(context);
   }
 }
 
@@ -57,7 +61,7 @@ function renderTexElements() {
   }
 
   const website = 'https://' + (tex.serverUrl ?? 'tex.io');
-  tex.elements.forEach(({ type, id }) => {
+  tex.elements.forEach(({ type, id, lang }) => {
     const element = document.querySelector(`#${id}`);
     if (!element) return;
 
@@ -65,14 +69,16 @@ function renderTexElements() {
     const code = element.textContent.trim();
     const checksum = utils.hashString(langattr + code);
     const params = []
-    if (meta.lang.width.length > 0) {
-      params.push(`width=${meta.lang.width}`);
-    }
-    if (meta.lang.height.length > 0) {
-      params.push(`height=${meta.lang.height}`);
-    }
-    if (meta.lang.zoom > 0) {
-      params.push(`zoom=${meta.lang.zoom}`);
+    if (lang) {
+      if (lang.width?.length > 0) {
+        params.push(`width=${lang.width}`);
+      }
+      if (lang.height?.length > 0) {
+        params.push(`height=${lang.height}`);
+      }
+      if (lang.zoom && lang.zoom > 0) {
+        params.push(`zoom=${lang.zoom}`);
+      }
     }
     const src = `${website}/${type}/svg` + (params.length > 0 ? `?${params.join('&')}` : '');
     try {
