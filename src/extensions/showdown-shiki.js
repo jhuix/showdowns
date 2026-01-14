@@ -8,7 +8,6 @@
 import format from './log';
 import cdnjs from './cdn';
 import utils from './utils';
-// import Shiki from 'shiki';
 
 if (typeof Shiki === 'undefined') {
   var Shiki = window.Shiki || undefined;
@@ -213,8 +212,10 @@ function onRenderShiki(resolve, element, options) {
     const code = element.textContent.trim();
     const language = element.classList[0];
     const doc = element.ownerDocument;
+    const lang = utils.parseLangAttr(element.dataset.lang);
     createCodeTools(doc);
-    let themeName = options.theme;
+    const theme = (lang?.theme) ? lang.theme : options.theme;
+    let themeName = theme;
     for (let i = 0; i < Shiki.bundledThemesInfo.length; i++) {
       if (Shiki.bundledThemesInfo[i].id === themeName) {
         themeName = Shiki.bundledThemesInfo[i].displayName
@@ -228,10 +229,10 @@ function onRenderShiki(resolve, element, options) {
         break;
       }
     }
-    Shiki.codeToHtml(code, { lang: language, theme: options.theme }).then((output) => {
+    Shiki.codeToHtml(code, { lang: language, theme: theme }).then((output) => {
       const container = doc.createElement('div');
       container.classList.add('codeblock-container');
-      container.dataset.theme = options.theme;
+      container.dataset.theme = theme;
       container.dataset.themeName = themeName;
       container.dataset.language = language;
       container.dataset.langName = langName;

@@ -296,6 +296,7 @@ export function deepMerge(target, ...sources) {
 }
 
 const utils = {
+  parseLangAttr,
   interopDefault,
   loadStyle,
   loadStylesheet,
