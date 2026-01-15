@@ -9,6 +9,7 @@ import format from './log';
 import utils from './utils';
 
 const texWeb = 'tex.io';
+const Tex = {};
 const graphsCache = {};
 const latexEngines = ['pdflatex', 'xelatex', 'lualatex'];
 
@@ -38,14 +39,12 @@ function markTexElement(element, tex) {
   if (meta.lang?.engine && latexEngines.includes(meta.lang.engine.toLowerCase())) {
     buildType = meta.lang.engine.toLowerCase();
   }
-  if (!!window && window.fetch && tex) {
-    tex.elements = tex.elements ?? []
-    const context = { type: buildType, id: meta.id };
-    if (meta.lang) {
-      context.lang = meta.lang;
-    }
-    tex.elements.push(context);
+  tex.elements = tex.elements ?? []
+  const context = { type: buildType, id: meta.id };
+  if (meta.lang) {
+    context.lang = meta.lang;
   }
+  tex.elements.push(context);
 }
 
 function markTexElements(elements, tex) {
@@ -55,12 +54,13 @@ function markTexElements(elements, tex) {
 }
 
 function renderTexElements() {
-  const tex = window.Tex ?? {};
+  if (!window || !('Tex' in window)) return;
+  const tex = window['Tex'];
   if (!tex.elements || !Array.isArray(tex.elements) || tex.elements.length === 0) {
     return;
   }
 
-  const website = 'https://' + (tex.serverUrl ?? 'tex.io');
+  const website = 'https://' + (tex.config.serverUrl ?? 'tex.io');
   tex.elements.forEach(({ type, id, lang }) => {
     const element = document.querySelector(`#${id}`);
     if (!element) return;
@@ -68,6 +68,43 @@ function renderTexElements() {
     const langattr = element.dataset.lang;
     const code = element.textContent.trim();
     const checksum = utils.hashString(langattr + code);
+    if (typeof tex.svgRender === 'function' && tex.svgRender) {
+      const params = {
+        build: type
+      };
+      if (lang) {
+        if (lang.width?.length > 0) {
+          params.width = lang.width;
+        }
+        if (lang.height?.length > 0) {
+          params.height = lang.height;
+        }
+        if (lang.zoom && lang.zoom > 0) {
+          params.zoom = lang.zoom;
+        }
+      }
+      try {
+        tex.svgRender(element.id, code, params).then((svg) => {
+          const texElement = document.createElement('div');
+          texElement.id = element.id;
+          texElement.className = element.className;
+          if (element.style.cssText.length > 0) {
+            texElement.style = element.style.cssText;
+          }
+          texElement.innerHTML = svg;
+          element.parentNode.replaceWith(texElement);
+          graphsCache[checksum] = texElement;
+        }).catch((err) => {
+          console.log(`kroki to ${imageFormat} of ${type} failed:`, err.toString());
+        });
+      } catch (err) {
+        console.log(`kroki to ${imageFormat} of ${type} failed:`, err.toString());
+      }
+      return;
+    }
+
+    if (!window || !window.fetch) return;
+
     const params = []
     if (lang) {
       if (lang.width?.length > 0) {
@@ -120,6 +157,7 @@ function renderTexElements() {
 const getConfig = (config = {}) => ({
   serverUrl: texWeb,
   buildType: 'pdflatex',
+  svgRender: null,
   ...config
 });
 
@@ -141,15 +179,21 @@ function showdownTex(userConfig) {
           return false;
         }
 
-        window.Tex = window.Tex ?? {}
-        window.Tex.config = this.config;
+        if (!!window) {
+          window['Tex'] = Tex;
+        }
+        Tex.config = {
+          serverUrl: this.config.serverUrl,
+          buildType: this.config.buildType
+        }
+        Tex.svgRender =this.config.svgRender;
         obj.scripts.push({
           id: 'showdown-tex',
           code: renderTexElements,
           once: true
         })
         console.log(format(`Begin render tex elements.`));
-        markTexElements(elements, window.Tex)
+        markTexElements(elements, Tex)
         clearCache(wrapper);
         console.log(format(`End render tex elements.`));
         return obj;

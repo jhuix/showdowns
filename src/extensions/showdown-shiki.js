@@ -286,7 +286,7 @@ function onRenderShiki(resolve, element, options) {
           tools.timer = null;
         }
         if (e.relatedTarget?.closest('.codeblock-tools') === tools.root) return;
-        if (tools && tools.parent) {
+        if (tools && tools.parent && tools.parent.contains(tools.root)) {
           tools.themes.options.style = '';
           tools.themes.options.classList.add('hidden');
           tools.parent.removeChild(tools.root);

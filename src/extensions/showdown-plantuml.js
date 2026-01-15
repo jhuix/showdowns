@@ -27,10 +27,18 @@ function renderPlantumlElement(element, config) {
     const imageFormat = config.imageFormat;
     if (imageFormat === 'svg') {
       if (typeof config.svgRender === 'function' && config.svgRender) {
-        config.svgRender(id, meta.className, meta.data, umlElementCount).then(svgData => {
-          element.parentNode.outerHTML = `<div id="${meta.id}" class="${meta.className}"${style}>${svgData}</div>`;
-          resolve(true);
-        });
+        try {
+          const params = {
+            count: umlElementCount
+          }
+          config.svgRender(meta.id, meta.data, params).then(svgData => {
+            element.parentNode.outerHTML = `<div id="${meta.id}" class="${meta.className}"${style}>${svgData}</div>`;
+            resolve(true);
+          });
+        } catch (err) {
+          console.log(`plantuml to ${imageFormat} of ${type} failed:`, err.toString());
+          resolve(false);
+        }
         return;
       }
       if (!!window && window.fetch) {

@@ -10,6 +10,7 @@ import utils from './utils';
 
 const krokiWeb = 'kroki.io';
 const graphsCache = {};
+const Kroki = {};
 
 function clearCache(doc) {
   Object.keys(graphsCache).forEach(key => {
@@ -54,13 +55,13 @@ function markKrokiElements(elements, kroki) {
 }
 
 function renderKrokiElements() {
-  const kroki = window.Kroki ?? {};
+  if (!window || !('Kroki' in window)) return;
+  const kroki = window['Kroki'];
   if (!kroki.elements || !Array.isArray(kroki.elements) || kroki.elements.length === 0) {
     return;
   }
 
-  const imageFormat = kroki.imageFormat ?? 'svg';
-  const website = 'https://' + (kroki.serverUrl ?? 'kroki.io');
+  const imageFormat = kroki.config.imageFormat ?? 'svg';
   kroki.elements.forEach(({ type, id }) => {
     const element = document.querySelector(`#${id}`);
     if (!element) return;
@@ -68,6 +69,32 @@ function renderKrokiElements() {
     const langattr = element.dataset.lang;
     const code = element.textContent.trim();
     const checksum = utils.hashString(langattr + code);
+    if (typeof kroki.svgRender === 'function' && kroki.svgRender) {
+      const params = {
+        diagramType: type,
+        imageFormat: imageFormat
+      }
+      try {
+        kroki.svgRender(element.id, code, params).then((svg) => {
+          const krokiElement = document.createElement('div');
+          krokiElement.id = element.id;
+          krokiElement.className = element.className;
+          if (element.style.cssText.length > 0) {
+            krokiElement.style = element.style.cssText;
+          }
+          krokiElement.innerHTML = svg;
+          element.parentNode.replaceWith(krokiElement);
+          graphsCache[checksum] = krokiElement;
+        }).catch((err) => {
+          console.log(`kroki to ${imageFormat} of ${type} failed:`, err.toString());
+        });
+      } catch (err) {
+        console.log(`kroki to ${imageFormat} of ${type} failed:`, err.toString());
+      }
+      return;
+    }
+
+    const website = 'https://' + (kroki.config.serverUrl ?? 'kroki.io');
     const src = `${website}/${type}/${imageFormat}`;
     try {
       window.fetch(src, {
@@ -108,6 +135,7 @@ function renderKrokiElements() {
 const getConfig = (config = {}) => ({
   serverUrl: krokiWeb,
   imageFormat: 'svg',
+  svgRender: null,
   ...config
 });
 
@@ -129,16 +157,21 @@ function showdownKroki(userConfig) {
           return false;
         }
 
-        window.Kroki = window.Kroki ?? {}
-        window.Kroki.serverUrl = this.config.serverUrl;
-        window.Kroki.imageFormat = this.config.imageFormat;
+        if (!!window) {
+          window['Kroki'] = Kroki;
+        }
+        Kroki.config = {
+          serverUrl: this.config.serverUrl,
+          imageFormat: this.config.imageFormat
+        }
+        Kroki.svgRender = this.config.svgRender;
         obj.scripts.push({
           id: 'showdown-kroki',
           code: renderKrokiElements,
           once: true
         })
         console.log(format(`Begin render kroki elements.`));
-        markKrokiElements(elements, window.Kroki)
+        markKrokiElements(elements, Kroki)
         clearCache(wrapper);
         console.log(format(`End render kroki elements.`));
         return obj;
