@@ -356,8 +356,16 @@ Put the following line into your HTML page \<header> or \<body>:
           })
           .then(function(text) {
             md = md + `\n\n## Showdown's Markdown syntax\n\n` + text;
-            showdowns.makeHtml(md).then(obj => {
-              element.innerHTML = obj.html;
+            showdowns.makeHtml({content: md, output: 'dom'}).then(res => {
+                if (typeof res === 'string') {
+                  element.innerHTML = res;
+                }else if (Array.isArray(res.html)) {
+                  element.replaceChildren();
+                  res.html.forEach((e)=>{
+                    element.appendChild(e);
+                  })
+                  showdowns.completedHtml(res.scripts, '.showdowns');
+                }
               showdowns.completedHtml(obj.scripts, '.showdowns');
             }).catch(err =>{
               element.innerHTML = '';
@@ -383,7 +391,7 @@ Put the following line into your HTML page \<header> or \<body>:
 
 #### defaultOptions
 
-Type: {showdown: object, plantuml: object, mermaid: object, katex: object, kroki: object, vega: object, toc: object, shiki: object }
+Type: {showdown: object, plantuml: object, mermaid: object, katex: object, kroki: object, vega: object, toc: object, tex: object, shiki: object }
 
 Default options is described below:
 
@@ -407,8 +415,10 @@ Default options is described below:
         { left: '@@', right: '@@', display: true, asciimath: true },
         { left: "\\$", right: "\\$", display: false, asciimath: true }
       ]},
-      kroki: { serverUrl: 'kroki.io' },
-      vega: { theme: 'vox' }
+      kroki: { serverUrl: 'kroki.io', imageFormat: 'svg' },
+      vega: { theme: 'vox' },
+      tex: { serverUrl: 'tex.io', buildType: 'pdflatex' },
+      shiki: { theme: 'ayu-dark' }
     };
 
 - showdown: showdown options object
@@ -442,7 +452,10 @@ Default options is described below:
 
       {
         umlWebSite: "www.plantuml.com/plantuml",
-        imageFormat: "svg" | "png" | "jpg"
+        imageFormat: "svg" | "png" | "jpg",
+        svgRender: (id:string, code:string, options: {
+          count?: number
+        }) => string
       }
 
 - mermaid: mermaid options object
@@ -484,7 +497,11 @@ Default options is described below:
 
       {
         serverUrl: "kroki.io",
-        imageFormat: "svg"
+        imageFormat: "svg",
+        svgRender: (id:string, code:string, options: {
+          diagramType: string,
+          imageFormat: string
+        }) => string
       }
 
 - vega: vega-embed options object
@@ -503,6 +520,20 @@ Default options is described below:
 
   The theme of shiki see [ShiKi Style](https://shiki.style/themes).
 
+- tex: tex options object
+
+  For more tex options:
+
+      {
+        serverUrl: "tex.io",
+        buildType: "pdflatex",
+        svgRender: (id:string, code:string, options: {
+          build: string,
+          zoom?: number,
+          width?: string,
+          height?: string
+        }) => string
+      }
 
 #### defaultExtensions
 
@@ -511,7 +542,7 @@ Type: Array of showdown extensions
 Default extensions is described below:
 
     defaultExtensions = {
-      'showdown-toc': showdownToc(),
+      'showdown-toc': showdownToc(options.toc),
       'showdown-align': showdownAlign(),
       'showdown-footnotes': showdownFootnotes(),
       'showdown-container': showdownContainer(),
@@ -530,10 +561,12 @@ Default async extensions is described below:
 
     defaultAsyncExtensions = {
       'showdown-toc': getExtension('showdown-toc', showdownToc),
-      'showdown-plantuml': showdownPlantuml(plantumlOptions()),
-      'showdown-mermaid': showdownMermaid(mermaidOptions()),
-      'showdown-katex': showdownKatex(katexOptions()),
-      'showdown-kroki': showdownKroki(krokiOptions()),
+      'showdown-plantuml': showdownPlantuml(plantumlOptions),
+      'showdown-mermaid': showdownMermaid(mermaidOptions),
+      'showdown-mathjax': showdownMathJax(mathjaxOptions),
+      'showdown-tex': showdownTex(texOptions),
+      'showdown-katex': showdownKatex(katexOptions),
+      'showdown-kroki': showdownKroki(krokiOptions),
       'showdown-flowchart': showdownFlowchart(),
       'showdown-viz': showdownViz(),
       'showdown-vega': showdownVega(vegaOptions),
@@ -542,6 +575,7 @@ Default async extensions is described below:
       'showdown-abc': showdownAbc(),
       'showdown-echarts': showdownEcharts(),
       'showdown-sequence': getExtension('showdown-sequence', showdownSequence),
+      'showdown-shiki': showdownShiki(shikiOptions),
       'showdow-css': showdownCss(),
     }
 
@@ -705,13 +739,19 @@ A function to init that be created showdown.convertor instance or update default
 
 Type: interface script {
     outer?:[
-      {name:string, src:string}
+      {name:string, src:string, module?:boolean|'import'|'link'}
     ],
     id?:string,
     code?:string,
+    module?:boolean,
     inner?:[
-      {id:string, code:string}
+      {id:string, code:string, module?:boolean}
     ]
+}
+
+Type: interface csslink {
+  id: string,
+  link: string
 }
 
 Type: ({type:'zip', content: string, output: 'dom'} | string,
@@ -719,7 +759,7 @@ Type: ({type:'zip', content: string, output: 'dom'} | string,
           hasKatex: boolean;
           hasRailroad: boolean;
           hasSequence: boolean
-       }) => void) => Promise\<{html: string | HTMLElement[], scripts: script[]}>
+       }) => void) => Promise\<{html: string | HTMLElement[], scripts: script[], cssLinks: csslink[]}>
 
 A async function to make markdown to html that showdown.convertor converte it in current showdowns instance.
 
