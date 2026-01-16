@@ -23,14 +23,12 @@ if (typeof renderMathInElement === 'undefined') {
 
 let katexElementCount = 0;
 function hasKatex() {
-  return typeof RenderMathInElement !== 'undefined' && RenderMathInElement && typeof katex !== 'undefined' && katex
-    ? true
-    : false;
+  return typeof katex !== 'undefined' && katex? true : false;
 }
 
 let dync = false;
 const cssCdnName = 'katexCSS';
-function dyncLoadScript(callback) {
+function dyncLoadScript(engine, callback) {
   const sync = hasKatex();
   if (typeof window !== 'undefined') {
     if (dync) {
@@ -44,7 +42,9 @@ function dyncLoadScript(callback) {
         .loadScript('katex')
         .then(name => {
           katex = utils.interopDefault(window[name]);
-          return cdnjs.loadScript('renderMathInElement');
+          if (engine === 'katex') {
+            return cdnjs.loadScript('renderMathInElement');
+          }
         })
         .then(name => {
           RenderMathInElement = utils.interopDefault(window[name]);
@@ -106,7 +106,7 @@ function onRenderKatex(resolve, res) {
     }
     res.element.parentNode.outerHTML = html;
     --katexElementCount;
-    if (!katexElementCount) {
+    if (!katexElementCount && RenderMathInElement) {
       RenderMathInElement(doc.body, config);
     }
     resolve(true);
@@ -121,7 +121,7 @@ function onRenderKatex(resolve, res) {
 function renderKatex(element, config, isAsciimath) {
   return new Promise(resolve => {
     let mathcode;
-    const meta = utils.createElementMeta('katex', element, code => {
+    const meta = utils.createElementMeta('katex', element, false, code => {
       let data;
       mathcode = code;
       const codes = code.split(/\n[ \f\r\t\v]*\n/);
@@ -152,7 +152,7 @@ function renderKatex(element, config, isAsciimath) {
 
 function renderBlockElements(latexmath, asciimath, config) {
   katexElementCount = latexmath.length + asciimath.length;
-  dyncLoadScript();
+  dyncLoadScript(config.engine);
   return new Promise(resolve => {
     const promiseArray = [];
     latexmath.forEach(element => {
@@ -338,7 +338,7 @@ function showdownKatex(userConfig) {
             }
             console.log(format(`Begin render inline katex elements.`));
             return new Promise(resolve => {
-              dyncLoadScript(render => {
+              dyncLoadScript(this.config.engine, (render) => {
                 asyncRenderKatex(resolve, render);
               });
             }).then(() => {

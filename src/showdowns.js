@@ -126,7 +126,7 @@ const getExtensions = (options, extensions = {}) => {
   return extnames;
 };
 
-const loadScript = (id, code, parent) => {
+const loadScript = (parent, id, code, module) => {
   if (!id || !code || typeof document === 'undefined') {
     return false;
   }
@@ -149,13 +149,17 @@ const loadScript = (id, code, parent) => {
 
   script = document.createElement('script');
   script.id = scriptID;
-  script.type = 'text/javascript';
+  if (module) {
+    script.type = 'module';
+  } else {
+    script.type = 'text/javascript';
+  }
   script.text = code;
   element.appendChild(script);
   return true;
 };
 
-const insertScript = (id, code, parent) => {
+const insertScript = (parent, id, code, module) => {
   if (!id || !code || typeof document === 'undefined') {
     return false;
   }
@@ -178,19 +182,24 @@ const insertScript = (id, code, parent) => {
 
   script = document.createElement('script');
   script.id = scriptID;
-  script.type = 'text/javascript';
+  if (module) {
+    script.type = 'module';
+  } else {
+    script.type = 'text/javascript';
+  }
   script.text = code;
   element.insertBefore(script, element.children[0]);
   return true;
 };
 
-function appendScript(name, src) {
+function appendScript(name, src, module) {
   return new Promise((resovle, reject) => {
     if (!name || !src || typeof document === 'undefined') {
       reject('Args is invaild!');
     }
 
-    const id = 'script-' + name.toLowerCase();
+    const lowerName = name.toLowerCase();
+    const id = 'script-' + lowerName;
     let script = document.getElementById(id);
     if (script) {
       return resovle(name);
@@ -198,8 +207,24 @@ function appendScript(name, src) {
 
     const head = document.head || document.getElementsByTagName('head')[0];
     script = document.createElement('script');
-    script.src = src;
     script.id = id;
+    if (module) {
+      script.type = 'module';
+      if (typeof module === 'string' && module === 'import') {
+        script.textContent = `import * as ${lowerName} from '${src}';
+if (!('${nativeName}' in window)) {
+  if ('default' in ${lowerName} && ${lowerName}['default']) {
+    window['${nativeName}'] = ${lowerName}['default']
+  } else {
+    window['${nativeName}'] = ${lowerName};
+  }
+}`;
+        head.appendChild(script);
+        return resovle(name);
+      }
+    }
+
+    script.src = src;
     script.onload = () => {
       resovle(name);
     };
@@ -247,11 +272,11 @@ const opScript = function (script, root, promise) {
 
     if (promise) {
       promise.then(() => {
-        loadScript(script.id, script.code, host);
+        loadScript(host, script.id, script.code, script.module);
       });
       return true;
     }
-    return loadScript(script.id, script.code, host);
+    return loadScript(host, script.id, script.code, script.module);
   }
 
   if (!showdown.helper.isArray(script.inner)) {
@@ -270,11 +295,11 @@ const opScript = function (script, root, promise) {
     } else {
       if (promise) {
         promise.then(() => {
-          if (!insertScript(script.id, script.code, host)) {
+          if (!insertScript(host, script.id, script.code, script.module)) {
             console.log(format('Args is invaild with insert script!'), script);
           }
         });
-      } else if (!insertScript(script.id, script.code, host)) {
+      } else if (!insertScript(host, script.id, script.code, script.module)) {
         console.log(format('Args is invaild with insert script!'), script);
       }
     }
@@ -302,11 +327,11 @@ const opScript = function (script, root, promise) {
       }
       if (promise) {
         promise.then(() => {
-          loadScript(s.id, s.code, innerHost);
+          loadScript(innerHost, s.id, s.code, s.module);
         });
         continue;
       }
-      loadScript(s.id, s.code, innerHost);
+      loadScript(innerHost, s.id, s.code, s.module);
     }
   }
   return true;
@@ -681,11 +706,11 @@ const showdowns = {
             script.outer = [script.outer];
           }
           let o = script.outer[0];
-          let result = appendScript(o.name, o.src);
+          let result = appendScript(o.name, o.src, o.module);
           for (let k = 1; k < script.outer.length; ++k) {
             o = script.outer[k];
             result = result.then(() => {
-              return appendScript(o.name, o.src);
+              return appendScript(o.name, o.src, o.module);
             });
           }
 

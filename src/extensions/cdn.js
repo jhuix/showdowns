@@ -191,7 +191,7 @@ function getSrc(native, name, src, def) {
     }
 
     if (url) {
-      if (native || url.substring(0, scheme.length) === scheme) {
+      if (native || url.startsWith('http://') || url.startsWith('https://') || url.startsWith(scheme)) {
         def = url;
       } else if (url.substring(0, 8) === '../dist/') {
         def = distScheme + url;

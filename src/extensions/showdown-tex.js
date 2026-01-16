@@ -15,21 +15,19 @@ const latexEngines = ['pdflatex', 'xelatex', 'lualatex'];
 
 function clearCache(doc) {
   Object.keys(graphsCache).forEach(key => {
-    if (!doc.querySelector(`[id*="-${key}-"]`)) {
+    if (!doc.querySelector(`[id*="-${key}"]`)) {
       delete graphsCache[key];
     }
   });
 }
 
 function markTexElement(element, tex) {
-  const meta = utils.createElementMeta('Tex', element);
+  const meta = utils.createElementMeta('Tex', element, true);
   if (!meta || meta.data.length === 0) {
     return;
   }
 
-  const langattr = element.dataset.lang;
-  const checksum = utils.hashString(langattr + meta.data);
-  const diagramInCache = graphsCache[checksum];
+  const diagramInCache = graphsCache[meta.hash];
   if (diagramInCache) {
     element.parentNode.replaceWith(diagramInCache);
     return;
@@ -68,6 +66,12 @@ function renderTexElements() {
     const langattr = element.dataset.lang;
     const code = element.textContent.trim();
     const checksum = utils.hashString(langattr + code);
+    const texElement = graphsCache[checksum];
+    if (texElement) {
+      element.parentNode.replaceWith(texElement);
+      return;
+    }
+
     if (typeof tex.svgRender === 'function' && tex.svgRender) {
       const params = {
         build: type
@@ -152,6 +156,7 @@ function renderTexElements() {
       console.log(`tex to svg of ${type} failed:`, err.toString());
     }
   })
+  delete tex.elements;
 }
 
 const getConfig = (config = {}) => ({
@@ -193,8 +198,10 @@ function showdownTex(userConfig) {
           once: true
         })
         console.log(format(`Begin render tex elements.`));
-        markTexElements(elements, Tex)
-        clearCache(wrapper);
+        markTexElements(elements, Tex);
+        if (Tex.elements?.length > 0) {
+          clearCache(wrapper);
+        }
         console.log(format(`End render tex elements.`));
         return obj;
       }

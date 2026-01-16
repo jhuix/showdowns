@@ -153,7 +153,7 @@ function parseLangAttr(langattr) {
   }
 }
 
-function createElementMeta(name, element, callback) {
+function createElementMeta(name, element, hashid, callback) {
   const langobj = parseLangAttr(element.dataset.lang);
   let diagramClass = 'diagram-left';
   if (langobj) {
@@ -195,7 +195,18 @@ function createElementMeta(name, element, callback) {
     (element.classList.length > 0 ? element.classList[0] : '') +
     (!element.className || !diagramClass ? '' : ' ') +
     diagramClass;
-  const id = name.toLowerCase() + '-' + Date.now() + '-' + Math.floor(Math.random() * 10000);
+  let hash;
+  if (typeof hashid === 'string') {
+    if (hashid.length > 0) {
+      hashid = '-' + hashid;
+    }
+  } else if (typeof hashid === 'boolean' && hashid){
+    hash = hashString(element.dataset.lang + code);
+    hashid = '-' + hash;
+  } else {
+    hashid = '-' + Math.floor(Math.random() * 10000)
+  }
+  const id = name.toLowerCase() + '-' + Date.now() + hashid;
   element.id = id;
   element.className = className;
   return {
@@ -203,6 +214,7 @@ function createElementMeta(name, element, callback) {
     container: id + '-container',
     className: className,
     data: code,
+    hash: hash,
     element: element,
     lang: langobj,
   };

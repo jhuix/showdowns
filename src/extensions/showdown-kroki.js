@@ -14,21 +14,19 @@ const Kroki = {};
 
 function clearCache(doc) {
   Object.keys(graphsCache).forEach(key => {
-    if (!doc.querySelector(`[id*="-${key}-"]`)) {
+    if (!doc.querySelector(`[id*="-${key}"]`)) {
       delete graphsCache[key];
     }
   });
 }
 
 function markKrokiElement(element, kroki) {
-  const meta = utils.createElementMeta('Tex', element);
+  const meta = utils.createElementMeta('Tex', element, true);
   if (!meta || meta.data.length === 0) {
     return;
   }
 
-  const langattr = element.dataset.lang;
-  const checksum = utils.hashString(langattr + meta.data);
-  const diagramInCache = graphsCache[checksum];
+  const diagramInCache = graphsCache[meta.hash];
   if (diagramInCache) {
     element.parentNode.replaceWith(diagramInCache);
     return;
@@ -69,6 +67,12 @@ function renderKrokiElements() {
     const langattr = element.dataset.lang;
     const code = element.textContent.trim();
     const checksum = utils.hashString(langattr + code);
+    const krokiElement = graphsCache[checksum];
+    if (krokiElement) {
+      element.parentNode.replaceWith(krokiElement);
+      return;
+    }
+
     if (typeof kroki.svgRender === 'function' && kroki.svgRender) {
       const params = {
         diagramType: type,
@@ -130,6 +134,7 @@ function renderKrokiElements() {
       console.log(`kroki to ${imageFormat} of ${type} failed:`, err.toString());
     }
   })
+  delete kroki.elements;
 }
 
 const getConfig = (config = {}) => ({
@@ -172,7 +177,9 @@ function showdownKroki(userConfig) {
         })
         console.log(format(`Begin render kroki elements.`));
         markKrokiElements(elements, Kroki)
-        clearCache(wrapper);
+        if (Kroki.elements?.length > 0) {
+          clearCache(wrapper);
+        }
         console.log(format(`End render kroki elements.`));
         return obj;
       }
