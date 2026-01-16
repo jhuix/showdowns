@@ -10,20 +10,41 @@ import utils from './utils';
 import plantumlcodec from '../utils/plantuml-codec.js';
 
 const defaultUmlWebsite = 'www.plantuml.com/plantuml';
-const defaultImageFormat = 'img';
+const defaultImageFormat = 'svg';
+const umlCache = {};
+
+function clearCache(doc) {
+  Object.keys(umlCache).forEach(key => {
+    if (!doc.querySelector(`[id*="-${key}"]`)) {
+      delete umlCache[key];
+    }
+  });
+}
 
 let umlElementCount = 0;
 function renderPlantumlElement(element, config) {
-  return new Promise(resolve => {
-    const meta = utils.createElementMeta('PlantUML', element);
-    if (!meta || meta.data.length === 0) {
-      return resolve(false);
-    }
+  const meta = utils.createElementMeta('PlantUML', element, true);
+  if (!meta || meta.data.length === 0) {
+    return;
+  }
 
-    let style = element.style.cssText;
-    if (style.length > 0) {
-      style = ` style="${style}"`;
-    }
+  const svgElement = umlCache[meta.hash]
+  if (svgElement) {
+    element.parentNode.replaceWith(svgElement);
+    return;
+  }
+
+  return new Promise(resolve => {
+    // const meta = utils.createElementMeta('PlantUML', element, true);
+    // if (!meta || meta.data.length === 0) {
+    //   return resolve(false);
+    // }
+
+    // const svgElement = umlCache[meta.hash]
+    // if (svgElement) {
+    //   element.parentNode.replaceWith(svgElement);
+    //   return resolve(true);
+    // }
     const imageFormat = config.imageFormat;
     if (imageFormat === 'svg') {
       if (typeof config.svgRender === 'function' && config.svgRender) {
@@ -31,8 +52,17 @@ function renderPlantumlElement(element, config) {
           const params = {
             count: umlElementCount
           }
-          config.svgRender(meta.id, meta.data, params).then(svgData => {
-            element.parentNode.outerHTML = `<div id="${meta.id}" class="${meta.className}"${style}>${svgData}</div>`;
+          config.svgRender(meta.id, meta.data, params).then(svg => {
+            const svgElement = document.createElement('div');
+            svgElement.id = meta.id;
+            svgElement.className = meta.className;
+            if (element.style.cssText.length > 0) {
+              svgElement.style = element.style.cssText;
+            }
+            svgElement.innerHTML = svg;
+            element.parentNode.replaceWith(svgElement);
+            umlCache[meta.hash] = svgElement;
+            // element.parentNode.outerHTML = `<div id="${meta.id}" class="${meta.className}"${style}>${svgData}</div>`;
             resolve(true);
           });
         } catch (err) {
@@ -62,7 +92,16 @@ function renderPlantumlElement(element, config) {
               throw new Error(`RequestError: ${res.status}`);
             })
             .then((svg) => {
-              element.parentNode.outerHTML = `<div id="${meta.id}" class="${meta.className}"${style}>${svg}</div>`;
+              const svgElement = document.createElement('div');
+              svgElement.id = meta.id;
+              svgElement.className = meta.className;
+              if (element.style.cssText.length > 0) {
+                svgElement.style = element.style.cssText;
+              }
+              svgElement.innerHTML = svg;
+              element.parentNode.replaceWith(svgElement);
+              umlCache[meta.hash] = svgElement;
+              // element.parentNode.outerHTML = `<div id="${meta.id}" class="${meta.className}"${style}>${svg}</div>`;
               resolve(true);
             }).catch((err) => {
               console.log('render remote plantuml failed: ', err.toString());
@@ -77,6 +116,11 @@ function renderPlantumlElement(element, config) {
       resolve(false);
       return;
     }
+
+    let style = element.style.cssText;
+    if (style.length > 0) {
+      style = ` style="${style}"`;
+    }
     const protocol = window && window.location.protocol;
     const website = (protocol === 'http:' || protocol === 'https:' ? '//' : 'https://') + config.umlWebSite;
     const imageExtension = imageFormat !== defaultImageFormat ? `.${imageFormat}` : '';
@@ -89,12 +133,16 @@ function renderPlantumlElement(element, config) {
 
 // <div class="plantuml"></div>
 function renderPlantumlElements(elements, config) {
-  umlElementCount = elements.length;
+  // umlElementCount = elements.length;
   return new Promise(resolve => {
     const promiseArray = [];
     elements.forEach(element => {
-      promiseArray.push(renderPlantumlElement(element, config));
+      const promise = renderPlantumlElement(element, config);
+      if (promise) {
+        promiseArray.push(promise);
+      }
     });
+    umlElementCount = promiseArray.length;
     Promise.all(promiseArray).then(() => {
       resolve(true);
     });
@@ -129,6 +177,7 @@ function showdownPlantuml(userConfig) {
 
         console.log(format(`Begin render plantuml elements.`));
         return renderPlantumlElements(elements, this.config).then(() => {
+          clearCache(wrapper);
           console.log(format(`End render plantuml elements.`));
           return obj;
         });

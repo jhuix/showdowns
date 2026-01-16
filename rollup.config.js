@@ -99,7 +99,8 @@ const config = {
     'vega',
     'vega-embed',
     'vega-lite',
-    'wavedrom'
+    'wavedrom',
+    'shiki'
   ],
   plugins: [
     json(),
