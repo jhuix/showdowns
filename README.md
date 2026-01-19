@@ -748,15 +748,21 @@ A function to init that be created showdown.convertor instance or update default
 #### makeHtml
 
 Type: interface script {
-    outer?:[
-      {name:string, src:string, module?:boolean|'import'|'link'}
-    ],
+    outer?:[{
+      name:string,
+      src:string,
+      module?:boolean|'import'|'link'
+    }],
     id?:string,
     code?:string,
     module?:boolean,
-    inner?:[
-      {id:string, code:string, module?:boolean}
-    ]
+    host?:string | HTMLElement
+    inner?:[{
+      id:string,
+      code:string,
+      module?:boolean,
+      host?:string | HTMLElement
+    }]
 }
 
 Type: interface csslink {
@@ -764,12 +770,7 @@ Type: interface csslink {
   link: string
 }
 
-Type: ({type:'zip', content: string, output: 'dom'} | string,
-       (csstypes?: {
-          hasKatex: boolean;
-          hasRailroad: boolean;
-          hasSequence: boolean
-       }) => void) => Promise\<{html: string | HTMLElement[], scripts: script[], cssLinks: csslink[]}>
+Type: ({type:'zip', content: string, output: 'dom'} | string) => Promise\<{html: string | HTMLElement[], scripts: script[], cssLinks: csslink[]}>
 
 A async function to make markdown to html that showdown.convertor converte it in current showdowns instance.
 
