@@ -260,7 +260,7 @@ Table header can be eliminated.
 
 [Kroki](https://github.com/jhuix/showdowns/blob/master/docs/showdowns-features.md#kroki)
 
-[Tex](https://github.com/jhuix/showdowns/blob/master/docs/showdowns-features.md#tex)
+[Plotly](https://github.com/jhuix/showdowns/blob/master/docs/showdowns-features.md#plotly)
 
 See more information, refer to the following document:
 
@@ -391,7 +391,7 @@ Put the following line into your HTML page \<header> or \<body>:
 
 #### defaultOptions
 
-Type: {showdown: object, plantuml: object, mermaid: object, katex: object, kroki: object, vega: object, toc: object, tex: object, shiki: object }
+Type: {showdown: object, plantuml: object, mermaid: object, katex: object, kroki: object, vega: object, toc: object, tex: object, shiki: object, gnuplot: object }
 
 Default options is described below:
 
@@ -418,7 +418,8 @@ Default options is described below:
       kroki: { serverUrl: 'kroki.io', imageFormat: 'svg' },
       vega: { theme: 'vox' },
       tex: { serverUrl: 'tex.io', buildType: 'pdflatex' },
-      shiki: { theme: 'ayu-dark' }
+      shiki: { theme: 'ayu-dark' },
+      gnuplot: {}
     };
 
 - showdown: showdown options object
@@ -535,6 +536,14 @@ Default options is described below:
         }) => string
       }
 
+- gnuplot: gnuplot options object
+
+  For more gnuplot options:
+
+      {
+        svgRender: (id:string, code:string) => string
+      }
+
 #### defaultExtensions
 
 Type: Array of showdown extensions
@@ -574,6 +583,7 @@ Default async extensions is described below:
       'showdown-railroad': showdownRailroad(),
       'showdown-abc': showdownAbc(),
       'showdown-echarts': showdownEcharts(),
+      'showdown-gnuplot': showdownShiki(gnuplotOptions),
       'showdown-sequence': getExtension('showdown-sequence', showdownSequence),
       'showdown-shiki': showdownShiki(shikiOptions),
       'showdow-css': showdownCss(),

@@ -40,7 +40,8 @@ const cdnSrc = {
     vega: '../node_modules/vega/build/vega.min.js',
     vegaLite: '../node_modules/vega-lite/build/vega-lite.min.js',
     vegaEmbed: '../node_modules/vega-embed/build/vega-embed.min.js',
-    Shiki: '../node_modules/@jhuix/shiki-loader/dist/index.js',
+    Plotly: '../node_modules/plotly.js-dist-min/plotly.min.js',
+    Shiki: '../node_modules/@jhuix/shiki-loader/dist/index.js'
   },
   cdnjs: {
     ABCJS: scheme + 'cdnjs.cloudflare.com/ajax/libs/abcjs/6.5.1/abcjs-basic-min.js',
@@ -70,6 +71,7 @@ const cdnSrc = {
     vega: scheme + 'cdnjs.cloudflare.com/ajax/libs/vega/6.1.2/vega.min.js',
     vegaLite: scheme + 'cdnjs.cloudflare.com/ajax/libs/vega-lite/6.1.0/vega-lite.min.js',
     vegaEmbed: scheme + 'cdnjs.cloudflare.com/ajax/libs/vega-embed/7.0.2/vega-embed.min.js',
+    Plotly: scheme + 'cdnjs.cloudflare.com/ajax/libs/plotly.js/3.1.1/plotly.min.js',
     Shiki: 'https://esm.sh/shiki@3.21.0',
   },
   jsdelivr: {
@@ -100,6 +102,7 @@ const cdnSrc = {
     vega: scheme + 'cdn.jsdelivr.net/npm/vega@6/build/vega.min.js',
     vegaLite: scheme + 'cdn.jsdelivr.net/npm/vega-lite@6/build/vega-lite.min.js',
     vegaEmbed: scheme + 'cdn.jsdelivr.net/npm/vega-embed@7/build/vega-embed.min.js',
+    Plotly: scheme + 'cdn.jsdelivr.net/npm/plotly.js-dist-min@3.3.1/plotly.min.js',
     Shiki: 'https://cdn.jsdelivr.net/npm/shiki@3.21.0/+esm',
   },
 };

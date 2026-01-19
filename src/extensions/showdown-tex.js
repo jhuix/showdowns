@@ -99,10 +99,10 @@ function renderTexElements() {
           element.parentNode.replaceWith(texElement);
           graphsCache[checksum] = texElement;
         }).catch((err) => {
-          console.log(`kroki to ${imageFormat} of ${type} failed:`, err.toString());
+          console.log(`tex to ${imageFormat} of ${type} failed:`, err.toString());
         });
       } catch (err) {
-        console.log(`kroki to ${imageFormat} of ${type} failed:`, err.toString());
+        console.log(`tex to ${imageFormat} of ${type} failed:`, err.toString());
       }
       return;
     }

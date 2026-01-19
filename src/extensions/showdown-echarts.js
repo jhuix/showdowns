@@ -98,7 +98,7 @@ function renderEcharts(element, scripts, config) {
   config = { ...config, ssr: false, width: meta.lang.width, height: meta.lang.height };
   const echartRenderer = (meta, config) => {
     const result = () => {
-      const wval = eval;
+      const wval = window.eval;
       let el = document.getElementById(meta.id);
       if (el) {
         let chart = echarts.getInstanceByDom(el);

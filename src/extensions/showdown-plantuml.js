@@ -34,7 +34,7 @@ function renderPlantumlElement(element, config) {
     return;
   }
 
-  return new Promise(resolve => {
+  return (resolve) => {
     // const meta = utils.createElementMeta('PlantUML', element, true);
     // if (!meta || meta.data.length === 0) {
     //   return resolve(false);
@@ -53,6 +53,7 @@ function renderPlantumlElement(element, config) {
             count: umlElementCount
           }
           config.svgRender(meta.id, meta.data, params).then(svg => {
+            // <div id="${meta.id}" class="${meta.className}"${style}>${svgData}</div>
             const svgElement = document.createElement('div');
             svgElement.id = meta.id;
             svgElement.className = meta.className;
@@ -62,7 +63,6 @@ function renderPlantumlElement(element, config) {
             svgElement.innerHTML = svg;
             element.parentNode.replaceWith(svgElement);
             umlCache[meta.hash] = svgElement;
-            // element.parentNode.outerHTML = `<div id="${meta.id}" class="${meta.className}"${style}>${svgData}</div>`;
             resolve(true);
           });
         } catch (err) {
@@ -101,7 +101,6 @@ function renderPlantumlElement(element, config) {
               svgElement.innerHTML = svg;
               element.parentNode.replaceWith(svgElement);
               umlCache[meta.hash] = svgElement;
-              // element.parentNode.outerHTML = `<div id="${meta.id}" class="${meta.className}"${style}>${svg}</div>`;
               resolve(true);
             }).catch((err) => {
               console.log('render remote plantuml failed: ', err.toString());
@@ -128,21 +127,24 @@ function renderPlantumlElement(element, config) {
     const src = `${website}/${imageFormat}/${uml}${imageExtension}`;
     element.parentNode.outerHTML = `<div id="${meta.id}" class="${meta.className}"${style}><img src='${src}' alt=''></img></div>`;
     return resolve(true);
-  });
+  };
 }
 
 // <div class="plantuml"></div>
 function renderPlantumlElements(elements, config) {
-  // umlElementCount = elements.length;
-  return new Promise(resolve => {
+  return new Promise((resolve) => {
     const promiseArray = [];
-    elements.forEach(element => {
-      const promise = renderPlantumlElement(element, config);
-      if (promise) {
-        promiseArray.push(promise);
+    const executores = []
+    elements.forEach((element) => {
+      const executor = renderPlantumlElement(element, config);
+      if (executor) {
+        executores.push(executor);
       }
     });
-    umlElementCount = promiseArray.length;
+    umlElementCount = executores.length;
+    executores.forEach((executor) => {
+      promiseArray.push(new Promise(executor));
+    })
     Promise.all(promiseArray).then(() => {
       resolve(true);
     });

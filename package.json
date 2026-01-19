@@ -73,7 +73,7 @@
     "semver": "^7.7.2"
   },
   "dependencies": {
-    "@jhuix/shiki-loader": "^0.1.0",
+    "@jhuix/shiki-loader": "^0.1.1",
     "@rokt33r/js-sequence-diagrams": "^2.0.6-2",
     "@viz-js/viz": "^3.24.0",
     "abcjs": "^6.5.1",
@@ -82,6 +82,7 @@
     "katex": "^0.16.22",
     "mathjax": "^4.0.0",
     "mermaid": "^11.6.0",
+    "plotly.js-dist-min": "^3.3.1",
     "railroad-diagrams": "^1.0.0",
     "raphael": "^2.3.0",
     "showdown": "^2.1.0",

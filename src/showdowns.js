@@ -20,6 +20,8 @@ import showdownAlign from './extensions/showdown-align.js';
 import showdownKatex from './extensions/showdown-katex.js';
 import showdownKroki from './extensions/showdown-kroki.js';
 import showdownShiki from './extensions/showdown-shiki.js';
+import showdownPlotly from './extensions/showdowns-plotly.js';
+import showdownGnuplot from './extensions/showdonw-gnuplot.js';
 import showdownMathJax from './extensions/showdown-mathjax.js';
 import showdownEcharts from './extensions/showdown-echarts.js';
 import showdownMermaid from './extensions/showdown-mermaid.js';
@@ -74,6 +76,7 @@ const getAsyncExtensions = (options, extensions = {}) => {
   const krokiOptions = options ? options.kroki || {} : {};
   const vegaOptions = options ? options.vega || {} : {};
   const shikiOptions = options ? options.shiki || {} : {};
+  const gnuplotOptions = options ? options.gnuplot || {} : {};
 
   const asyncExtensions = {
     'showdown-toc': getExtension('showdown-toc', showdownToc),
@@ -90,6 +93,8 @@ const getAsyncExtensions = (options, extensions = {}) => {
     'showdown-railroad': showdownRailroad(),
     'showdown-abc': showdownAbc(),
     'showdown-echarts': showdownEcharts(),
+    'showdown-plotly': showdownPlotly(),
+    'showdown-gnuplot': showdownGnuplot(gnuplotOptions),
     'showdown-sequence': getExtension('showdown-sequence', showdownSequence),
     ...extensions,
     'showdown-shiki': showdownShiki(shikiOptions),
@@ -131,16 +136,16 @@ const loadScript = (parent, id, code, module) => {
     return false;
   }
 
-  let element = document.getElementById(id);
-  if (!element) {
+  if (parent && typeof parent === 'string') {
+    parent = document.querySelector(parent);
+  }
+  if (!parent) {
+    parent = document.getElementById(id);
     if (!parent) {
       parent = document.body;
-    } else if (typeof parent === 'string') {
-      parent = document.querySelector(parent);
     }
-    element = parent;
   }
-  const tag = element.tagName;
+  const tag = parent.tagName;
   const scriptID = `script-${id}`;
   let script = document.querySelector(`${tag} > #${scriptID}`);
   if (script) {
@@ -155,7 +160,7 @@ const loadScript = (parent, id, code, module) => {
     script.type = 'text/javascript';
   }
   script.text = code;
-  element.appendChild(script);
+  parent.appendChild(script);
   return true;
 };
 
@@ -164,16 +169,16 @@ const insertScript = (parent, id, code, module) => {
     return false;
   }
 
-  let element = document.getElementById(id);
-  if (!element) {
+  if (parent && typeof parent === 'string') {
+    parent = document.querySelector(parent);
+  }
+  if (!parent) {
+    parent = document.getElementById(id);
     if (!parent) {
       parent = document.body;
-    } else if (typeof parent === 'string') {
-      parent = document.querySelector(parent);
     }
-    element = parent;
   }
-  const tag = element.tagName;
+  const tag = parent.tagName;
   const scriptID = `script-${id}`;
   let script = document.querySelector(`${tag} > #${scriptID}`);
   if (script) {
@@ -188,7 +193,7 @@ const insertScript = (parent, id, code, module) => {
     script.type = 'text/javascript';
   }
   script.text = code;
-  element.insertBefore(script, element.children[0]);
+  parent.insertBefore(script, parent.children[0]);
   return true;
 };
 
@@ -249,8 +254,12 @@ function addCssLink(obj, link, id) {
 
 const opScript = function (script, root, promise) {
   let host = root;
-  if (script.host && typeof script.host === 'string') {
-    host = document.querySelector(script.host);
+  if (script.host) {
+    if (typeof script.host === 'string') {
+      host = document.querySelector(script.host);
+    } else {
+      host = script.host;
+    }
   }
   if (!script.inner) {
     if (!script.code) {
@@ -322,8 +331,12 @@ const opScript = function (script, root, promise) {
       }
 
       let innerHost = host;
-      if (s.host && typeof s.host === 'string') {
-        innerHost = document.querySelector(s.host);
+      if (s.host) {
+        if (typeof s.host === 'string') {
+          innerHost = document.querySelector(s.host);
+        } else {
+          innerHost = s.host;
+        }
       }
       if (promise) {
         promise.then(() => {
@@ -362,7 +375,7 @@ const showdowns = {
     katex: {},
     kroki: {},
     vega: { theme: 'vox' },
-    shiki: {},
+    shiki: {}
   },
   defaultExtensions: {},
   defaultAsyncExtensions: {},
@@ -380,7 +393,7 @@ const showdowns = {
         katex: {},
         kroki: {},
         vega: {},
-        shiki: {},
+        shiki: {}
       };
     }
   },
@@ -678,9 +691,9 @@ const showdowns = {
             extras = [extras];
           }
           for (let i = 0; i < extras.length; ++i) {
-            if (typeof extras[i] !== 'string'){
-               content += extras.outerHTML;
-               continue
+            if (typeof extras[i] !== 'string') {
+              content += extras.outerHTML;
+              continue
             };
             content += extras[i];
           }

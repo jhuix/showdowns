@@ -76,7 +76,7 @@ function renderVega(element, options, scripts, isVegaLite) {
   const container = meta.container;
   const vegaRenderer = (meta, config) => {
     const result = () => {
-      const wval = eval;
+      const wval = window.eval;
       let el = document.getElementById(meta.id);
       if (el) {
         if (

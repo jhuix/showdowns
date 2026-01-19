@@ -100,7 +100,9 @@ const config = {
     'vega-embed',
     'vega-lite',
     'wavedrom',
-    'shiki'
+    'shiki',
+    'https://esm.sh/shiki@3.21.0',
+    'plotly.js-dist-min'
   ],
   plugins: [
     json(),
