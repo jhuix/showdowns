@@ -262,6 +262,8 @@ Table header can be eliminated.
 
 [Plotly](https://github.com/jhuix/showdowns/blob/master/docs/showdowns-features.md#plotly)
 
+[AntV Infographic](https://github.com/jhuix/showdowns/blob/master/docs/showdowns-features.md#antv-infographic)
+
 See more information, refer to the following document:
 
 [Extensions Examples](https://github.com/jhuix/showdowns/blob/master/docs/showdowns-features.md)
@@ -584,6 +586,7 @@ Default async extensions is described below:
       'showdown-abc': showdownAbc(),
       'showdown-echarts': showdownEcharts(),
       'showdown-gnuplot': showdownShiki(gnuplotOptions),
+      'showdown-antv': showdownAntV(),
       'showdown-sequence': getExtension('showdown-sequence', showdownSequence),
       'showdown-shiki': showdownShiki(shikiOptions),
       'showdow-css': showdownCss(),

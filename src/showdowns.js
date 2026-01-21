@@ -16,6 +16,7 @@ import showdownCss from './extensions/showdown-css.js';
 import showdownViz from './extensions/showdown-viz.js';
 import showdownTex from './extensions/showdown-tex.js';
 import showdownVega from './extensions/showdown-vega.js';
+import showdownAntV from './extensions/showdown-antv.js';
 import showdownAlign from './extensions/showdown-align.js';
 import showdownKatex from './extensions/showdown-katex.js';
 import showdownKroki from './extensions/showdown-kroki.js';
@@ -95,6 +96,7 @@ const getAsyncExtensions = (options, extensions = {}) => {
     'showdown-echarts': showdownEcharts(),
     'showdown-plotly': showdownPlotly(),
     'showdown-gnuplot': showdownGnuplot(gnuplotOptions),
+    'showdown-antv': showdownAntV(),
     'showdown-sequence': getExtension('showdown-sequence', showdownSequence),
     ...extensions,
     'showdown-shiki': showdownShiki(shikiOptions),
