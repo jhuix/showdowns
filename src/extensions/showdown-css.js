@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2019-present, Jhuix (Hui Jin) <jhuix0117@gmail.com>. All rights reserved.
  * Use of this source code is governed by a MIT license that can be found in the LICENSE file.
- * Description: showdown checktype extension for markdown
+ * Description: showdown css extension for markdown
  */
 'use strict';
 
@@ -30,7 +30,7 @@ function showdownCss() {
             if (e.href && typeof e.href === 'string' && e.href.substr(0, 4) === 'css:') {
               let cssLink = e.href.substr(4).trim();
               const hash = `${utils.hashString(cssLink)}`;
-              utils.addCssLink(obj, cssLink, prefix + hash);             
+              utils.addCssLink(obj, cssLink, prefix + hash);
               if (e.parentNode && e.parentNode.tagName === 'P' && e.parentNode.parentNode) {
                 e.parentNode.parentNode.removeChild(e.parentNode);
               } else {

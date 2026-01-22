@@ -1653,7 +1653,11 @@ data
 
 ### ZenUML
 
-Support rendering svg of [zenuml](https://github.com/mermaid-js/zenuml-core).
+Support rendering svg of [ZenUML](https://github.com/mermaid-js/zenuml-core).
+
+[ZenUML](https://github.com/mermaid-js/zenuml-core). is a family of diagramming tools operated by P&D Vision Pty Ltd. It works on Atlassian Confluence, any modern browser, JetBrains Intellij IDE. It is featured as a leading diagram-as-code solution for sequence diagrams. Extra capabilities are provided on different platforms.
+
+ZenUML language guide see [Language Guide](https://zenuml.com/docs/category/language-guide/).
 
 ZenUML options see [ZenumlOptions](https://github.com/mermaid-js/zenuml-core/blob/main/TUTORIAL.md#configuration).
 

@@ -135,7 +135,7 @@ function parseLangAttr(langattr) {
         if (!obj) {
           obj = {};
         }
-        const key = kv[0].trim();
+        const key = kv[0].trim().replace(' ', '-');
         let value = kv[1].trim();
         if (value.toLowerCase() === 'true') {
           value = true;

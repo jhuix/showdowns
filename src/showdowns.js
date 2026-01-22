@@ -34,11 +34,16 @@ import showdownWavedrom from './extensions/showdown-wavedrom.js';
 import showdownFootnotes from './extensions/showdown-footnotes.js';
 import showdownContainer from './extensions/showdown-container.js';
 import showdownFlowchart from './extensions/showdown-flowchart.js';
+import { showdownImage, showdownAsyncImage, imageEventName } from './extensions/showdown-image.js'
 
 import * as zlibcodec from './utils/zlib-codec.js';
 import cdnjs from './extensions/cdn';
 import format from './extensions/log';
 import { deepMerge } from './extensions/utils.js';
+import EventBus from './utils/event-bus.js';
+
+const events = {};
+events[imageEventName] = imageEventName;
 
 //////////////////////////////////////////////////////////////////////
 const getOptions = (options = {}) => {
@@ -82,6 +87,7 @@ const getAsyncExtensions = (options, extensions = {}) => {
 
   const asyncExtensions = {
     'showdown-toc': getExtension('showdown-toc', showdownToc),
+    'showdown-image': showdownAsyncImage(),
     'showdown-plantuml': showdownPlantuml(plantumlOptions),
     'showdown-mermaid': showdownMermaid(mermaidOptions),
     'showdown-mathjax': showdownMathJax(mathjaxOptions),
@@ -118,6 +124,7 @@ const getAsyncExtensions = (options, extensions = {}) => {
 const getExtensions = (options, extensions = {}) => {
   const nativeExtensions = {
     'showdown-toc': showdownToc(options.toc),
+    'showdown-image': showdownImage(),
     'showdown-align': showdownAlign(),
     'showdown-footnotes': showdownFootnotes(),
     'showdown-container': showdownContainer(),
@@ -383,6 +390,7 @@ const showdowns = {
   },
   defaultExtensions: {},
   defaultAsyncExtensions: {},
+  eventBus: EventBus,
   markdownDecodeFilter: function (doc) {
     return '';
   },
@@ -399,6 +407,11 @@ const showdowns = {
         vega: {},
         shiki: {}
       };
+    }
+  },
+  onEvent: (event, callback) => {
+    if (events[event]) {
+      EventBus.on(events[event], callback);
     }
   },
   setFlavor: function (name) {
