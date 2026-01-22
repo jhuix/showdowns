@@ -86,6 +86,7 @@ const config = {
     '@jhuix/shiki-loader',
     '@rokt33r/js-sequence-diagrams',
     '@viz-js/viz',
+    '@zenuml/core',
     'abcjs',
     'echarts',
     'flowchart.js',

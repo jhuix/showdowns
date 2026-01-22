@@ -264,6 +264,8 @@ Table header can be eliminated.
 
 [AntV Infographic](https://github.com/jhuix/showdowns/blob/master/docs/showdowns-features.md#antv-infographic)
 
+[ZenUML](https://github.com/jhuix/showdowns/blob/master/docs/showdowns-features.md#zenuml)
+
 See more information, refer to the following document:
 
 [Extensions Examples](https://github.com/jhuix/showdowns/blob/master/docs/showdowns-features.md)

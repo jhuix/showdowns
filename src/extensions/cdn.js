@@ -42,7 +42,8 @@ const cdnSrc = {
     vegaEmbed: '../node_modules/vega-embed/build/vega-embed.min.js',
     Plotly: '../node_modules/plotly.js-dist-min/plotly.min.js',
     Shiki: '../node_modules/@jhuix/shiki-loader/dist/index.js',
-    AntVInfographic: '../node_modules/@antv/infographic/dist/infographic.min.js'
+    AntVInfographic: '../node_modules/@antv/infographic/dist/infographic.min.js',
+    zenuml: '../node_modules/@zenuml/core/dist/zenuml.js'
   },
   cdnjs: {
     ABCJS: scheme + 'cdnjs.cloudflare.com/ajax/libs/abcjs/6.5.1/abcjs-basic-min.js',
@@ -74,7 +75,8 @@ const cdnSrc = {
     vegaEmbed: scheme + 'cdnjs.cloudflare.com/ajax/libs/vega-embed/7.0.2/vega-embed.min.js',
     Plotly: scheme + 'cdnjs.cloudflare.com/ajax/libs/plotly.js/3.1.1/plotly.min.js',
     Shiki: 'https://esm.sh/shiki@3.21.0',
-    AntVInfographic: scheme + 'cdn.jsdelivr.net/npm/@antv/infographic/dist/infographic.min.js'
+    AntVInfographic: scheme + 'www.unpkg.com/@antv/infographic/dist/infographic.min.js',
+    zenuml: scheme + 'www.unpkg.com/@zenuml/core/dist/zenuml.js'
   },
   jsdelivr: {
     ABCJS: scheme + 'cdn.jsdelivr.net/npm/abcjs@6/dist/abcjs-basic-min.js',
@@ -106,7 +108,8 @@ const cdnSrc = {
     vegaEmbed: scheme + 'cdn.jsdelivr.net/npm/vega-embed@7/build/vega-embed.min.js',
     Plotly: scheme + 'cdn.jsdelivr.net/npm/plotly.js-dist-min@3.3.1/plotly.min.js',
     Shiki: 'https://cdn.jsdelivr.net/npm/shiki@3.21.0/+esm',
-    AntVInfographic: scheme + 'cdn.jsdelivr.net/npm/@antv/infographic/dist/infographic.min.js'
+    AntVInfographic: scheme + 'cdn.jsdelivr.net/npm/@antv/infographic/dist/infographic.min.js',
+    zenuml: scheme + 'cdn.jsdelivr.net/npm/@zenuml/core/dist/zenuml.min.js'
   },
 };
 
