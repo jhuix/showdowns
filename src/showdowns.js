@@ -4,10 +4,10 @@
  */
 'use strict';
 
-import './less/preview.less';
+import './less/toc.less';
 import './less/container.less';
 import './less/codetools.less';
-import './less/toc.less';
+import './less/preview.less';
 
 import showdown from './parser/showdown.js';
 import showdownAbc from './extensions/showdown-abc.js';
@@ -34,7 +34,7 @@ import showdownWavedrom from './extensions/showdown-wavedrom.js';
 import showdownFootnotes from './extensions/showdown-footnotes.js';
 import showdownContainer from './extensions/showdown-container.js';
 import showdownFlowchart from './extensions/showdown-flowchart.js';
-import { showdownImage, showdownAsyncImage, imageEventName } from './extensions/showdown-image.js'
+import { showdownImage, showdownAsyncImage, imageResetEventName } from './extensions/showdown-image.js'
 
 import * as zlibcodec from './utils/zlib-codec.js';
 import cdnjs from './extensions/cdn';
@@ -43,7 +43,7 @@ import { deepMerge } from './extensions/utils.js';
 import EventBus from './utils/event-bus.js';
 
 const events = {};
-events[imageEventName] = imageEventName;
+events[imageResetEventName] = imageResetEventName;
 
 //////////////////////////////////////////////////////////////////////
 const getOptions = (options = {}) => {
@@ -377,6 +377,7 @@ const mathEngines = ['mathjax', 'katex'];
 const showdowns = {
   showdown: showdown,
   converter: null,
+  eventBus: EventBus,
   defaultOptions: {
     showdown: getOptions(),
     toc: {},
@@ -390,7 +391,6 @@ const showdowns = {
   },
   defaultExtensions: {},
   defaultAsyncExtensions: {},
-  eventBus: EventBus,
   markdownDecodeFilter: function (doc) {
     return '';
   },

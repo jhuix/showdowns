@@ -2,35 +2,23 @@
  * Copyright (c) 2019-present, Jhuix (Hui Jin) <jhuix0117@gmail.com>. All rights reserved.
  * Use of this source code is governed by a MIT license that can be found in the LICENSE file.
  */
+.none {
+  position: absolute;
+  width: 0px;
+  height: 0px;
+  overflow: hidden;
+}
+
+.hidden {
+  display: none !important;
+}
+
 .showdowns {
   position: relative;
   margin-left: 1rem;
   margin-right: 1rem;
   flex-grow: 1;
   min-width: 300px;
-
-  div,
-  dl,
-  dt,
-  dd,
-  ul,
-  ol,
-  li,
-  h1,
-  h2,
-  h3,
-  h4,
-  h5,
-  h6,
-  pre,
-  form,
-  p,
-  blockquote,
-  th,
-  td {
-    margin: 0;
-    padding: 0;
-  }
 
   p,
   li,
@@ -318,7 +306,6 @@
     word-wrap: break-word;
     /* Internet Explorer 5.5+ */
     border: 1px solid #dfdfdf;
-    margin-top: 1.5em;
     margin-bottom: 1.5em;
     padding: 0.125em 0.3125em 0.0625em;
   }

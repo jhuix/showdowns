@@ -15,11 +15,11 @@ class EventEmitter {
   /** @type { [key: string]: Set<Callback> } */
   events = {};
 
-  /**
- *
- * @param {string} event
- * @param {Callback} callback
- */
+  /** Event on
+   *
+   * @param {string} event
+   * @param {Callback} callback
+   */
   on(event, callback) {
     if (!this.events[event]) {
       this.events[event] = new Set();
@@ -27,7 +27,7 @@ class EventEmitter {
     this.events[event].add(callback);
   }
 
-  /**
+  /** Event off
    *
    * @param {string} event
    * @param {Callback} callback
@@ -36,19 +36,19 @@ class EventEmitter {
     this.events[event]?.delete(callback);
   }
 
-  /**
-   * emit event
+  /** Event emit
+   *
    * @param {string} event
-   * @param {any} [data]
+   * @param {...any[]} [data]
    *
    * @returns {number}
    */
-  emit(event, data) {
+  emit(event, ...data) {
     let count = 0;
     const callbacks = this.events[event];
     if (callbacks) {
       callbacks.forEach((callback) => {
-        callback(data)
+        callback(...data)
         count++;
       });
     }

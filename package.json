@@ -38,7 +38,9 @@
     "railroad",
     "viz",
     "vega",
-    "gnuplot"
+    "gnuplot",
+    "zenuml",
+    "antv"
   ],
   "files": [
     "dist",

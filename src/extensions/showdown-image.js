@@ -1,14 +1,14 @@
 /*
  * Copyright (c) 2025-present, Jhuix (Hui Jin) <jhuix0117@gmail.com>. All rights reserved.
  * Use of this source code is governed by a MIT license that can be found in the LICENSE file.
- * Description: showdown image extension for markdown
+ * Description: showdown inline image extension for markdown
  */
 'use strict';
 
 import format from './log';
 import EventBus from '../utils/event-bus';
 
-const imageEventName = 'getImagePath';
+const imageResetEventName = 'resetImagePath';
 
 function showdownImage() {
   return [
@@ -31,13 +31,14 @@ function renderInlineImage(element) {
     }
 
     const id = 'image-' + Date.now() + Math.floor(Math.random() * 10000);
-    const data = { id: id, src: src, callback: (filepath) => {
+    const callback = (filepath) => {
       if (!filepath) filepath = src;
       element.src = filepath;
+      delete element.dataset.src;
       resolve(true);
-    }};
-    if (!EventBus.emit(imageEventName, data)) {
-      return resolve(false);
+    };
+    if (!EventBus.emit(imageResetEventName, id, src, callback)) {
+      callback(src);
     }
   });
 }
@@ -63,7 +64,7 @@ function showdownAsyncImage() {
         if (!wrapper) {
           return false;
         }
-        // find the plotly in code blocks
+        // find the inline image in code blocks
         const elements = wrapper.querySelectorAll('img.inline-image');
         if (!elements.length) {
           return false;
@@ -79,4 +80,4 @@ function showdownAsyncImage() {
   ];
 }
 
-export { showdownImage as default, showdownImage, showdownAsyncImage, imageEventName };
+export { showdownImage as default, showdownImage, showdownAsyncImage, imageResetEventName };

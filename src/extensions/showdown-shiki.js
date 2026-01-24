@@ -8,6 +8,7 @@
 import format from './log';
 import cdnjs from './cdn';
 import utils from './utils';
+import i18n from './i18n';
 
 if (typeof Shiki === 'undefined') {
   var Shiki = window.Shiki || undefined;
@@ -48,9 +49,8 @@ function unloadScript() {
 
 function loadCodeTools() {
   function load() {
-    let tools;
-    let refContainer = 0;
-    /** example html
+    let themes;
+    /** example theme options
     <div class="select-items select-theme-items">
       <div class="options-item selected-item"  data-theme="GitHub Light" title="GitHub Light">
         <span class="select-item-content">GitHub Light</span>
@@ -58,7 +58,9 @@ function loadCodeTools() {
       ...
     </div>
      */
-    function ceateThemes(doc) {
+    function getThemes(doc) {
+      if (themes) return themes;
+
       function ceateThemeItem(root, theme, name) {
         const item = doc.createElement('div');
         item.classList.add('options-item');
@@ -79,23 +81,35 @@ function loadCodeTools() {
             }
           });
           // change theme
-          if (tools) {
-            tools.themeSelect.selector.dataset.theme = item.dataset.theme;
-            tools.themeSelect.selector.title = item.dataset.name;
-            tools.themeSelect.content.textContent = item.title;
-            tools.currContainer.dataset.theme = item.dataset.theme;
-            tools.currContainer.dataset.themeName = item.dataset.name;
-            const langId = tools.currContainer.dataset.language;
-            const themeId = tools.currContainer.dataset.theme;
-            const codeblock = tools.currContainer.querySelector('pre code');
+          if (themes && themes.container) {
+            const container = themes.container;
+            const themer = themes.themer;
+            const tools = themes.tools;
+            container.dataset.theme = item.dataset.theme;
+            container.dataset.themeName = item.dataset.name;
+            if (themer) {
+              const themePrefix = i18n.getLangString('code-theme-prefix');
+              themer.dataset.title = themePrefix + item.dataset.name;
+            }
+            const langId = container.dataset.language;
+            const themeId = item.dataset.theme;
+            const codeblock = container.querySelector('pre code');
             if (codeblock) {
               const code = codeblock?.textContent;
               window.Shiki.codeToHtml(code, { lang: langId, theme: themeId }).then((output) => {
                 codeblock.parentNode.outerHTML = output;
               });
             }
+            if (tools) {
+              tools.classList.remove('show-theme-options');
+            }
+            themes.container = null;
+            themes.themer = null;
+            themes.tools = null;
           }
           root.style = '';
+          root.remove();
+          e.stopPropagation();
         });
         return { option: item, content: content };
       }
@@ -109,225 +123,106 @@ function loadCodeTools() {
         options.appendChild(item.option);
         items.push(item);
       });
-      return { options, items };
+      themes = { options, items };
+      return themes;
     }
 
-    function createCodeTools(doc) {
-      if (tools) return;
-
-      tools = {};
-      tools.root = doc.createElement('div');
-      tools.root.classList.add('codeblock-tools');
-      tools.root.innerHTML = `<div class="start-nav">
-  <div class="tools-select tools-select-lanuage">
-    <div class="tools-select-selector">
-      <span class="tools-select-selection-item"></span>
-    </div>
-  </div>
-  <div class="tools-message hidden">
-    <div class="tools-message-notice">
-    <span role="img" class="tools-message-icon">
-      <svg viewBox="64 64 896 896" focusable="false" width="1em" height="1em" fill="currentColor" aria-hidden="true">
-        <path
-          d="M512 64C264.6 64 64 264.6 64 512s200.6 448 448 448 448-200.6 448-448S759.4 64 512 64zm193.5 301.7l-210.6 292a31.8 31.8 0 01-51.7 0L318.5 484.9c-3.8-5.3 0-12.7 6.5-12.7h46.9c10.2 0 19.9 4.9 25.9 13.3l71.2 98.8 157.2-218c6-8.3 15.6-13.3 25.9-13.3H699c6.5 0 10.3 7.4 6.5 12.7z">
-        </path>
-      </svg>
-    </span>
-    <span class="tools-message-content"></span>
-    </div>
-  </div>
-</div>
-<div class="end-nav">
-  <div class="tools-select tools-select-theme">
-    <div class="tools-select-selector">
-      <span class="tools-select-selection-item"></span>
-    </div>
-    <span class="tools-select-arrow" unselectable="on" aria-hidden="true">
-      <div class="tools-icon" data-name="ArrowDown">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor" fill-rule="evenodd"
-          class="svg-icon svg-icon-arrow-down" width="1em" height="1em" style="width: 16px; height: 16px;">
-          <path
-            d="M57.297 102.865c3.834-3.834 10.007-3.904 13.927-.21l.215.21 48.99 48.99c3.834 3.834 10.007 3.904 13.927.209l.215-.21 48.99-48.99c3.905-3.904 10.237-3.904 14.142 0 3.834 3.835 3.904 10.008.21 13.928l-.21.215-48.99 48.99c-11.598 11.599-30.331 11.714-42.073.348l-.353-.348-48.99-48.99c-3.905-3.905-3.905-10.237 0-14.142Z">
-          </path>
-        </svg>
-      </div>
-    </span>
-  </div>
-</div>
-<div class="tools-divider tools-divider-vertical"></div>
-<div class="codeblock-tools-button tools-copy-button" title="Action Copy">
-  <div class="tools-icon" data-name="ActionCopy">
-    <svg width="1em" height="1em" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg"
-      class="svg-icon svg-icon-action-copy">
-      <g fill="currentColor" fill-rule="nonzero">
-        <path
-          d="M198 28h-80c-16.569 0-30 13.431-30 30v80c0 16.569 13.431 30 30 30h80c16.569 0 30-13.431 30-30V58c0-16.569-13.431-30-30-30Zm-80 20h80c5.523 0 10 4.477 10 10v80c0 5.523-4.477 10-10 10h-80c-5.523 0-10-4.477-10-10V58c0-5.523 4.477-10 10-10Z">
-        </path>
-        <path
-          d="M97.6 88v20H58c-5.43 0-9.848 4.327-9.996 9.72L48 118v80c0 5.43 4.327 9.848 9.72 9.996L58 208h80c5.43 0 9.848-4.327 9.996-9.72L148 198v-40.705h20V198c0 16.403-13.164 29.731-29.504 29.996L138 228H58c-16.403 0-29.731-13.164-29.996-29.504L28 198v-80c0-16.403 13.164-29.731 29.504-29.996L58 88h39.6Z">
-        </path>
-      </g>
-    </svg>
-  </div>
-</div>`;
-
-      const langSelect = tools.root.querySelector('.tools-select-lanuage')
-      if (langSelect) {
-        tools.langSelect = { select: langSelect };
-        tools.langSelect.selector = langSelect.querySelector('.tools-select-selector');
-        tools.langSelect.content = langSelect.querySelector('.tools-select-selection-item');
+    function showMessageNotice(message, text) {
+      if (message.content) {
+        message.content.textContent = text;
       }
-      const message = tools.root.querySelector('.tools-message');
-      if (message) {
-        tools.message = { select: message };
-        tools.message.notice = message.querySelector('.tools-message-notice');
-        tools.message.content = message.querySelector('.tools-message-content');
+      if (message.root) {
+        message.root.classList.remove('hidden');
       }
-      const themeSelect = tools.root.querySelector('.tools-select-theme');
-      if (themeSelect) {
-        tools.themeSelect = { select: themeSelect };
-        tools.themeSelect.selector = themeSelect.querySelector('.tools-select-selector');
-        tools.themeSelect.content = themeSelect.querySelector('.tools-select-selection-item');
-        tools.themes = ceateThemes(doc);
-        tools.root.appendChild(tools.themes.options);
-        themeSelect.addEventListener('click', function () {
-          if (!tools.currContainer) return;
-          if (tools.themes) {
+      if (message.timer) {
+        clearTimeout(message.timer);
+        message.timer = null;
+      }
+      message.timer = setTimeout(() => {
+        if (message.content) {
+          message.content.textContent = '';
+        }
+        if (message.root) {
+          message.root.classList.add('hidden');
+        }
+        message.timer = null;
+        message.content = null;
+        message.root = null;
+      }, 5000);
+    }
+
+    const containers = document.querySelectorAll('.codeblock-container');
+    if (!containers?.length) return;
+
+    getThemes(document);
+    for (let i = 0; i < containers.length; i++) {
+      const container = containers[i];
+      const tools = container.querySelector('.codeblock-tools');
+      const copyer = container.querySelector('.tools-button-copy');
+      if (copyer) {
+        copyer.addEventListener('click', function () {
+          const codeblock = container.querySelector('pre code');
+          const message = {
+            root: container.querySelector('.tools-message'),
+            content: container.querySelector('.tools-message-content')
+          };
+          const text = codeblock?.textContent;
+          navigator.clipboard.writeText(text).then(function () {
+            showMessageNotice(message, i18n.getLangString('msg-copy-success'));
+          }, function (err) {
+            showMessageNotice(message, i18n.getLangString('msg-copy-failed'));
+          });
+        });
+      }
+      const themer = container.querySelector('.tools-button-theme');
+      if (themer) {
+        themer.addEventListener('click', function (ev) {
+          if (themes) {
+            if (themes.container && themes.options) {
+              themes.options.remove();
+            }
+            themes.container = container;
+            themes.themer = themer;
+            themes.tools = tools;
+            if (themes.tools) {
+              themes.tools.classList.add('show-theme-options');
+            }
             let activeOption;
-            tools.themes.items.forEach(function (item) {
-              if (tools.currContainer.dataset.theme === item.option.dataset.theme) {
+            themes.items.forEach(function (item) {
+              if (container.dataset.theme === item.option.dataset.theme) {
                 activeOption = item.option;
                 item.option.classList.add('selected-item');
               } else {
                 item.option.classList.remove('selected-item');
               }
             });
-
-            tools.themes.options.style.top = (tools.root.clientHeight - 1) + 'px';
-            tools.themes.options.style.right = 0;
-            tools.themes.options.classList.remove('hidden');
+            const currBound = themer.getBoundingClientRect();
+            const parentBound = themes.container.getBoundingClientRect();
+            themes.options.style.top = (currBound.bottom - parentBound.top - 1) + 'px';
+            themes.options.style.right = 0;
+            themes.container.appendChild(themes.options);
+            themes.options.classList.remove('hidden');
             if (activeOption) {
               activeOption.scrollIntoView({ container: "nearest" });
             }
+            ev.stopPropagation();
           }
-        });
-      }
-      const copyer = tools.root.querySelector('.tools-copy-button');
-      if (copyer) {
-        copyer.addEventListener('click', function () {
-          if (!tools.currContainer) return;
-          const codeblock = tools.currContainer.querySelector('pre code');
-          const text = codeblock?.textContent;
-          navigator.clipboard.writeText(text).then(function () {
-            if (tools.message) {
-              tools.message.content.textContent = '复制成功';
-              tools.message.select.classList.remove('hidden');
-              tools.message.notice.classList.add('show');
-              if (tools.message.timer){
-                clearTimeout(tools.message.timer);
-                tools.message.timer = null;
-              }
-              tools.message.timer = setTimeout(()=>{
-                tools.message.notice.classList.remove('show');
-                tools.message.select.classList.add('hidden');
-                tools.message.content.textContent = '';
-                tools.message.timer = null;
-              }, 5000)
-            }
-            console.log('Copy success!');
-          }, function (err) {
-            console.error('Copy failed:', err);
-          });
         });
       }
     }
 
-
-    createCodeTools(document);
-    const containers = document.querySelectorAll('.codeblock-container');
-    for (let i = 0; i < containers.length; i++) {
-      const container = containers[i];
-      container.addEventListener('mouseenter', function (e) {
-        refContainer++;
-        if (tools) {
-          const currContainer = e.target;
-          if (currContainer === tools.currContainer) return;
-
-          tools.currContainer = currContainer;
-          // clear tools timer
-          if (tools.timer) {
-            clearTimeout(tools.timer);
-            tools.timer = null;
-          }
-          tools.timer = setTimeout(() => {
-            // clean message
-            if (tools.message.timer){
-                clearTimeout(tools.message.timer);
-                tools.message.timer = null;
-            }
-            tools.message.notice.classList.remove('show');
-            tools.message.select.classList.add('hidden');
-            tools.message.content.textContent = '';
-
-            // set language and name
-            tools.langSelect.selector.dataset.language = currContainer.dataset.language;
-            tools.langSelect.selector.dataset.title = currContainer.dataset.langName;
-            tools.langSelect.content.textContent = currContainer.dataset.langName;
-
-            // set theme and name
-            tools.themeSelect.selector.dataset.theme = currContainer.dataset.theme;
-            tools.themeSelect.selector.dataset.title = currContainer.dataset.themeName;
-            tools.themeSelect.content.textContent = currContainer.dataset.themeName;
-
-            // set tools position
-            const rect = currContainer.getBoundingClientRect();
-            tools.themes.options.style = '';
-            tools.themes.options.classList.add('hidden');
-            tools.root.style.top = (rect.top + window.scrollY) + 'px';
-            tools.root.style.width = '500px';
-            tools.root.style.right = (document.body.offsetWidth - rect.right) + 'px';
-            if (!tools.parent) {
-              const showdowns = document.querySelector('.showdowns');
-              if (showdowns) {
-                tools.parent = showdowns.parentElement;
-              } else {
-                tools.parent = document.body;
-              }
-            }
-            // set tools to parent
-            if (!tools.parent.contains(tools.root)) {
-              tools.parent.appendChild(tools.root);
-            }
-            tools.timer = null;
-          }, 1500);
+    document.addEventListener('click', function () {
+      if (themes?.options?.parentNode) {
+        themes.options.style = '';
+        themes.options.remove();
+        if (themes.tools) {
+          themes.tools.classList.remove('show-theme-options');
         }
-      });
-      container.addEventListener('mouseleave', function (e) {
-        refContainer--;
-        // clear tools timer
-        if (tools.timer) {
-          clearTimeout(tools.timer);
-          tools.timer = null;
-        }
-        if (e.relatedTarget?.closest('.codeblock-tools') === tools.root) return;
-        if (tools && tools.parent && tools.parent.contains(tools.root)) {
-          // hidden theme options
-          tools.themes.options.style = '';
-          tools.themes.options.classList.add('hidden');
-          // remove tools from parent
-          tools.parent.removeChild(tools.root);
-          // clean message
-          if (tools.message.timer){
-              clearTimeout(tools.message.timer);
-              tools.message.timer = null;
-          }
-          tools.message.notice.classList.remove('show');
-          tools.message.select.classList.add('hidden');
-          tools.message.content.textContent = '';
-          tools.currContainer = null;
-        }
-      });
-    }
+        themes.container = null;
+        themes.themer = null;
+        themes.tools = null;
+      }
+    }, false);
   }
 
   if (!window || !('Shiki' in window)) {
@@ -344,6 +239,46 @@ function loadCodeTools() {
   }
 
   load();
+}
+
+function createCodeTools(doc, language, theme) {
+  const copyTitle = i18n.getLangString('code-copy');
+  const themePrefix = i18n.getLangString('code-theme-prefix');
+  const langPrefix = i18n.getLangString('code-lang-prefix');
+  const tools = doc.createElement('div');
+  tools.classList.add('codeblock-tools', 'toolbar-hover');
+  tools.innerHTML = `<div class="tools-message hidden">
+      <div class="tools-icon tools-message-icon">
+        <svg xmlns="http://www.w3.org/2000/svg">
+          <use xlink:href="#svg-icon-info"/>
+        </svg>
+      </div>
+      <span class="tools-message-content"></span>
+  </div>
+  <div class="tools-icon tools-button-lang" rel="tooltip" data-title="${langPrefix}${language}">
+    <svg xmlns="http://www.w3.org/2000/svg">
+      <use xlink:href="#svg-icon-language"/>
+    </svg>
+  </div>
+  <div class="tools-icon tools-button-theme" rel="tooltip" data-title="${themePrefix}${theme}">
+    <svg xmlns="http://www.w3.org/2000/svg">
+      <use xlink:href="#svg-icon-theme"/>
+    </svg>
+  </div>
+  <div class="tools-icon tools-button-copy" rel="tooltip" data-title="${copyTitle}">
+    <svg xmlns="http://www.w3.org/2000/svg">
+      <use xlink:href="#svg-icon-copy"/>
+    </svg>
+  </div>`;
+  return tools;
+}
+
+let tempDiv
+function getTempDiv(doc) {
+  if (tempDiv) return tempDiv;
+
+  tempDiv = doc.createElement('div');
+  return tempDiv;
 }
 
 function onRenderShiki(resolve, element, options) {
@@ -374,7 +309,13 @@ function onRenderShiki(resolve, element, options) {
       container.dataset.themeName = themeName;
       container.dataset.language = language;
       container.dataset.langName = langName;
-      container.innerHTML = output;
+      const tools = createCodeTools(doc, langName, themeName);
+      container.appendChild(tools);
+      const temp = getTempDiv(doc);
+      temp.innerHTML = output;
+      const codeblock = temp.children[0];
+      codeblock.remove();
+      container.appendChild(codeblock);
       element.parentNode.replaceWith(container);
       resolve(true);
     }).catch((err) => {
@@ -437,6 +378,8 @@ function showdownShiki(userConfig) {
           module: true,
         };
         obj.scripts.push(script);
+        const svgGlobal = '<div id="code-svgs" class="none hidden"><svg xmlns="http://www.w3.org/2000/svg"><symbol id="svg-icon-info" viewBox="64 64 896 896" fill="currentColor"><path d="M512 64C264.6 64 64 264.6 64 512s200.6 448 448 448 448-200.6 448-448S759.4 64 512 64zm193.5 301.7l-210.6 292a31.8 31.8 0 01-51.7 0L318.5 484.9c-3.8-5.3 0-12.7 6.5-12.7h46.9c10.2 0 19.9 4.9 25.9 13.3l71.2 98.8 157.2-218c6-8.3 15.6-13.3 25.9-13.3H699c6.5 0 10.3 7.4 6.5 12.7z"></path></symbol><symbol id="svg-icon-language" viewBox="0 0 1024 1024"><path d="M512 1024C229.248 1024 0 794.752 0 512S229.248 0 512 0s512 229.248 512 512-229.248 512-512 512z m0-938.666667C276.352 85.333333 85.333333 276.352 85.333333 512s191.018667 426.666667 426.666667 426.666667 426.666667-191.018667 426.666667-426.666667A426.666667 426.666667 0 0 0 512 85.333333z m0 682.666667a42.666667 42.666667 0 0 1-42.368-42.666667v-255.573333a42.368 42.368 0 1 1 84.693333 0V725.333333A42.410667 42.410667 0 0 1 512 768z m0-426.666667a42.325333 42.325333 0 1 1-0.085333-84.650666A42.325333 42.325333 0 0 1 512 341.333333z m42.325333-42.666666v0z" fill="currentColor"></path></symbol><symbol id="svg-icon-theme" viewBox="0 0 1024 1024"><path fill="currentColor" d="M42.666667 512C42.666667 251.733333 251.733333 42.666667 512 42.666667s469.333333 187.733333 469.333333 422.4c0 72.533333-29.866667 145.066667-81.066666 200.533333-51.2 51.2-123.733333 81.066667-200.533334 81.066667h-85.333333c-12.8 0-25.6 12.8-29.866667 25.6 0 8.533333 4.266667 17.066667 8.533334 21.333333 21.333333 21.333333 29.866667 46.933333 29.866666 76.8 0 64-51.2 110.933333-115.2 115.2C251.733333 981.333333 42.666667 772.266667 42.666667 512z m85.333333 0c0 213.333333 170.666667 384 384 384 17.066667 0 29.866667-12.8 29.866667-29.866667 0-4.266667 0-8.533333-4.266667-12.8l-4.266667-4.266666c-17.066667-21.333333-25.6-46.933333-29.866666-76.8 0-64 51.2-110.933333 115.2-110.933334h85.333333c51.2 0 102.4-21.333333 136.533333-55.466666 38.4-38.4 55.466667-85.333333 55.466667-136.533334 0-187.733333-170.666667-341.333333-384-341.333333s-384 170.666667-384 384z m593.066667 21.333333c-21.333333-21.333333-25.6-51.2-17.066667-76.8 12.8-25.6 38.4-42.666667 64-42.666666 38.4 0 68.266667 34.133333 72.533333 72.533333 0 29.866667-17.066667 55.466667-42.666666 64-8.533333 4.266667-17.066667 4.266667-25.6 4.266667-17.066667 0-38.4-8.533333-51.2-21.333334z m-520.533334 0c-21.333333-21.333333-25.6-51.2-17.066666-76.8 12.8-25.6 38.4-42.666667 64-42.666666 38.4 0 68.266667 34.133333 72.533333 72.533333 0 29.866667-17.066667 55.466667-42.666667 64-8.533333 4.266667-17.066667 4.266667-25.6 4.266667-21.333333 0-38.4-8.533333-51.2-21.333334z m379.733334-187.733333c-21.333333-21.333333-25.6-51.2-17.066667-76.8 12.8-25.6 38.4-42.666667 64-42.666667 38.4 0 68.266667 34.133333 72.533333 72.533334 0 29.866667-17.066667 55.466667-42.666666 64-8.533333 4.266667-17.066667 4.266667-25.6 4.266666-21.333333 0-38.4-8.533333-51.2-21.333333zM341.333333 345.6c-17.066667-21.333333-25.6-51.2-12.8-76.8 12.8-25.6 38.4-42.666667 64-42.666667 38.4 0 68.266667 34.133333 72.533334 72.533334 0 29.866667-17.066667 55.466667-42.666667 64l-29.866667 4.266666c-17.066667 0-34.133333-8.533333-51.2-21.333333z"></path></symbol><symbol id="svg-icon-copy" viewBox="0 0 16 16"><path d="M7 5h2a3 3 0 0 0 3-3 2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2 3 3 0 0 0 3 3zM6 2a2 2 0 1 1 4 0 1 1 0 0 1-1 1H7a1 1 0 0 1-1-1z" fill-rule="evenodd"></path></symbol></svg></div>';
+        obj.extras.push(svgGlobal);
         console.log(format(`Begin render shiki elements.`));
         return renderBlockElements(elements, this.config).then(() => {
           console.log(format(`End render shiki elements.`));

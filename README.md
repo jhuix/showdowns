@@ -232,6 +232,10 @@ Table header can be eliminated.
 
 [Container](https://github.com/jhuix/showdowns/blob/master/docs/showdowns-features.md#container)
 
+[CSS defined](https://github.com/jhuix/showdowns/blob/master/docs/showdowns-features.md#css-defined)
+
+[Inline Image](https://github.com/jhuix/showdowns/blob/master/docs/showdowns-features.md#inline-image)
+
 [Table of Contents](https://github.com/jhuix/showdowns/blob/master/docs/showdowns-features.md#table-of-contents)
 
 [LaTeX math and AsciiMath](https://github.com/jhuix/showdowns/blob/master/docs/showdowns-features.md#latex-math-and-asciimath)
@@ -556,6 +560,7 @@ Default extensions is described below:
 
     defaultExtensions = {
       'showdown-toc': showdownToc(options.toc),
+      'showdown-image': showdownImage(),
       'showdown-align': showdownAlign(),
       'showdown-footnotes': showdownFootnotes(),
       'showdown-container': showdownContainer(),
@@ -574,6 +579,7 @@ Default async extensions is described below:
 
     defaultAsyncExtensions = {
       'showdown-toc': getExtension('showdown-toc', showdownToc),
+      'showdown-image': showdownAsyncImage(),
       'showdown-plantuml': showdownPlantuml(plantumlOptions),
       'showdown-mermaid': showdownMermaid(mermaidOptions),
       'showdown-mathjax': showdownMathJax(mathjaxOptions),
@@ -612,7 +618,27 @@ Default: null
 
 Output showdown.convertor native object in current showdowns Instance.
 
+#### eventBus
+
+Type: EventBus
+
+Default: EventBus
+
+A internal event bus object, its method is as follows:
+
+- on(event: string, callback: (...args: any[]) => any) -- Register event method
+- off(event: string, callback: (...args: any[]) => any) -- Close event method
+- emit(event: string, ...data: ...any[]) => number -- Emit event method
+
 ### Methods
+
+#### onEvent
+
+Type: {event: string, callback: (...args: any[]) => any} => void
+
+Register event to showdowns engine. Currently supporting the following events:
+
+- 'resetImagePath': (id: string, src: string, callback: (imagePath: string) => void) -- Reset image path event for inline image
 
 #### setFlavor
 
