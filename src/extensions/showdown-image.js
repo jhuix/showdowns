@@ -13,12 +13,14 @@ const imageResetEventName = 'resetImagePath';
 function showdownImage() {
   return [
     {
-      type: 'lang',
-      filter: (text) =>
-        text.replace(/!\[\[([^\[\]]*)\]\](?:\{([^\{\}]*)\})?/gm, (_, filepath, attrs) => {
-          if (!attrs) attrs = '';
-          return `<img class="inline-image" data-src="${filepath}" ${attrs}/>`;
-        })
+      type: 'listener',
+      listeners: {
+        'images.after': (_, text) =>
+          text.replace(/!\[\[([^\[\]]*)\]\](?:\{([^\{\}]*)\})?/gm, (_, filepath, attrs) => {
+            if (!attrs) attrs = '';
+            return `<img class="inline-image" data-src="${filepath}" ${attrs}/>`;
+          })
+      }
     }
   ];
 }
