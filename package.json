@@ -65,6 +65,7 @@
     "@rollup/plugin-terser": "^0.4.4",
     "@types/rollup-plugin-node-builtins": "^2.1.5",
     "@types/rollup-plugin-node-globals": "^1.4.4",
+    "@types/showdown": "^2.0.6",
     "autoprefixer": "^10.4.19",
     "cssnano": "^7.0.4",
     "eslint": "^9.29.0",
