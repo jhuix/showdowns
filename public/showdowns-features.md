@@ -159,7 +159,7 @@ It's implemented in showdown-footnotes.js, use for reference the [showdown-footn
 
 ### CSS Defined
 
-Surpport css be defined. 
+Support css be defined. 
 
 #### Markdown Syntax
 
@@ -205,7 +205,7 @@ Which will be append a link element to head as:
 
 ### Inline Image
 
-Surpport inline image be defined, including the image path can be reset using a reset event.
+Support inline image be defined, including the image path can be reset using a reset event.
 
 Its markdown syntax format Its grammatical format is the same as that of obsidian-style image links.
 
