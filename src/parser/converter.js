@@ -204,7 +204,8 @@ showdown.Converter.prototype.initConvertExtObj = function(flavor, asyncExtension
 
     var globals = {
       outputs: outputs,
-      converter: this
+      converter: this,
+
     };
     const parser = new DOMParser();
     const doc = parser.parseFromString(content, 'text/html');
@@ -213,7 +214,9 @@ showdown.Converter.prototype.initConvertExtObj = function(flavor, asyncExtension
     const options = this.getOptions();
     let scripts = [];
     let cssLinks = [];
-    let result = Promise.resolve({ wrapper, options, globals, scripts, cssLinks });
+    let extras = [];
+    let symbols = [];
+    let result = Promise.resolve({ wrapper, options, globals, scripts, extras, symbols, cssLinks });
     //forEach写法
     outputs.forEach(function(ext) {
       result = result.then(obj => {
@@ -222,6 +225,10 @@ showdown.Converter.prototype.initConvertExtObj = function(flavor, asyncExtension
       });
     });
     return result.then(obj => {
+      if (obj.symbols.length > 0) {
+        const globalSymbols = `<div id="global-showdowns-svgs" class="none hidden"><svg xmlns="http://www.w3.org/2000/svg">${obj.symbols.join('')}</svg></div>`;
+        obj.extras.unshift(globalSymbols);
+      }
       if (typeof callback === 'function' && callback) {
         const promise = callback(obj);
         if (promise instanceof Promise) {
