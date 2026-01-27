@@ -98,7 +98,7 @@ function onRenderInfoGraphic(resolve, meta) {
 function renderInfoGraphic(element) {
   return new Promise(resolve => {
     const meta = utils.createElementMeta('infographic', element);
-    if (!meta || meta.data.length === 0) {
+    if (!meta || !meta.data) {
       return resolve(false);
     }
 

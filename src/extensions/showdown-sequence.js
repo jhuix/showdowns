@@ -57,7 +57,6 @@ function dyncLoadScript() {
 
     if (!sync) {
       dync = true;
-      cdnjs.loadStyleSheet(cssCdnName);
       cdnjs
         .loadScript('WebFont')
         .then(() => {
@@ -100,7 +99,6 @@ function unloadScript() {
   cdnjs.unloadScript('underscore');
   cdnjs.unloadScript('Snap');
   cdnjs.unloadScript('WebFont');
-  cdnjs.unloadStyleSheet(cssCdnName);
   diagram = null;
   sequence = null;
   window.Diagram = null;
@@ -127,48 +125,24 @@ function unloadScript() {
  * render sequence graphs
  */
 function renderSequence(element) {
-  const langattr = element.dataset.lang;
-  const langobj = langattr ? JSON.parse(langattr) : null;
-  let diagramClass = '';
-  if (langobj) {
-    if (
-      (typeof langobj.codeblock === 'boolean' && langobj.codeblock) ||
-      (typeof langobj.codeblock === 'string' && langobj.codeblock.toLowerCase() === 'true')
-    ) {
-      return;
-    }
+  const meta = utils.createElementMeta('sequence', element);
+  if (!meta || !meta.data) {
+    return;
+  }
 
-    if (langobj.align) {
-      //default left
-      if (langobj.align === 'center') {
-        diagramClass = 'diagram-center';
-      } else if (langobj.align === 'right') {
-        diagramClass = 'diagram-right';
-      }
-    }
-  }
   const sync = dyncLoadScript();
-  const cssLink = cdnjs.getSrc(true, cssCdnName);
-  const code = element.textContent.trim();
-  const name = 'js-sequence' + (!diagramClass ? '' : ' ') + diagramClass;
-  const id = 'sequence-' + Date.now() + '-' + Math.floor(Math.random() * 10000);
-  element.id = id;
-  element.classList.remove('language-sequence');
-  if (cssLink) {
-    element.className = element.className + (!element.className ? '' : ' ') + 'css-sequence';
-    element.dataset.css = cssLink;
-  }
+  const code = meta.data;
+  element.classList.replace('sequence', 'js-sequence');
   if (!sync && typeof window !== 'undefined' && window.dispatchEvent) {
-    Promise.resolve(id).then((elementid) => {
+    Promise.resolve(meta.id).then((elementid) => {
       // dispatch sequence custom event
       window.dispatchEvent(
         new CustomEvent('sequence', {
           detail: {
-            id: elementid,
-            className: name,
+            id: element.id,
+            className: element.className,
             data: code,
-            langattr: langattr,
-            cssLink: cssLink,
+            lang: meta.lang
           },
         })
       );
@@ -179,11 +153,10 @@ function renderSequence(element) {
       window.dispatchEvent(
         new CustomEvent('sequence', {
           detail: {
-            id: id,
-            className: name,
+            id: element.id,
+            className: element.className,
             data: code,
-            langattr: langattr,
-            cssLink: cssLink
+            lang: meta.lang
           }
         })
       );
@@ -207,24 +180,18 @@ function onRenderSequence(element) {
     const id = element.id;
     const name = element.className;
     const data = element.data;
+    const lang = element.lang;
     if (!data || data.length === 0) {
       return;
     }
 
-    const cssLink = element.cssLink;
     let theme = 'hand';
-    const langattr = element.langattr;
-    if (langattr) {
-      const obj = JSON.parse(langattr);
-      if (obj && obj.theme && themes.indexOf(obj.theme) != -1) {
-        theme = obj.theme;
-      }
+    if (lang && lang.theme && themes.indexOf(lang.theme) != -1) {
+      theme = lang.theme;
     }
     let el = window.document.getElementById(id);
     if (el) {
-      el.parentNode.outerHTML = cssLink
-        ? `<div id="${id}" class="${name} css-sequence" data-css="${cssLink}"></div>`
-        : `<div id="${id}" class="${name}"></div>`;
+      el.parentNode.outerHTML = `<div id="${id}" class="${name}"></div>`;
       el = window.document.getElementById(id);
       const d = sequence.parse(data);
       const options = { theme: theme };
@@ -265,7 +232,7 @@ function showdownSequence() {
             }
 
             this.config = {
-              cssLink: cdnjs.getSrc(true, cssCdnName),
+              cssLink: cdnjs.getCSS(true, 'sequence'),
             };
           }
           if (!renderSequenceElements(elements)) {
@@ -283,7 +250,7 @@ function showdownSequence() {
         const wrapper = obj.wrapper;
         const elements = wrapper.querySelectorAll('code.sequence.language-sequence');
         if (elements.length > 0) {
-          utils.addCssLink(obj, cdnjs.getSrc(true, cssCdnName), 'css-sequence');
+          utils.addCssLink(obj, cdnjs.getCSS(true, 'sequence'), 'css-sequence');
         }
         return obj;
       },

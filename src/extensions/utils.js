@@ -118,16 +118,16 @@ function renderElement(doc, id, name) {
 }
 
 
-function parseLangAttr(langattr) {
-  if (!langattr || typeof langattr !== 'string') {
+function parseAttribute(attrs) {
+  if (!attrs || typeof attrs !== 'string') {
     return null;
   }
 
   try {
-    return JSON.parse(langattr);
+    return JSON.parse(attrs);
   } catch (e) {
     let obj = null;
-    const code = langattr.replace(/^\{(.*)\}$/, '$1');
+    const code = attrs.replace(/^\{(.*)\}$/, '$1');
     const pairs = code.split(',');
     pairs.forEach(pair => {
       const kv = pair.split('=');
@@ -154,7 +154,7 @@ function parseLangAttr(langattr) {
 }
 
 function createElementMeta(name, element, hashid, callback) {
-  const langobj = parseLangAttr(element.dataset.lang);
+  const langobj = parseAttribute(element.dataset.lang);
   let diagramClass = 'diagram-left';
   if (langobj) {
     const codeblock = langobj.codeblock || langobj.code_block;
@@ -308,7 +308,7 @@ export function deepMerge(target, ...sources) {
 }
 
 const utils = {
-  parseLangAttr,
+  parseAttribute,
   interopDefault,
   loadStyle,
   loadStylesheet,

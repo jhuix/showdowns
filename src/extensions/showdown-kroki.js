@@ -22,7 +22,7 @@ function clearCache(doc) {
 
 function markKrokiElement(element, kroki) {
   const meta = utils.createElementMeta('Tex', element, true);
-  if (!meta || meta.data.length === 0) {
+  if (!meta || !meta.data) {
     return;
   }
 

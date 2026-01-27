@@ -23,7 +23,7 @@ function clearCache(doc) {
 
 function markTexElement(element, tex) {
   const meta = utils.createElementMeta('Tex', element, true);
-  if (!meta || meta.data.length === 0) {
+  if (!meta || !meta.data) {
     return;
   }
 

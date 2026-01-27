@@ -11,105 +11,203 @@ let defScheme = '';
 let distScheme = '';
 let uriPath = '';
 
+/** CDN source
+ *
+ * @typedef {string | Record<string, string>} CDNLink
+ *
+ * @typedef {{module: string, importmap: {imports: Record<string, string>},
+ *            css?: CDNLink, skin?: CDNLink, plugins?: Record<string, string>}} CDNModule
+ *
+ * @typedef {Record<string, string | CDNModule>} CDNModules
+ *
+ * @type {Record<string, CDNModules>}
+ */
 const cdnSrc = {
   local: {
-    ABCJS: '../node_modules/abcjs/dist/abcjs-basic.js',
-    ABCJSCSS: '../node_modules/abcjs/abcjs-audio.css',
+    ABCJS: {
+      src: '../node_modules/abcjs/dist/abcjs-basic.js',
+      css: '../node_modules/abcjs/abcjs-audio.css'
+    },
     echarts: '../node_modules/echarts/dist/echarts.js',
     Viz: '../node_modules/@viz-js/viz/dist/viz-global.js',
     Raphael: '../node_modules/raphael/raphael.min.js',
-    flowchart: '../dist/diagrams/flowchart/flowchart.min.js',
-    mermaid: '../node_modules/mermaid/dist/mermaid.js',
-    katex: '../node_modules/katex/dist/katex.min.js',
-    katexCSS: '../node_modules/katex/dist/katex.min.css',
+    flowchart: '../dist/flowchart/flowchart.min.js',
+    mermaid: {
+      src: '../node_modules/mermaid/dist/mermaid.min.js',
+      plugins: {
+        'mermaid-zenuml': '../node_modules/@mermaid-js/mermaid-zenuml/dist/mermaid-zenuml.min.js',
+        'mermaid-mindmap': '../node_modules/@mermaid-js/mermaid-mindmap/dist/mermaid-mindmap.min.js'
+      }
+    },
+    katex: {
+      src: '../node_modules/katex/dist/katex.min.js',
+      css: '../node_modules/katex/dist/katex.min.css'
+    },
     renderMathInElement: '../node_modules/katex/dist/contrib/auto-render.js',
     MathJax: '../node_modules/mathjax/tex-mml-svg.js',
-    railroad: '../node_modules/railroad-diagrams/railroad-diagrams.js',
-    railroadCSS: '../node_modules/railroad-diagrams/railroad-diagrams.css',
+    railroad: {
+      src: '../node_modules/railroad-diagrams/railroad-diagrams.js',
+      css: '../node_modules/railroad-diagrams/railroad-diagrams.css'
+    },
     Snap: '../node_modules/snapsvg/dist/snap.svg-min.js',
     WebFont: '../node_modules/webfontloader/webfontloader.js',
     underscore: '../node_modules/underscore/underscore-min.js',
-    sequence: '../node_modules/@rokt33r/js-sequence-diagrams/dist/sequence-diagram-min.js',
-    sequenceCSS: '../node_modules/@rokt33r/js-sequence-diagrams/dist/sequence-diagram-min.css',
-    WaveDrom: '../node_modules/wavedrom/wavedrom.min.js',
-    WaveDromSkin: {
-      default: '../node_modules/wavedrom/skins/default.js',
-      lowkey: '../node_modules/wavedrom/skins/lowkey.js',
-      narrow: '../node_modules/wavedrom/skins/narrow.js',
+    sequence: {
+      src: '../node_modules/@rokt33r/js-sequence-diagrams/dist/sequence-diagram-min.js',
+      css: '../node_modules/@rokt33r/js-sequence-diagrams/dist/sequence-diagram-min.css'
+    },
+    WaveDrom: {
+      src: '../node_modules/wavedrom/wavedrom.min.js',
+      skin: {
+        default: '../node_modules/wavedrom/skins/default.js',
+        lowkey: '../node_modules/wavedrom/skins/lowkey.js',
+        narrow: '../node_modules/wavedrom/skins/narrow.js'
+      }
     },
     vega: '../node_modules/vega/build/vega.min.js',
     vegaLite: '../node_modules/vega-lite/build/vega-lite.min.js',
     vegaEmbed: '../node_modules/vega-embed/build/vega-embed.min.js',
     Plotly: '../node_modules/plotly.js-dist-min/plotly.min.js',
-    Shiki: '../node_modules/@jhuix/shiki-loader/dist/index.js',
+    Shiki: {
+      type: 'module',
+      src: '../node_modules/@jhuix/shiki-loader/dist/index.js'
+    },
     AntVInfographic: '../node_modules/@antv/infographic/dist/infographic.min.js',
     zenuml: '../node_modules/@zenuml/core/dist/zenuml.js'
   },
-  cdnjs: {
-    ABCJS: scheme + 'cdnjs.cloudflare.com/ajax/libs/abcjs/6.5.1/abcjs-basic-min.js',
-    ABCJSCSS: scheme + 'cdn.jsdelivr.net/npm/abcjs@6/abcjs-audio.css',
-    echarts: scheme + 'cdnjs.cloudflare.com/ajax/libs/echarts/5.6.0/echarts.min.js',
-    Viz: scheme + 'cdn.jsdelivr.net/npm/@viz-js/viz@3/dist/viz-global.js',
-    Raphael: scheme + 'cdnjs.cloudflare.com/ajax/libs/raphael/2.3.0/raphael.min.js',
-    flowchart: scheme + 'cdnjs.cloudflare.com/ajax/libs/flowchart/1.18.0/flowchart.min.js',
-    mermaid: scheme + 'cdnjs.cloudflare.com/ajax/libs/mermaid/11.6.0/mermaid.min.js',
-    katex: scheme + 'cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.22/katex.min.js',
-    katexCSS: scheme + 'cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.22/katex.min.css',
-    renderMathInElement: scheme + 'cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.22/contrib/auto-render.js',
-    MathJax: scheme + 'cdnjs.cloudflare.com/ajax/libs/mathjax/4.0.0/tex-mml-svg.js',
-    railroad: scheme + 'cdnjs.cloudflare.com/ajax/libs/railroad-diagrams/1.0.0/railroad-diagrams.js',
-    railroadCSS: scheme + 'cdnjs.cloudflare.com/ajax/libs/railroad-diagrams/1.0.0/railroad-diagrams.css',
-    Snap: scheme + 'cdnjs.cloudflare.com/ajax/libs/snap.svg/0.5.1/snap.svg-min.js',
-    WebFont: scheme + 'cdnjs.cloudflare.com/ajax/libs/webfont/1.6.28/webfontloader.js',
-    underscore: scheme + 'cdnjs.cloudflare.com/ajax/libs/underscore.js/1.13.7/underscore-min.js',
-    sequence: scheme + 'cdn.jsdelivr.net/npm/@rokt33r/js-sequence-diagrams@2.0.6-2/dist/sequence-diagram-min.js',
-    sequenceCSS: scheme + 'cdn.jsdelivr.net/npm/@rokt33r/js-sequence-diagrams@2.0.6-2/dist/sequence-diagram-min.css',
-    WaveDrom: scheme + 'cdnjs.cloudflare.com/ajax/libs/wavedrom/3.5.0/wavedrom.min.js',
-    WaveDromSkin: {
-      default: scheme + 'cdnjs.cloudflare.com/ajax/libs/wavedrom/3.5.0/skins/default.js',
-      lowkey: scheme + 'cdnjs.cloudflare.com/ajax/libs/wavedrom/3.5.0/skins/lowkey.js',
-      narrow: scheme + 'cdnjs.cloudflare.com/ajax/libs/wavedrom/3.5.0/skins/narrow.js',
+  unpkg: {
+    ABCJS: {
+      src: 'https://unpkg.com/abcjs/dist/abcjs-basic-min.js',
+      css: 'https://unpkg.com/abcjs/dist/abcjs-audio.css'
     },
-    vega: scheme + 'cdnjs.cloudflare.com/ajax/libs/vega/6.1.2/vega.min.js',
-    vegaLite: scheme + 'cdnjs.cloudflare.com/ajax/libs/vega-lite/6.1.0/vega-lite.min.js',
-    vegaEmbed: scheme + 'cdnjs.cloudflare.com/ajax/libs/vega-embed/7.0.2/vega-embed.min.js',
-    Plotly: scheme + 'cdnjs.cloudflare.com/ajax/libs/plotly.js/3.1.1/plotly.min.js',
-    Shiki: 'https://esm.sh/shiki@3.21.0',
-    AntVInfographic: scheme + 'www.unpkg.com/@antv/infographic/dist/infographic.min.js',
-    zenuml: scheme + 'www.unpkg.com/@zenuml/core/dist/zenuml.js'
+    echarts: 'https://unpkg.com/echarts/dist/echarts.min.js',
+    Viz: 'https://unpkg.com/@viz-js/viz/dist/viz-global.js',
+    Raphael: 'https://unpkg.com/raphael/raphael.min.js',
+    flowchart: '../dist/flowchart/flowchart.min.js',
+    mermaid: {
+      src: 'https://unpkg.com/mermaid/dist/mermaid.min.js',
+      plugins: {
+        'mermaid-zenuml': 'https://unpkg.com/@mermaid-js/mermaid-zenuml/dist/mermaid-zenuml.min.js',
+        'mermaid-mindmap': 'https://unpkg.com/@mermaid-js/mermaid-mindmap/dist/mermaid-mindmap.min.js'
+      }
+    },
+    katex: {
+      src: 'https://unpkg.com/KaTeX/dist/katex.min.js',
+      css: 'https://unpkg.com/KaTeX/dist/katex.min.css'
+    },
+    renderMathInElement: 'https://unpkg.com/KaTeX/dist/contrib/auto-render.js',
+    MathJax: 'https://unpkg.com/mathjax/tex-mml-svg.js',
+    railroad: {
+      src: 'https://unpkg.com/railroad-diagrams/railroad-diagrams.js',
+      css: 'https://unpkg.com/railroad-diagrams/railroad-diagrams.css'
+    },
+    Snap: 'https://unpkg.com/snapsvg/dist/snap.svg-min.js',
+    WebFont: 'https://unpkg.com/webfontloader/webfontloader.js',
+    underscore: 'https://unpkg.com/underscore/underscore-min.js',
+    sequence: {
+      src: 'https://unpkg.com/@rokt33r/js-sequence-diagrams/dist/sequence-diagram-min.js',
+      css: 'https://unpkg.com/@rokt33r/js-sequence-diagrams/dist/sequence-diagram-min.css'
+    },
+    WaveDrom: {
+      src: 'https://unpkg.com/wavedrom/wavedrom.min.js',
+      skin: {
+        default: 'https://unpkg.com/wavedrom/skins/default.js',
+        lowkey: 'https://unpkg.com/wavedrom/skins/lowkey.js',
+        narrow: 'https://unpkg.com/wavedrom/skins/narrow.js',
+      }
+    },
+    vega: 'https://unpkg.com/vega/build/vega.min.js',
+    vegaLite: 'https://unpkg.com/vega-lite/build/vega-lite.min.js',
+    vegaEmbed: 'https://unpkg.com/vega-embed/build/vega-embed.min.js',
+    Plotly: 'https://unpkg.com/plotly.js/dist/plotly.min.js',
+    /** shiki for https://unpkg.com/shiki
+     * {
+     *     type: 'module',
+     *     module: 'https://unpkg.com/shiki',
+     *     importmap: {
+     *       imports: {
+     *           "@shikijs/": "https://unpkg.com/@shikijs/",
+     *           "hast-util-to-html": "https://unpkg.com/hast-util-to-html",
+     *           "html-void-elements": "https://unpkg.com/html-void-elements",
+     *           "property-information": "https://unpkg.com/property-information",
+     *           "zwitch": "https://unpkg.com/zwitch",
+     *           "stringify-entities": "https://unpkg.com/stringify-entities",
+     *           "character-entities-legacy": "https://unpkg.com/character-entities-legacy",
+     *           "character-entities-html4": "https://unpkg.com/character-entities-html4",
+     *           "ccount": "https://unpkg.com/ccount",
+     *           "comma-separated-tokens": "https://unpkg.com/comma-separated-tokens",
+     *           "space-separated-tokens": "https://unpkg.com/space-separated-tokens",
+     *           "hast-util-whitespace": "https://unpkg.com/hast-util-whitespace",
+     *           "oniguruma-to-es": "https://unpkg.com/oniguruma-to-es/dist/esm/index.js",
+     *           "oniguruma-parser/parser": "https://unpkg.com/oniguruma-parser/dist/parser/parse.js",
+     *           "oniguruma-parser/traverser": "https://unpkg.com/oniguruma-parser/dist/traverser/traverse.js",
+     *           "regex/internals": "https://unpkg.com/regex/src/internals.js",
+     *           "regex-recursion": "https://unpkg.com/regex-recursion/src/index.js",
+     *           "regex-utilities": "https://unpkg.com/regex-utilities/src/index.js",
+     *           "shiki/": "https://unpkg.com/shiki/"
+     *       }
+     *     }
+     * }
+     */
+    Shiki: {
+      type: 'module',
+      module: 'https://esm.sh/shiki'
+    },
+    AntVInfographic: 'https://unpkg.com/@antv/infographic/dist/infographic.min.js',
+    zenuml: 'https://unpkg.com/@zenuml/core/dist/zenuml.js'
   },
   jsdelivr: {
-    ABCJS: scheme + 'cdn.jsdelivr.net/npm/abcjs@6/dist/abcjs-basic-min.js',
-    ABCJSCSS: scheme + 'cdn.jsdelivr.net/npm/abcjs@6/abcjs-audio.css',
-    echarts: scheme + 'cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js',
-    Viz: scheme + 'cdn.jsdelivr.net/npm/@viz-js/viz@3/dist/viz-global.js',
-    Raphael: scheme + 'cdn.jsdelivr.net/npm/raphael@2/raphael.min.js',
-    flowchart: scheme + 'cdnjs.cloudflare.com/ajax/libs/flowchart/1.18.0/flowchart.min.js',
-    mermaid: scheme + 'cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js',
-    katex: scheme + 'cdn.jsdelivr.net/npm/katex@0/dist/katex.min.js',
-    katexCSS: scheme + 'cdn.jsdelivr.net/npm/katex@0/dist/katex.min.css',
-    renderMathInElement: scheme + 'cdn.jsdelivr.net/npm/katex@0/dist/contrib/auto-render.js',
-    MathJax: scheme + 'cdn.jsdelivr.net/npm/mathjax@4/tex-mml-svg.js',
-    railroad: scheme + 'cdn.jsdelivr.net/npm/railroad-diagrams@1/railroad-diagrams.js',
-    railroadCSS: scheme + 'cdn.jsdelivr.net/npm/railroad-diagrams@1/railroad-diagrams.css',
-    Snap: scheme + 'cdn.jsdelivr.net/npm/snapsvg@0/dist/snap.svg-min.js',
-    WebFont: scheme + 'cdn.jsdelivr.net/npm/webfontloader@1/webfontloader.js',
-    underscore: scheme + 'cdn.jsdelivr.net/npm/underscore@1/underscore-min.js',
-    sequence: scheme + 'cdn.jsdelivr.net/npm/@rokt33r/js-sequence-diagrams@2.0.6-2/dist/sequence-diagram-min.js',
-    sequenceCSS: scheme + 'cdn.jsdelivr.net/npm/@rokt33r/js-sequence-diagrams@2.0.6-2/dist/sequence-diagram-min.css',
-    WaveDrom: scheme + 'cdn.jsdelivr.net/npm/wavedrom@3/wavedrom.min.js',
-    WaveDromSkin: {
-      default: scheme + 'cdn.jsdelivr.net/npm/wavedrom@3/skins/default.js',
-      lowkey: scheme + 'cdn.jsdelivr.net/npm/wavedrom@3/skins/lowkey.js',
-      narrow: scheme + 'cdn.jsdelivr.net/npm/wavedrom@3/skins/narrow.js',
+    ABCJS: {
+      src: 'https://cdn.jsdelivr.net/npm/abcjs/dist/abcjs-basic-min.js',
+      css: 'https://cdn.jsdelivr.net/npm/abcjs/abcjs-audio.css'
     },
-    vega: scheme + 'cdn.jsdelivr.net/npm/vega@6/build/vega.min.js',
-    vegaLite: scheme + 'cdn.jsdelivr.net/npm/vega-lite@6/build/vega-lite.min.js',
-    vegaEmbed: scheme + 'cdn.jsdelivr.net/npm/vega-embed@7/build/vega-embed.min.js',
-    Plotly: scheme + 'cdn.jsdelivr.net/npm/plotly.js-dist-min@3.3.1/plotly.min.js',
-    Shiki: 'https://cdn.jsdelivr.net/npm/shiki@3.21.0/+esm',
-    AntVInfographic: scheme + 'cdn.jsdelivr.net/npm/@antv/infographic/dist/infographic.min.js',
-    zenuml: scheme + 'cdn.jsdelivr.net/npm/@zenuml/core/dist/zenuml.min.js'
+    echarts: 'https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js',
+    Viz: 'https://cdn.jsdelivr.net/npm/@viz-js/viz/dist/viz-global.js',
+    Raphael: 'https://cdn.jsdelivr.net/npm/raphael/raphael.min.js',
+    flowchart: '../dist/flowchart/flowchart.min.js',
+    mermaid: {
+      type: 'module',
+      module: 'https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs',
+      plugins: {
+        'mermaid-zenuml': 'https://cdn.jsdelivr.net/npm/@mermaid-js/mermaid-zenuml/dist/mermaid-zenuml.esm.min.mjs',
+        'mermaid-mindmap': 'https://cdn.jsdelivr.net/npm/@mermaid-js/mermaid-mindmap/dist/mermaid-mindmap.esm.min.mjs'
+      }
+    },
+    katex: {
+      src: 'https://cdn.jsdelivr.net/npm/katex/dist/katex.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/katex/dist/katex.min.css'
+    },
+    renderMathInElement: 'https://cdn.jsdelivr.net/npm/katex/dist/contrib/auto-render.js',
+    MathJax: 'https://cdn.jsdelivr.net/npm/mathjax/tex-mml-svg.js',
+    railroad: {
+      src: 'https://cdn.jsdelivr.net/npm/railroad-diagrams/railroad-diagrams.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/railroad-diagrams/railroad-diagrams.css'
+    },
+    Snap: 'https://cdn.jsdelivr.net/npm/snapsvg/dist/snap.svg-min.js',
+    WebFont: 'https://cdn.jsdelivr.net/npm/webfontloader/webfontloader.js',
+    underscore: 'https://cdn.jsdelivr.net/npm/underscore/underscore-min.js',
+    sequence: {
+      src: 'https://cdn.jsdelivr.net/npm/@rokt33r/js-sequence-diagrams/dist/sequence-diagram-min.js',
+      css: 'https://cdn.jsdelivr.net/npm/@rokt33r/js-sequence-diagrams/dist/sequence-diagram-min.css'
+    },
+    WaveDrom: {
+      src: 'https://cdn.jsdelivr.net/npm/wavedrom/wavedrom.min.js',
+      skin: {
+        default: 'https://cdn.jsdelivr.net/npm/wavedrom/skins/default.js',
+        lowkey: 'https://cdn.jsdelivr.net/npm/wavedrom/skins/lowkey.js',
+        narrow: 'https://cdn.jsdelivr.net/npm/wavedrom/skins/narrow.js'
+      }
+    },
+    vega: 'https://cdn.jsdelivr.net/npm/vega/build/vega.min.js',
+    vegaLite: 'https://cdn.jsdelivr.net/npm/vega-lite/build/vega-lite.min.js',
+    vegaEmbed: 'https://cdn.jsdelivr.net/npm/vega-embed/build/vega-embed.min.js',
+    Plotly: 'https://cdn.jsdelivr.net/npm/plotly.js-dist-min/plotly.min.js',
+    Shiki: {
+      type: 'module',
+      module: 'https://cdn.jsdelivr.net/npm/shiki/+esm'
+    },
+    AntVInfographic: 'https://cdn.jsdelivr.net/npm/@antv/infographic/dist/infographic.min.js',
+    zenuml: 'https://cdn.jsdelivr.net/npm/@zenuml/core/dist/zenuml.min.js'
   },
 };
 
@@ -136,18 +234,6 @@ function setCDN(name, scheme_default, scheme_dist, uri_path) {
 
 function getCDN() {
   return cdnName;
-}
-
-function getName(name) {
-  if (typeof name === 'object') {
-    const key = Object.keys(name)[0];
-    const val = name[key];
-    if (typeof val === 'string') {
-      return key + '-' + val;
-    }
-  }
-
-  return name;
 }
 
 function getUrl(url) {
@@ -182,143 +268,294 @@ function getUrl(url) {
   return url;
 }
 
-function getSrc(native, name, src, def) {
-  if (typeof src === 'undefined' || !src) {
-    src = getCDN();
+function filterUrl(native, url) {
+  if (native || url.startsWith('http://') || url.startsWith('https://') || url.startsWith(scheme)) {
+    return url;
   }
-  if (cdnSrc.hasOwnProperty(src)) {
-    const cdn = cdnSrc[src];
-    let url = '';
-    if (typeof name === 'object') {
-      const key = Object.keys(name)[0];
-      const val = name[key];
-      if (cdn[key] && typeof val === 'string' && val && cdn[key][val]) {
-        url = cdn[key][val];
-      }
-    } else if (cdn[name]) {
-      url = cdn[name];
-    }
 
-    if (url) {
-      if (native || url.startsWith('http://') || url.startsWith('https://') || url.startsWith(scheme)) {
-        def = url;
-      } else if (url.substring(0, 8) === '../dist/') {
-        def = distScheme + url;
-      } else {
-        def = defScheme + url;
-      }
-    }
+  if (url.startsWith('../dist/')) {
+    return distScheme + url;
   }
-  return def;
+
+  return defScheme + url;
 }
 
-function loadScript(name, src, defer, module) {
-  return new Promise((resovle, reject) => {
-    if (!name || typeof document === 'undefined') {
-      reject('Args is invaild!');
-    }
-
-    if (typeof src === 'undefined') {
-      src = '';
-    } else if (typeof src === 'boolean') {
-      module = defer
-      defer = src;
-      src = '';
-    }
-
-    src = getSrc(false, name, src);
-    if (!src) {
-      reject(name + ' script source invaild!');
-    }
-
-    const nativeName = getName(name);
-    const id = 'script-' + nativeName.toLowerCase();
-    let script = document.getElementById(id);
-    if (script) {
-      return resovle(name);
-    }
-
-    const head = document.head || document.getElementsByTagName('head')[0];
-    script = document.createElement('script');
-    script.id = id;
-    if (defer) {
-      script.defer = true;
-    }
-    if (module) {
-      script.type = 'module';
-      if (!(typeof module === 'string' && module === 'link')) {
-        const lowerName = nativeName.toLowerCase();
-        script.textContent = `import * as ${lowerName} from '${src}';
-if (!('${nativeName}' in window)) {
-  if ('default' in ${lowerName} && ${lowerName}['default']) {
-    window['${nativeName}'] = ${lowerName}['default']
-  } else {
-    window['${nativeName}'] = ${lowerName};
+function getModule(native, name, src) {
+  if (typeof src === 'undefined' || !src || src === 'default') {
+    src = getCDN();
   }
-}`;
-        head.appendChild(script);
-        return resovle(name);
+
+  if (cdnSrc.hasOwnProperty(src)) {
+    const cdn = cdnSrc[src];
+    const module = cdn[name];
+    if (module) {
+      if (typeof module === 'string') {
+        return { src: filterUrl(native, module) };
+      }
+
+      if (module.src) {
+        module.src = filterUrl(native, module.src)
+      }
+      if (module.module) {
+        module.module = filterUrl(native, module.module);
+      }
+      if (module.css) {
+        if (typeof module.css === 'string') {
+          module.css = filterUrl(native, module.css);
+        } else {
+          for (const [k, v] of Object.entries(module.css)) {
+            module.css[k] = filterUrl(native, v);
+          }
+        }
+      }
+      if (module.skin) {
+        if (typeof module.skin === 'string') {
+          module.skin = filterUrl(native, module.skin);
+        } else {
+          for (const [k, v] of Object.entries(module.skin)) {
+            module.skin[k] = filterUrl(native, v);
+          }
+        }
+      }
+      if (module.plugins) {
+        for (const [k, v] of Object.entries(module.plugins)) {
+          module.plugins[k] = filterUrl(native, v);
+        }
+      }
+      if (module.src || module.module) {
+        return module;
+      }
+    }
+  }
+  return null;
+}
+
+function loadLinkStyle(name, css) {
+  const id = 'css-' + name.toLowerCase();
+  let link = document.getElementById(id);
+  var head = document.head || document.getElementsByTagName('head')[0];
+  if (link) {
+    link.remove();
+  }
+  link = document.createElement('link');
+  link.id = id;
+  link.rel = 'stylesheet';
+  link.href = css;
+  head.appendChild(link);
+}
+
+function loadLinkScript(name, src, module) {
+  return new Promise((resolve) => {
+    const id = 'script-' + name.toLowerCase();
+    let script = document.getElementById(id);
+    if (!script) {
+      var head = document.head || document.getElementsByTagName('head')[0];
+      var s = document.createElement('script');
+      s.id = id;
+      if (module) {
+        s.type = module;
+      }
+      s.src = src;
+      s.onload = () => {
+        resolve(name);
+      };
+      head.appendChild(s);
+      return;
+    }
+
+    resolve(name);
+  })
+}
+
+function loadModule(name, module, resolve) {
+  const lowerName = name.toLowerCase();
+  const id = 'script-' + lowerName;
+  let script = document.getElementById(id);
+  if (script) {
+    return resolve(name);
+  }
+
+  const head = document.head || document.getElementsByTagName('head')[0];
+  script = document.createElement('script');
+  script.id = id;
+  let importModule = false;
+  if (module.type) {
+    script.type = module.type;
+    if (module.type === 'module' && module.module) {
+      importModule = true;
+      let importPluginsCode = '';
+      let namespaces = '';
+      const pluginnames = [];
+      script.onloaded = (args) => {
+        resolve(!args ? name : args);
+      }
+      for (const [k, v] of Object.entries(module.plugins)) {
+        pluginnames.push(`'${k}'`);
+        const kName = k.replace(/[-@+.]/, '');
+        importPluginsCode += `import ${kName} from '${v}';
+if (!('${k}' in window)) {
+  if ('default' in ${kName} && ${kName}['default']) {
+    window['${k}'] = ${kName}['default']
+  } else {
+    window['${k}'] = ${kName};
+  }
+}
+`;
+      }
+      if (pluginnames.length > 0) {
+        namespaces = `['${name}',${pluginnames.join(',')}]`;
+      }
+      const objName = lowerName.replace(/[-@+.]/, '');
+      script.textContent = `
+import ${objName} from '${module.module}';
+if (!('${name}' in window)) {
+  if ('default' in ${objName} && ${objName}['default']) {
+    window['${name}'] = ${objName}['default']
+  } else {
+    window['${name}'] = ${objName};
+  }
+}
+${importPluginsCode}
+const s = document.querySelector('#${id}');
+if (s && s.onloaded) {
+  s.onloaded(${namespaces});
+}
+`;
+    }
+  }
+  if (module.src) {
+    script.src = module.src;
+  }
+  if (module.defer) {
+    script.defer = true;
+  }
+
+  if (!importModule) {
+    if (module.plugins) {
+      script.onload = () => {
+        const promiseArray = [];
+        promiseArray.push(new Promise((r) => {
+          r(name);
+        }));
+        for (const [k, v] of Object.entries(module.plugins)) {
+          promiseArray.push(loadLinkScript(k, v));
+        }
+        Promise.all(promiseArray).then((results) => {
+          resolve(results);
+        });
+      };
+    } else {
+      script.onload = () => {
+        resolve(name);
+      };
+    }
+  }
+  head.appendChild(script);
+}
+
+function loadScript(name, src, cssName, skinName) {
+  return new Promise((resolve, reject) => {
+    if (!name || typeof document === 'undefined') {
+      return reject('Args is invaild!');
+    }
+
+    if (!src) {
+      src = '';
+    }
+
+    const module = getModule(false, name, src);
+    if (!module) {
+      return reject(name + ' script source invaild!');
+    }
+
+    if (module.css) {
+      if (typeof module.css === 'string') {
+        loadLinkStyle(name, module.css);
+      } else if (cssName && cssName.length > 0 && cssName in module.css) {
+        loadLinkStyle(name, module.css[cssName]);
+      }
+    }
+    if (module.skin) {
+      let skin = '';
+      if (typeof module.skin === 'string') {
+        skin = module.skin;
+        skinName = 'skin';
+      } else if (skinName && skinName.length > 0 && skinName in module.skin) {
+        skin = module.skin[skinName];
+      }
+      if (skin.length > 0) {
+        loadLinkScript(name + '-' + skinName, skin).then(() => {
+          loadModule(name, module, resolve);
+        });
+        return;
       }
     }
 
-    script.onload = () => {
-      resovle(name);
-    };
-    script.src = src;
-    head.appendChild(script);
+    loadModule(name, module, resolve);
   });
 }
 
-function unloadScript(name) {
-  name = getName(name);
-  const e = document.getElementById('script-' + name.toLowerCase());
-  if (e) {
-    const head = document.head || document.getElementsByTagName('head')[0];
-    head.removeChild(e);
+function unloadScript(name, skinName) {
+  const elements = document.querySelectorAll(`[id^="script-${name.toLowerCase()}"]`);
+  if (elements) {
+    elements.forEach((e) => { e.remove(); });
   }
+  if (!skinName || !skinName.length) {
+    skinName = 'skin';
+  }
+  const e = document.getElementById('script-' + name.toLowerCase() + '-' + skinName.toLowerCase());
+  if (e) {
+    e.remove();
+  }
+  unloadStyleSheet(name);
 }
 
-function loadStyleSheet(name, css) {
+function loadStyleSheet(name, src, cssName) {
   if (!name || typeof document === 'undefined') {
     return '';
   }
 
-  if (typeof css === 'undefined') {
-    css = '';
-  }
-
-  css = getSrc(false, name, css);
-  if (!css) {
+  const module = getModule(false, name, src);
+  if (!module || !module.css) {
     return '';
   }
 
-  const id = 'css-' + getName(name).toLowerCase();
-  let script = document.getElementById(id);
-  if (!script) {
-    var head = document.head || document.getElementsByTagName('head')[0];
-    var link = document.createElement('link');
-    link.rel = 'stylesheet';
-    link.href = css;
-    link.id = id;
-    head.appendChild(link);
+  let css = '';
+  if (typeof module.css === 'string') {
+    css = module.css;
+  } else if (cssName && cssName in module.css) {
+    css = module.css[cssName];
   }
-  return cdnName === 'local' ? '' : css;
+  if (css.length > 0) {
+    loadLinkStyle(name, module.css[cssName]);
+  }
+  return src === 'local' ? '' : css;
 }
 
 function unloadStyleSheet(name) {
-  name = getName(name);
   const e = document.getElementById('css-' + name.toLowerCase());
   if (e) {
-    const head = document.head || document.getElementsByTagName('head')[0];
-    head.removeChild(e);
+    e.remove();
   }
+}
+
+function getCSS(native, name, src, cssName) {
+  const module = getModule(native, name, src, cssName);
+  return module.css;
+}
+
+function getSrc(native, name, src) {
+  const module = getModule(native, name, src);
+  return module.src;
 }
 
 const cdnjs = {
   setCDN,
   getCDN,
-  getUrl,
+  getCSS,
   getSrc,
+  getUrl,
+  getModule,
   loadScript,
   unloadScript,
   loadStyleSheet,

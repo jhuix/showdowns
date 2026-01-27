@@ -53,7 +53,7 @@ function dyncLoadScript(config) {
       } else if (window.MathJaxConfig) {
         utils.deepMerge(window.MathJax, window.MathJaxConfig);
       }
-      cdnjs.loadScript('MathJax', true).then(name => {
+      cdnjs.loadScript('MathJax').then(name => {
         MathJax = utils.interopDefault(window[name]);
       }).catch(e => {
         console.log('load script error: ' + e);
@@ -117,7 +117,7 @@ function onRenderMathJax(resolve, res) {
 function renderMathJax(element, options) {
   return new Promise(resolve => {
     const meta = utils.createElementMeta('MathJax', element);
-    if (!meta || meta.data.length === 0) {
+    if (!meta || !meta.data) {
       return resolve(false);
     }
 

@@ -89,7 +89,7 @@ function onRenderViz(resolve, res) {
 function renderViz(element) {
   return new Promise(resolve => {
     const meta = utils.createElementMeta("viz", element);
-    if (!meta || meta.data.length === 0) {
+    if (!meta || !meta.data) {
       return resolve(false);
     }
 

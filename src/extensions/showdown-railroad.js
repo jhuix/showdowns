@@ -31,7 +31,6 @@ function dyncLoadScript() {
 
     if (!sync) {
       dync = true;
-      cdnjs.loadStyleSheet(cssCdnName);
       cdnjs.loadScript(extName).then(() => {
         railroad = true;
       });
@@ -43,7 +42,6 @@ function dyncLoadScript() {
 function unloadScript() {
   if (!hasRailroad()) return;
   cdnjs.unloadScript(extName);
-  cdnjs.unloadStyleSheet(cssCdnName);
   railroad = false;
   dync = false;
 }
@@ -53,16 +51,13 @@ function onRenderRailroad(resolve, res) {
     const id = res.id;
     const name = res.className;
     const data = res.data;
-    const cssLink = res.cssLink;
     const railroadElement = window.eval(data).format();
     const doc = res.element.ownerDocument;
     let style = res.element.style.cssText;
     if (style.length > 0) {
       style = ` style="${style}"`;
     }
-    res.element.parentNode.outerHTML = cssLink
-      ? `<div id="${id}" class="${name} css-railroad" data-css="${cssLink}"${style}></div>`
-      : `<div id="${id}" class="${name}"${style}></div>`;
+    res.element.parentNode.outerHTML = `<div id="${id}" class="${name}"${style}></div>`;
     railroadElement.addTo(doc.getElementById(id));
     return resolve(true);
   }
@@ -78,12 +73,11 @@ function onRenderRailroad(resolve, res) {
 function renderRailroad(element) {
   return new Promise(resolve => {
     const meta = utils.createElementMeta(extName, element);
-    if (!meta || meta.data.length === 0) {
+    if (!meta || !meta.data) {
       return resolve(false);
     }
 
 
-    meta.cssLink = cdnjs.getSrc(true, cssCdnName);
     onRenderRailroad(resolve, meta);
   });
 }
@@ -118,7 +112,7 @@ function showdownRailroad() {
         }
 
         this.config = {
-          cssLink: cdnjs.getSrc(true, cssCdnName)
+          cssLink: cdnjs.getCSS(true, extName)
         };
         utils.addCssLink(obj, this.config.cssLink, 'css-railroad');
         console.log(format(`Begin render railroad elements.`));

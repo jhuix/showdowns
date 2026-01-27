@@ -33,14 +33,9 @@ function dyncLoadScript(skin) {
   if (!sync) {
     dync = true;
     if (typeof window !== 'undefined') {
-      cdnjs
-        .loadScript({ WaveDromSkin: skin })
-        .then(() => {
-          return cdnjs.loadScript('WaveDrom');
-        })
-        .then(name => {
-          WaveDrom = utils.interopDefault(window[name]);
-        });
+      cdnjs.loadScript('WaveDrom', 'default', '', skin).then(name => {
+        WaveDrom = utils.interopDefault(window[name]);
+      });
     }
   }
   return sync;
@@ -48,8 +43,7 @@ function dyncLoadScript(skin) {
 
 function unloadScript(skin) {
   if (!hasWavedrom()) return;
-  cdnjs.unloadScript('WaveDrom');
-  cdnjs.unloadScript({ WaveDromSkin: skin });
+  cdnjs.unloadScript('WaveDrom', skin);
   WaveDrom = null;
   window.WaveDrom = null;
   dync = false;
@@ -182,7 +176,7 @@ function showdownWavedrom(skinConfig) {
     {
       type: 'output',
       config: config,
-      filter: function(obj) {
+      filter: function (obj) {
         const wrapper = obj.wrapper;
         if (!wrapper) {
           return false;

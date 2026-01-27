@@ -48,12 +48,74 @@ const cssbanner =
   'Copyright (c) 2019-present, Jhuix (Hui Jin) <jhuix0117@gmail.com>\n' +
   'Released under the MIT License.';
 
+const configs = [];
+
+if (!isFormatCJS) {
+  const flowchartConfig = {
+    input: 'src/flowchart/flowchart.js',
+    output: {
+      file: 'dist/flowchart/flowchart' + (isMinBuild ? '.min.js' : '.js'),
+      format: 'umd',
+      sourcemap: true,
+      globals: {
+        raphael: 'Raphael'
+      }
+    },
+    external: ['raphael'],
+    plugins: [
+      json(),
+      postcss({
+        use: ['less'],
+        extract: true,
+        minimize: isMinBuild,
+        extensions: ['.css', '.less'],
+        plugins: [
+          autoprefixer(),
+          simplevars(),
+          nested(),
+        ]
+      }),
+      babel({
+        exclude: '**/node_modules/**',
+        babelHelpers: 'bundled'
+      }),
+      nodeResolve({
+        browser: true,
+        preferBuiltins: true,
+        // 选择module目录传递给解析插件
+        moduleDirectories: ['node_modules']
+      }),
+      commonjs({
+        include: ['node_modules/**']
+      }),
+      globals(),
+      builtins()
+    ]
+  }
+
+  if (isMinBuild) {
+    flowchartConfig.plugins.push(
+      terser({
+        // include: [/^.+\.min\.js$/],
+        compress: {
+          pure_getters: true,
+          unsafe: true,
+          unsafe_comps: true,
+          drop_console: !isDemoBuild
+        }
+      })
+    );
+  }
+
+  configs.push(flowchartConfig);
+}
+
 const config = {
   input: 'src/showdowns.js',
   output: {
     file: out_file,
     // 输出CJS格式，NODE.js模块规范通用;
-    // 输出UMD格式，各种模块规范通用.
+    // 输出UMD格式，各种模块规范通用.es
     format: isFormatCJS ? 'cjs' : 'umd',
     // 打包后的全局变量，如浏览器端 window.showdowns;
     name: 'showdowns',
@@ -62,7 +124,6 @@ const config = {
     globals: {
       ABCJS: 'ABCJS',
       raphael: 'Raphael',
-      'flowchart.js': 'flowchart',
       '@viz-js/viz': 'Viz',
       mermaid: 'mermaid',
       katex: 'katex',
@@ -83,13 +144,14 @@ const config = {
   // 作用：指出应将哪些模块视为外部模块，否则会被打包进最终的代码里
   external: [
     '@antv/infographic',
+    '@mermaid-js/mermaid-zenuml',
+    '@mermaid-js/mermaid-mindmap',
     '@jhuix/shiki-loader',
     '@rokt33r/js-sequence-diagrams',
     '@viz-js/viz',
     '@zenuml/core',
     'abcjs',
     'echarts',
-    'flowchart.js',
     'katex',
     'katex/dist/contrib/auto-render',
     'mermaid',
@@ -184,20 +246,23 @@ if (!isFormatCJS) {
           { src: 'demo', dest: 'docs' },
           { src: 'logo.png', dest: 'docs' },
           { src: 'favicon.ico', dest: 'docs' },
-          { src: 'dist/showdowns.min.*', dest: 'docs/dist' }
-        ]
-      })
-    );
-  } else {
-    config.plugins.push(
-      copy({
-        targets: [
-          // Publish common dist resource
-          { src: 'public/dist/*', dest: 'dist' }
+          { src: 'dist/showdowns.min.*', dest: 'docs/dist' },
+          { src: 'dist/flowchart/flowchart.min.*', dest: 'docs/dist/flowchart' }
         ]
       })
     );
   }
+  // else {
+  //   config.plugins.push(
+  //     copy({
+  //       targets: [
+  //         // Publish common dist resource
+  //         { src: 'public/dist/*', dest: 'dist' }
+  //       ]
+  //     })
+  //   );
+  // }
 }
 
-export default config;
+configs.push(config);
+export default configs;

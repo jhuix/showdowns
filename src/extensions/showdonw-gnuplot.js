@@ -21,7 +21,7 @@ function clearCache(doc) {
 
 function markGnuplotElement(element, gnuplot) {
   const meta = utils.createElementMeta('Gnuplot', element, true);
-  if (!meta || meta.data.length === 0) {
+  if (!meta || !meta.data) {
     return;
   }
 

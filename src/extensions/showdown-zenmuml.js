@@ -93,7 +93,7 @@ function onRenderZenuml(resolve, meta) {
 function renderZenuml(element) {
   return new Promise(resolve => {
     const meta = utils.createElementMeta(extName, element);
-    if (!meta || meta.data.length === 0) {
+    if (!meta || !meta.data) {
       return resolve(false);
     }
 

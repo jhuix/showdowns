@@ -91,7 +91,7 @@ function onRenderEcharts(resolve, meta) {
  */
 function renderEcharts(element, scripts, config) {
   const meta = utils.createElementMeta(extName, element);
-  if (!meta || meta.data.length === 0) {
+  if (!meta || !meta.data) {
     return Promise.resolve(false);
   }
 

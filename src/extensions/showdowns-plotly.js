@@ -99,7 +99,7 @@ function onRenderPlotly(resolve, meta, scripts) {
 function renderPlotly(element, scripts) {
   return new Promise(resolve => {
     const meta = utils.createElementMeta(extName, element);
-    if (!meta || meta.data.length === 0) {
+    if (!meta || !meta.data) {
       return resolve(false);
     }
 

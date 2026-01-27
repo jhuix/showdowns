@@ -36,9 +36,27 @@ function dyncLoadScript(config) {
 
     if (!sync) {
       dync = true;
-      cdnjs.loadScript(extName).then(name => {
-        mermaid = utils.interopDefault(window[name]);
-        mermaid.initialize(config);
+      cdnjs.loadScript(extName).then((res) => {
+        if (typeof res === 'string') {
+          mermaid = utils.interopDefault(window[res]);
+          mermaid.initialize(config);
+        } else if (Array.isArray(res) && res.length > 0) {
+          const plugins = [];
+          res.forEach((name)=> {
+            plugins.push(utils.interopDefault(window[name]));
+          })
+          const m = plugins[0];
+          plugins.shift();
+          if (plugins.length > 0) {
+            m.registerExternalDiagrams(plugins).then(() => {
+              mermaid = m;
+              mermaid.initialize(config);
+            });
+          } else {
+            mermaid = m;
+            mermaid.initialize(config);
+          }
+        }
       });
       return sync
     }
@@ -51,7 +69,6 @@ function dyncLoadScript(config) {
 function unloadScript() {
   if (!hasMermaid()) return;
   cdnjs.unloadScript(extName);
-  katex = null;
   window.mermaid = null;
   mermaid = null;
   dync = false;
@@ -65,7 +82,7 @@ function onRenderMermaid(resolve, res) {
     const data = res.data;
     const node = res.element.parentNode;
     const element = res.element;
-    mermaid.render(id, data).then(m =>{
+    mermaid.render(id, data).then(m => {
       let style = element.style.cssText;
       if (style.length > 0) {
         style = ` style="${style}"`;
@@ -87,7 +104,7 @@ function onRenderMermaid(resolve, res) {
 function renderMermaid(element) {
   return new Promise(resolve => {
     const meta = utils.createElementMeta(extName, element);
-    if (!meta || meta.data.length === 0) {
+    if (!meta || !meta.data) {
       return resolve(false);
     }
 
@@ -133,7 +150,7 @@ function showdownMermaid(userConfig) {
     {
       type: 'output',
       config: config,
-      filter: function(obj) {
+      filter: function (obj) {
         const wrapper = obj.wrapper;
         if (!wrapper) {
           return false;

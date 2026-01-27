@@ -29,9 +29,9 @@ function dyncLoadScript() {
 
     if (!sync) {
       dync = true;
-      cdnjs.loadScript('Shiki', false, cdnjs.getCDN() === 'local' ? 'link' : 'import').then(name => {
+      cdnjs.loadScript('Shiki').then(name => {
         Shiki = utils.interopDefault(window[name]);
-      }).catch(e => {
+      }).catch((e) => {
         console.error('load script error: ' + e);
       });
     }
@@ -286,7 +286,7 @@ function onRenderShiki(resolve, element, options) {
     const code = element.textContent.trim();
     const language = element.classList[0];
     const doc = element.ownerDocument;
-    const lang = utils.parseLangAttr(element.dataset.lang);
+    const lang = utils.parseAttribute(element.dataset.lang);
     const theme = (lang?.theme) ? lang.theme : options.theme;
     let themeName = theme;
     for (let i = 0; i < Shiki.bundledThemesInfo.length; i++) {

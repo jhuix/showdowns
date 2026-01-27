@@ -50,17 +50,17 @@ function dyncLoadScript() {
             Raphael = utils.interopDefault(window[name]);
             return cdnjs.loadScript('flowchart');
           })
-          .then(name => {
+          .then((name) => {
             flowchart = utils.interopDefault(window[name]);
           });
         return sync
       }
 
       cdnjs
-      .loadScript('flowchart')
-      .then(name => {
-        flowchart = utils.interopDefault(window[name]);
-      });
+        .loadScript('flowchart')
+        .then((name) => {
+          flowchart = utils.interopDefault(window[name]);
+        });
     }
   }
   return sync;
@@ -68,7 +68,7 @@ function dyncLoadScript() {
 
 function unloadScript() {
   if (!hasFlowchart()) return;
-  cdnjs.unloadScript('flowchart');
+  // cdnjs.unloadScript('flowchart');
   flowchart = null;
   window.flowchart = null;
   if (!hasSequence()) {
@@ -118,7 +118,7 @@ function onRenderFlowchart(resolve, res) {
 function renderFlowchart(element, options) {
   return new Promise(resolve => {
     const meta = utils.createElementMeta('flowchart', element);
-    if (!meta || meta.data.length === 0) {
+    if (!meta || !meta.data) {
       return resolve(false);
     }
 
@@ -234,7 +234,7 @@ function showdownFlowchart(userOptions) {
     {
       type: 'output',
       config: options,
-      filter: function(obj) {
+      filter: function (obj) {
         const wrapper = obj.wrapper;
         if (!wrapper) {
           return false;

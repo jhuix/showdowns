@@ -27,7 +27,6 @@ function hasKatex() {
 }
 
 let dync = false;
-const cssCdnName = 'katexCSS';
 function dyncLoadScript(engine, callback) {
   const sync = hasKatex();
   if (typeof window !== 'undefined') {
@@ -37,7 +36,6 @@ function dyncLoadScript(engine, callback) {
 
     if (!sync) {
       dync = true;
-      cdnjs.loadStyleSheet(cssCdnName);
       cdnjs
         .loadScript('katex')
         .then(name => {
@@ -69,7 +67,6 @@ function unloadScript() {
   if (!hasKatex()) return;
   cdnjs.unloadScript('renderMathInElement');
   cdnjs.unloadScript('katex');
-  cdnjs.unloadStyleSheet(cssCdnName);
   katex = null;
   window.katex = null;
   RenderMathInElement = null;
@@ -79,11 +76,9 @@ function unloadScript() {
 
 function onRenderKatex(resolve, res) {
   if (hasKatex()) {
-    const id = res.id;
     const name = res.className;
     const input = res.input;
     const data = res.data;
-    const cssLink = res.cssLink;
     const config = res.options;
     const doc = res.element.ownerDocument;
     let html = '';
@@ -93,16 +88,12 @@ function onRenderKatex(resolve, res) {
           html += '<br>';
         } else {
           const math = katex.renderToString(code, config);
-          html += cssLink
-            ? `<div title="${input}" class="${name} css-katex" data-css="${cssLink}">${math}</div>`
-            : `<div title="${input}" class="${name}">${math}</div>`;
+          html += `<div title="${input}" class="${name}">${math}</div>`;
         }
       });
     } else {
       const math = katex.renderToString(data, config);
-      html = cssLink
-        ? `<div title="${input}" class="${name} css-katex" data-css="${cssLink}">${math}</div>`
-        : `<div title="${input}" class="${name}">${math}</div>`;
+      html = `<div title="${input}" class="${name}">${math}</div>`;
     }
     res.element.parentNode.outerHTML = html;
     --katexElementCount;
@@ -143,7 +134,6 @@ function renderKatex(element, config, isAsciimath) {
       return resolve(false);
     }
 
-    meta.cssLink = cdnjs.getSrc(true, cssCdnName);
     meta.input = mathcode;
     meta.options = config;
     onRenderKatex(resolve, meta);
@@ -324,7 +314,7 @@ function showdownKatex(userConfig) {
 
         if (!latexmath.length && !asciimath.length) {
           if (inlineMathCount > 0) {
-            this.config.cssLink = cdnjs.getSrc(true, cssCdnName);
+            this.config.cssLink = cdnjs.getCSS(true, 'katex');
             const that = this;
             function asyncRenderKatex(resolve, render) {
               if (hasKatex()) {
@@ -350,7 +340,7 @@ function showdownKatex(userConfig) {
           return false;
         }
 
-        this.config.cssLink = cdnjs.getSrc(true, cssCdnName);
+        this.config.cssLink = cdnjs.getCSS(true, 'katex');
         utils.addCssLink(obj, this.config.cssLink, 'css-katex');
         console.log(format(`Begin render katex elements.`));
         return renderBlockElements(latexmath, asciimath, this.config).then(() => {

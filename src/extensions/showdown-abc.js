@@ -5,8 +5,8 @@
  */
 'use strict';
 
-const extName = 'abc';
-const cssCdnName = 'ABCJSCSS';
+const extName = 'ABCJS';
+const codeName = 'abc'
 
 if (typeof window === 'undefined') {
   throw Error('The showdown abcjs extension can only be used in browser environment!');
@@ -34,14 +34,13 @@ function dyncLoadScript() {
 
     if (!sync) {
       dync = true;
-      cdnjs.loadStyleSheet(cssCdnName);
       utils.loadStyle(
         'abc-audio',
         '.highlight{fill: #0a9ecc;} .abcjs-cursor{stroke: red;}' +
           ' .abcjs-inline-audio .abcjs-midi-loop.abcjs-pushed{border: none;}' +
           ' .abcjs-inline-audio .abcjs-midi-loop.abcjs-pushed svg path{fill: #6eaa49;}'
       );
-      cdnjs.loadScript('ABCJS').then((name) => {
+      cdnjs.loadScript(extName).then((name) => {
         ABCJS = utils.interopDefault(window[name]);
       });
     }
@@ -52,7 +51,6 @@ function dyncLoadScript() {
 function unloadScript() {
   if (!hasAbc()) return;
   cdnjs.unloadScript('ABCJS');
-  cdnjs.unloadStyleSheet(cssCdnName);
   ABCJS = null;
   window.ABCJS = null;
   dync = false;
@@ -227,15 +225,12 @@ function onRenderAbc(resolve, scripts, meta) {
       return resolve(true);
     }
 
-    const cssLink = meta.cssLink;
     const data = meta.data;
     const audio = id + '-audio';
     if (style) {
-      html += cssLink
-        ? `<div id="${audio}" style="width:100%;height:100%;display:inline-block" class="css-abc" data-css="${cssLink}"></div>`
-        : `<div id="${audio}" style="width:100%;height:100%;display:inline-block"></div>`;
+      html += `<div id="${audio}" style="width:100%;height:100%;display:inline-block"></div>`;
     } else {
-      html += cssLink ? `<div id="${audio}" class="css-abc" data-css="${cssLink}"></div>` : `<div id="${audio}"></div>`;
+      html += `<div id="${audio}"></div>`;
     }
     html += '</div>';
     meta.element.parentNode.outerHTML = html;
@@ -263,12 +258,11 @@ function onRenderAbc(resolve, scripts, meta) {
  */
 function renderAbc(element, scripts) {
   return new Promise((resolve) => {
-    let meta = utils.createElementMeta(extName, element);
-    if (!meta || meta.data.length === 0) {
+    let meta = utils.createElementMeta(codeName, element);
+    if (!meta || !meta.data) {
       return resolve(false);
     }
 
-    meta.cssLink = cdnjs.getSrc(true, cssCdnName);
     onRenderAbc(resolve, scripts, meta);
   });
 }
@@ -310,13 +304,13 @@ function showdownAbc() {
         }
 
         // find the abc in code blocks
-        const elements = wrapper.querySelectorAll(`code.${extName}.language-${extName}`);
+        const elements = wrapper.querySelectorAll(`code.${codeName}.language-${codeName}`);
         if (!elements.length) {
           return false;
         }
 
         this.config = {
-          cssLink: cdnjs.getSrc(true, cssCdnName),
+          cssLink: cdnjs.getCSS(true, extName),
         };
         utils.addCssLink(obj, this.config.cssLink, 'css-abc');
         console.log(format(`Begin render ${extName} elements.`));

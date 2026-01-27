@@ -633,92 +633,56 @@ const showdowns = {
       content = doc;
     }
 
-    if (this.converter && content) {
-      // Compatible with old versions, be deprecated in the future.
-      function _checkCssTypes(obj) {
-        return new Promise((resolve) => {
-          if (obj.cssLinks && Array.isArray(obj.cssLinks)) {
-            obj.cssTypes = { css: {} };
-            obj.cssLinks.forEach((css) => {
-              if (css.id === 'css-abc') {
-                obj.cssTypes.hasAbc = true;
-                obj.cssTypes.css.abc = css.link;
-                return;
-              }
-
-              if (css.id === 'css-katex') {
-                obj.cssTypes.hasKatex = true;
-                obj.cssTypes.css.katex = css.link;
-                return;
-              }
-
-              if (css.id === 'css-railroad') {
-                obj.cssTypes.hasRailroad = true;
-                obj.cssTypes.css.railroad = css.link;
-                return;
-              }
-
-              if (css.id === 'css-sequence') {
-                obj.cssTypes.hasSequence = true;
-                obj.cssTypes.css.sequence = css.link;
-              }
-            });
-            if (typeof callback === 'function' && callback) {
-              callback(obj.cssTypes);
-            }
-          }
-          return resolve(obj);
-        });
-      }
-
-      return this.converter.asyncMakeHtml(content, _checkCssTypes).then((obj) => {
-        if (typeof obj.html !== 'string') {
-          if (typeof document !== 'undefined' && output === 'dom') {
-            let doms = [obj.html];
-            if (obj.extras) {
-              let extraContent = '';
-              let extras = obj.extras;
-              if (!showdown.helper.isArray(extras)) {
-                extras = [extras];
-              }
-              for (let i = 0; i < extras.length; ++i) {
-                if (typeof extras[i] !== 'string') {
-                  doms.push(extras[i]);
-                  continue
-                };
-                extraContent += extras[i];
-              }
-              if (extraContent.length > 0) {
-                const div = document.createElement('div');
-                div.innerHTML = extraContent;
-                doms.push(...div.childNodes);
-                div.replaceChildren();
-              }
-            }
-            return { html: doms, scripts: obj.scripts, cssLinks: obj.cssLinks };
-          }
-
-          content = obj.html.outerHTML;
-        } else {
-          content = obj.html;
-        }
-        if (obj.extras) {
-          let extras = obj.extras;
-          if (!showdown.helper.isArray(extras)) {
-            extras = [extras];
-          }
-          for (let i = 0; i < extras.length; ++i) {
-            if (typeof extras[i] !== 'string') {
-              content += extras.outerHTML;
-              continue
-            };
-            content += extras[i];
-          }
-        }
-        return { html: content, scripts: obj.scripts, cssLinks: obj.cssLinks };
-      });
+    if (!this.converter || !content) {
+      return Promise.reject(!content ? 'Content is empty.' : 'Converter is invaild.');
     }
-    return Promise.reject(!content ? 'Content is empty.' : 'Converter is invaild.');
+
+    return this.converter.asyncMakeHtml(content).then((obj) => {
+      if (typeof obj.html !== 'string') {
+        if (typeof document !== 'undefined' && output === 'dom') {
+          let doms = [obj.html];
+          if (obj.extras) {
+            let extraContent = '';
+            let extras = obj.extras;
+            if (!showdown.helper.isArray(extras)) {
+              extras = [extras];
+            }
+            for (let i = 0; i < extras.length; ++i) {
+              if (typeof extras[i] !== 'string') {
+                doms.push(extras[i]);
+                continue
+              };
+              extraContent += extras[i];
+            }
+            if (extraContent.length > 0) {
+              const div = document.createElement('div');
+              div.innerHTML = extraContent;
+              doms.push(...div.childNodes);
+              div.replaceChildren();
+            }
+          }
+          return { html: doms, scripts: obj.scripts, cssLinks: obj.cssLinks };
+        }
+
+        content = obj.html.outerHTML;
+      } else {
+        content = obj.html;
+      }
+      if (obj.extras) {
+        let extras = obj.extras;
+        if (!showdown.helper.isArray(extras)) {
+          extras = [extras];
+        }
+        for (let i = 0; i < extras.length; ++i) {
+          if (typeof extras[i] !== 'string') {
+            content += extras.outerHTML;
+            continue
+          };
+          content += extras[i];
+        }
+      }
+      return { html: content, scripts: obj.scripts, cssLinks: obj.cssLinks };
+    });
   },
   completedHtml: function (scripts, element) {
     if (!showdown.helper.isArray(scripts)) {

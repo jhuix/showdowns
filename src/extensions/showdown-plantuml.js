@@ -24,7 +24,7 @@ function clearCache(doc) {
 let umlElementCount = 0;
 function renderPlantumlElement(element, config) {
   const meta = utils.createElementMeta('PlantUML', element, true);
-  if (!meta || meta.data.length === 0) {
+  if (!meta || !meta.data) {
     return;
   }
 
@@ -35,16 +35,6 @@ function renderPlantumlElement(element, config) {
   }
 
   return (resolve) => {
-    // const meta = utils.createElementMeta('PlantUML', element, true);
-    // if (!meta || meta.data.length === 0) {
-    //   return resolve(false);
-    // }
-
-    // const svgElement = umlCache[meta.hash]
-    // if (svgElement) {
-    //   element.parentNode.replaceWith(svgElement);
-    //   return resolve(true);
-    // }
     const imageFormat = config.imageFormat;
     if (imageFormat === 'svg') {
       if (typeof config.svgRender === 'function' && config.svgRender) {
