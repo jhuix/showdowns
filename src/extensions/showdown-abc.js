@@ -42,6 +42,8 @@ function dyncLoadScript() {
       );
       cdnjs.loadScript(extName).then((name) => {
         ABCJS = utils.interopDefault(window[name]);
+      }).catch((err) =>{
+        console.log('load abcjs failed: ' + err);
       });
     }
   }

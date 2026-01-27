@@ -37,6 +37,8 @@ function dyncLoadScript() {
       dync = true;
       cdnjs.loadScript('Viz').then(name => {
         Viz = utils.interopDefault(window[name]);
+      }).catch((e) => {
+        console.error('load script error: ' + e);
       });
     }
   }
@@ -74,6 +76,9 @@ function onRenderViz(resolve, res) {
       const svg = viz.renderString(data, { format: 'svg', engine: engine });
       element.parentNode.outerHTML = `<div id="${id}" class="${name}"${style}>${svg}</div>`;
       resolve(true)
+    }).catch((e) => {
+      console.error('render viz error: ' + e);
+      resolve(false);
     });
     return;
   }

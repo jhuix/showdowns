@@ -52,6 +52,8 @@ function dyncLoadScript() {
           })
           .then((name) => {
             flowchart = utils.interopDefault(window[name]);
+          }).catch((err) => {
+            console.log('load flowchart failed: ' + err);
           });
         return sync
       }
@@ -60,6 +62,8 @@ function dyncLoadScript() {
         .loadScript('flowchart')
         .then((name) => {
           flowchart = utils.interopDefault(window[name]);
+        }).catch((err) => {
+          console.log('load flowchart failed: ' + err);
         });
     }
   }

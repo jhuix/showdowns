@@ -35,6 +35,8 @@ function dyncLoadScript() {
       dync = true;
       cdnjs.loadScript(extName).then((name) => {
         echarts = utils.interopDefault(window[name]);
+      }).catch((err) =>{
+        console.log('load echarts failed: ' + err);
       });
     }
   }

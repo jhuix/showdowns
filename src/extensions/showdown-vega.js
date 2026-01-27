@@ -43,6 +43,8 @@ function dyncLoadScript() {
         })
         .then((name) => {
           vegaEmbed = utils.interopDefault(window[name]);
+        }).catch((e) => {
+          console.error('load script error: ' + e);
         });
     }
   }

@@ -35,6 +35,8 @@ function dyncLoadScript(skin) {
     if (typeof window !== 'undefined') {
       cdnjs.loadScript('WaveDrom', 'default', '', skin).then(name => {
         WaveDrom = utils.interopDefault(window[name]);
+      }).catch((e) => {
+        console.error('load script error: ' + e);
       });
     }
   }

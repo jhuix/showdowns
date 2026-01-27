@@ -74,7 +74,6 @@ function unloadScript() {
   dync = false;
 }
 
-
 function onRenderMermaid(resolve, res) {
   if (hasMermaid()) {
     const id = res.id;
@@ -82,13 +81,16 @@ function onRenderMermaid(resolve, res) {
     const data = res.data;
     const node = res.element.parentNode;
     const element = res.element;
-    mermaid.render(id, data).then(m => {
+    mermaid.render(id, data).then((m) => {
       let style = element.style.cssText;
       if (style.length > 0) {
         style = ` style="${style}"`;
       }
       node.outerHTML = `<div class="${name}"${style}>${m.svg}</div>`;
       resolve(true);
+    }).catch((err)=>{
+      console.log('render mermaid error: ' + err);
+      resolve(false);
     });
     return;
   }

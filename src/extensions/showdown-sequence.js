@@ -87,6 +87,8 @@ function dyncLoadScript() {
           if (diagram) {
             window['Diagram'] = diagram;
           }
+        }).catch((err) => {
+          console.log('load sequence failed: ' + err);
         });
     }
   }

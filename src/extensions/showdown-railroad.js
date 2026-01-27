@@ -33,6 +33,8 @@ function dyncLoadScript() {
       dync = true;
       cdnjs.loadScript(extName).then(() => {
         railroad = true;
+      }).catch((err) => {
+        console.log('load railroad failed: ' + err);
       });
     }
   }
@@ -100,7 +102,7 @@ function showdownRailroad() {
   return [
     {
       type: 'output',
-      filter: function(obj) {
+      filter: function (obj) {
         const wrapper = obj.wrapper;
         if (!wrapper) {
           return false;

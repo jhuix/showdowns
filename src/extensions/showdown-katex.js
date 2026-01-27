@@ -23,7 +23,7 @@ if (typeof renderMathInElement === 'undefined') {
 
 let katexElementCount = 0;
 function hasKatex() {
-  return typeof katex !== 'undefined' && katex? true : false;
+  return typeof katex !== 'undefined' && katex ? true : false;
 }
 
 let dync = false;
