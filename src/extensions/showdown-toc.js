@@ -118,8 +118,6 @@ function renderTocElements(wrapper, config) {
   let totalToc = null;
 
   const test = new RegExp(`^(${config.toc})$`, 'i');
-  config.extraDocs = [];
-  config.symbols = [];
 
   let currHeadingLevel = 1;
   const numbering = [0, 0, 0, 0, 0, 0];
@@ -141,7 +139,6 @@ function renderTocElements(wrapper, config) {
         showdownToc = wrapper.ownerDocument.createElement('div');
         showdownToc.classList.add('showdown-toc');
         totalToc = showdownToc;
-        // config.extraDocs.push('<div id="divider" class="divider"></div>');
         let tocTitle = i18n.getLangString('toc');
         let showTitle = i18n.getLangString('toc-show-title-prefix');
         let hideTitle = i18n.getLangString('toc-hide-title-prefix');
@@ -253,10 +250,13 @@ function renderTocElements(wrapper, config) {
   }
 
   if (currTocNode) {
-    config.symbols.push(...svgSymbols);
+    config.symbols = svgSymbols;
   }
   if (totalToc) {
-    config.extraDocs.push(totalToc.outerHTML);
+    if (!config.extras) {
+      config.extras = [];
+    }
+    config.extras.push(totalToc.outerHTML);
   }
 
   // Final, clear all toc node in node list.
@@ -363,7 +363,7 @@ function loadTocEvent() {
 const getConfig = (config = {}) => ({
   chapterNumber: true,
   title: '',
-  toc: '[\\[【]Table[ -]Of[ -]Contents[\\]】]|[\\[【]目录[\\]】]|[\\[【]TOC[\\]】]|\\{\\{TOC\\}\\}',
+  toc: '[\\[【](?:Table[ -]Of[ -]Contents|目录|TOC)[\\]】]|(?:\\{\\{|\\[\\[|【)[_]{0,1}TOC[_]{0,1}(?:\\}\\}|\\]\\]|】)',
   ...config
 });
 
@@ -387,13 +387,13 @@ function showdownToc(options) {
           return wrapper.innerHTML;
         }
 
-        if (typeof html !== 'object' || !html || !this.config.extraDocs ||
-           !Array.isArray(this.config.extraDocs) || !this.config.extraDocs.length) {
+        if (typeof html !== 'object' || !html || !this.config.extras ||
+           !Array.isArray(this.config.extras) || !this.config.extras.length) {
           return false;
         }
 
         const obj = html;
-        this.config.extraDocs.forEach((doc) => {
+        this.config.extras.forEach((doc) => {
           utils.addExtra(obj, doc);
         });
         if (this.config.symbols?.length > 0) {
