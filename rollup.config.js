@@ -49,12 +49,21 @@ const cssbanner =
   'Released under the MIT License.';
 
 const configs = [];
+const terserPlugin = terser({
+  // include: [/^.+\.min\.js$/],
+  compress: {
+    pure_getters: true,
+    unsafe: true,
+    unsafe_comps: true,
+    drop_console: !isDemoBuild
+  }
+});
 
 if (!isFormatCJS) {
   const flowchartConfig = {
-    input: 'src/flowchart/flowchart.js',
+    input: 'src/diagrams/flowchart/flowchart.js',
     output: {
-      file: 'dist/flowchart/flowchart' + (isMinBuild ? '.min.js' : '.js'),
+      file: 'dist/diagrams/flowchart/flowchart' + (isMinBuild ? '.min.js' : '.js'),
       format: 'umd',
       sourcemap: true,
       globals: {
@@ -64,17 +73,6 @@ if (!isFormatCJS) {
     external: ['raphael'],
     plugins: [
       json(),
-      postcss({
-        use: ['less'],
-        extract: true,
-        minimize: isMinBuild,
-        extensions: ['.css', '.less'],
-        plugins: [
-          autoprefixer(),
-          simplevars(),
-          nested(),
-        ]
-      }),
       babel({
         exclude: '**/node_modules/**',
         babelHelpers: 'bundled'
@@ -94,17 +92,7 @@ if (!isFormatCJS) {
   }
 
   if (isMinBuild) {
-    flowchartConfig.plugins.push(
-      terser({
-        // include: [/^.+\.min\.js$/],
-        compress: {
-          pure_getters: true,
-          unsafe: true,
-          unsafe_comps: true,
-          drop_console: !isDemoBuild
-        }
-      })
-    );
+    flowchartConfig.plugins.push(terserPlugin);
   }
 
   configs.push(flowchartConfig);
@@ -223,17 +211,7 @@ if (isFormatCJS) {
 }
 
 if (isMinBuild) {
-  config.plugins.push(
-    terser({
-      // include: [/^.+\.min\.js$/],
-      compress: {
-        pure_getters: true,
-        unsafe: true,
-        unsafe_comps: true,
-        drop_console: !isDemoBuild
-      }
-    })
-  );
+  config.plugins.push(terserPlugin);
 }
 
 if (!isFormatCJS) {
@@ -247,21 +225,19 @@ if (!isFormatCJS) {
           { src: 'logo.png', dest: 'docs' },
           { src: 'favicon.ico', dest: 'docs' },
           { src: 'dist/showdowns.min.*', dest: 'docs/dist' },
-          { src: 'dist/flowchart/flowchart.min.*', dest: 'docs/dist/flowchart' }
+          { src: 'dist/diagrams/flowchart/flowchart.min.*', dest: 'docs/dist/diagrams/flowchart' }
         ]
       })
     );
   }
-  // else {
-  //   config.plugins.push(
-  //     copy({
-  //       targets: [
-  //         // Publish common dist resource
-  //         { src: 'public/dist/*', dest: 'dist' }
-  //       ]
-  //     })
-  //   );
-  // }
+  // config.plugins.push(
+  //   copy({
+  //     targets: [
+  //       // Publish common dist resource
+  //       { src: 'src/diagrams/mermaid/layout-elk.js', dest: 'dist/diagrams/mermaid' },
+  //     ]
+  //   })
+  // );
 }
 
 configs.push(config);

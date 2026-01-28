@@ -42,11 +42,20 @@ function dyncLoadScript(config) {
           mermaid.initialize(config);
         } else if (Array.isArray(res) && res.length > 0) {
           const plugins = [];
-          res.forEach((name)=> {
-            plugins.push(utils.interopDefault(window[name]));
+          const layouts = [];
+          res.forEach((name) => {
+            const obj = utils.interopDefault(window[name]);
+            if (Array.isArray(obj)) {
+              layouts.push(...obj);
+            } else {
+              plugins.push(obj);
+            }
           })
           const m = plugins[0];
           plugins.shift();
+          if (layouts.length > 0) {
+            m.registerLayoutLoaders(layouts);
+          }
           if (plugins.length > 0) {
             m.registerExternalDiagrams(plugins).then(() => {
               mermaid = m;
@@ -88,7 +97,7 @@ function onRenderMermaid(resolve, res) {
       }
       node.outerHTML = `<div class="${name}"${style}>${m.svg}</div>`;
       resolve(true);
-    }).catch((err)=>{
+    }).catch((err) => {
       console.log('render mermaid error: ' + err);
       resolve(false);
     });

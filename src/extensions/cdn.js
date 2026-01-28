@@ -15,8 +15,9 @@ let uriPath = '';
  *
  * @typedef {string | Record<string, string>} CDNLink
  *
- * @typedef {{module: string, importmap: {imports: Record<string, string>},
- *            css?: CDNLink, skin?: CDNLink, plugins?: Record<string, string>}} CDNModule
+ * @typedef {{type?:string, src?: string, module?:string, importmap?: {imports: Record<string, string>}}} CDNScript
+ *
+ * @typedef {CDNScript & {css?: CDNLink, skin?: CDNLink, plugins?: Record<string, string | CDNScript>}} CDNModule
  *
  * @typedef {Record<string, string | CDNModule>} CDNModules
  *
@@ -31,12 +32,16 @@ const cdnSrc = {
     echarts: '../node_modules/echarts/dist/echarts.js',
     Viz: '../node_modules/@viz-js/viz/dist/viz-global.js',
     Raphael: '../node_modules/raphael/raphael.min.js',
-    flowchart: '../dist/flowchart/flowchart.min.js',
+    flowchart: '../dist/diagrams/flowchart/flowchart.min.js',
     mermaid: {
-      src: '../node_modules/mermaid/dist/mermaid.min.js',
+      src: '../node_modules/mermaid/dist/mermaid.js',
       plugins: {
         'mermaid-zenuml': '../node_modules/@mermaid-js/mermaid-zenuml/dist/mermaid-zenuml.min.js',
-        'mermaid-mindmap': '../node_modules/@mermaid-js/mermaid-mindmap/dist/mermaid-mindmap.min.js'
+        'mermaid-mindmap': '../node_modules/@mermaid-js/mermaid-mindmap/dist/mermaid-mindmap.min.js',
+        'mermaid-layout-elk': {
+          type: 'module',
+          module: '../node_modules/@mermaid-js/layout-elk/dist/mermaid-layout-elk.esm.min.mjs'
+        }
       }
     },
     katex: {
@@ -87,6 +92,10 @@ const cdnSrc = {
     mermaid: {
       src: 'https://unpkg.com/mermaid/dist/mermaid.min.js',
       plugins: {
+        'mermaid-layout-elk': {
+          type: 'module',
+          module: 'https://unpkg.com/@mermaid-js/layout-elk/dist/mermaid-layout-elk.esm.min.mjs'
+        },
         'mermaid-zenuml': 'https://unpkg.com/@mermaid-js/mermaid-zenuml/dist/mermaid-zenuml.min.js',
         'mermaid-mindmap': 'https://unpkg.com/@mermaid-js/mermaid-mindmap/dist/mermaid-mindmap.min.js'
       }
@@ -169,6 +178,7 @@ const cdnSrc = {
       type: 'module',
       module: 'https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs',
       plugins: {
+        'mermaid-layout-elk': 'https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk/dist/mermaid-layout-elk.esm.min.mjs',
         'mermaid-zenuml': 'https://cdn.jsdelivr.net/npm/@mermaid-js/mermaid-zenuml/dist/mermaid-zenuml.esm.min.mjs',
         'mermaid-mindmap': 'https://cdn.jsdelivr.net/npm/@mermaid-js/mermaid-mindmap/dist/mermaid-mindmap.esm.min.mjs'
       }
@@ -319,7 +329,16 @@ function getModule(native, name, src) {
       }
       if (module.plugins) {
         for (const [k, v] of Object.entries(module.plugins)) {
-          module.plugins[k] = filterUrl(native, v);
+          if (typeof v === 'string') {
+            module.plugins[k] = filterUrl(native, v);
+            continue;
+          }
+          if (v.src) {
+            module.plugins[k].src = filterUrl(native, v.src)
+          }
+          if (v.module) {
+            module.plugins[k].module = filterUrl(native, v.module);
+          }
         }
       }
       if (module.src || module.module) {
@@ -327,7 +346,6 @@ function getModule(native, name, src) {
       }
     }
   }
-  return null;
 }
 
 function loadLinkStyle(name, css) {
@@ -344,18 +362,42 @@ function loadLinkStyle(name, css) {
   head.appendChild(link);
 }
 
-function loadLinkScript(name, src, module) {
+function loadLinkScript(name, script) {
   return new Promise((resolve) => {
-    const id = 'script-' + name.toLowerCase();
-    let script = document.getElementById(id);
-    if (!script) {
+    const lowerName = name.toLowerCase();
+    const id = 'script-' + lowerName;
+    let element = document.getElementById(id);
+    if (!element) {
       var head = document.head || document.getElementsByTagName('head')[0];
       var s = document.createElement('script');
       s.id = id;
-      if (module) {
-        s.type = module;
+      if (typeof script === 'string') {
+        s.src = script;
+      } else {
+        if (script.type) {
+          s.type = script.type;
+          if (script.type === 'module' && script.module) {
+            const objName = lowerName.replaceAll(/[-@+.]/g, '');
+            s.textContent = `
+import ${objName} from '${script.module}';
+if (!('${name}' in window)) {
+  if ('default' in ${objName} && ${objName}['default']) {
+    window['${name}'] = ${objName}['default']
+  } else {
+    window['${name}'] = ${objName};
+  }
+}
+const s = document.querySelector('#${id}');
+if (s && s.onload) {
+  s.onload();
+}
+`;
+          }
+        }
+        if (script.src) {
+          s.src = script.src;
+        }
       }
-      s.src = src;
       s.onload = () => {
         resolve(name);
       };
@@ -391,7 +433,7 @@ function loadModule(name, module, resolve) {
       }
       for (const [k, v] of Object.entries(module.plugins)) {
         pluginnames.push(`'${k}'`);
-        const kName = k.replace(/[-@+.]/, '');
+        const kName = k.toLowerCase().replaceAll(/[-@+.]/g, '');
         importPluginsCode += `import ${kName} from '${v}';
 if (!('${k}' in window)) {
   if ('default' in ${kName} && ${kName}['default']) {
@@ -405,7 +447,7 @@ if (!('${k}' in window)) {
       if (pluginnames.length > 0) {
         namespaces = `['${name}',${pluginnames.join(',')}]`;
       }
-      const objName = lowerName.replace(/[-@+.]/, '');
+      const objName = lowerName.replaceAll(/[-@+.]/g, '');
       script.textContent = `
 import ${objName} from '${module.module}';
 if (!('${name}' in window)) {
@@ -541,12 +583,12 @@ function unloadStyleSheet(name) {
 
 function getCSS(native, name, src, cssName) {
   const module = getModule(native, name, src, cssName);
-  return module.css;
+  if (module) return module.css;
 }
 
 function getSrc(native, name, src) {
   const module = getModule(native, name, src);
-  return module.src;
+  if (module) return module.src;
 }
 
 const cdnjs = {
@@ -559,7 +601,7 @@ const cdnjs = {
   loadScript,
   unloadScript,
   loadStyleSheet,
-  unloadStyleSheet,
+  unloadStyleSheet
 };
 
 export default cdnjs;
