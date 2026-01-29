@@ -32,8 +32,8 @@ import showdownRailroad from './extensions/showdown-railroad.js';
 import showdownSequence from './extensions/showdown-sequence.js';
 import showdownWavedrom from './extensions/showdown-wavedrom.js';
 import showdownFootnotes from './extensions/showdown-footnotes.js';
-import showdownContainer from './extensions/showdown-container.js';
 import showdownFlowchart from './extensions/showdown-flowchart.js';
+import { showdownContainer, showdownAsyncContainer} from './extensions/showdown-container.js';
 import { showdownImage, showdownAsyncImage, imageResetEventName } from './extensions/showdown-image.js'
 
 import * as zlibcodec from './utils/zlib-codec.js';
@@ -88,6 +88,7 @@ const getAsyncExtensions = (options, extensions = {}) => {
   const asyncExtensions = {
     'showdown-toc': getExtension('showdown-toc', showdownToc),
     'showdown-image': showdownAsyncImage(),
+    'showdown-container': showdownAsyncContainer(),
     'showdown-plantuml': showdownPlantuml(plantumlOptions),
     'showdown-mermaid': showdownMermaid(mermaidOptions),
     'showdown-mathjax': showdownMathJax(mathjaxOptions),

@@ -15,7 +15,7 @@
 
 import showdown from 'showdown';
 
-showdown.subParser('githubCodeBlocks', function(text, options, globals) {
+showdown.subParser('githubCodeBlocks', function (text, options, globals) {
   'use strict';
 
   // early exit if option is not enabled
@@ -29,7 +29,7 @@ showdown.subParser('githubCodeBlocks', function(text, options, globals) {
 
   text = text.replace(
     /(?:^|\n)(?: {0,3})(```+|~~~+)(?: *)([^\s`~]*?)(?:[ \t]*?)((?:\{[\S\t ]*\}|\[[\S\t ]*\])?)\n([\s\S]*?)\n(?: {0,3})\1/g,
-    function(wholeMatch, delim, language, langattr, codeblock) {
+    function (wholeMatch, delim, language, langattr, codeblock) {
       var end = options.omitExtraWLInCodeBlocks ? '' : '\n';
 
       // First parse the github code block
@@ -52,15 +52,7 @@ showdown.subParser('githubCodeBlocks', function(text, options, globals) {
       // Since GHCodeblocks can be false positives, we need to
       // store the primitive text and the parsed text in a global var,
       // and then return a token
-      return (
-        '\n\n¨G' +
-        (globals.ghCodeBlocks.push({
-          text: wholeMatch,
-          codeblock: codeblock
-        }) -
-          1) +
-        'G\n\n'
-      );
+      return ('\n\n¨G' + (globals.ghCodeBlocks.push({ text: wholeMatch, codeblock: codeblock }) - 1) + 'G\n\n');
     }
   );
 

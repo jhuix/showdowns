@@ -5,34 +5,63 @@
 .showdowns {
   .showdown-container {
     position: relative;
-    padding: 0.75rem 1.25rem;
+    padding: 0.5rem 1rem;
     margin-bottom: 1rem;
     border: 1px solid #eee;
-    border-radius: 0.25rem;
+    border-radius: 7px;
 
-    &.container {
-      border-left-width: 0.25rem;
-      border-right-width: 0.25rem;
+    &.note {
+      border-left-width: 5px;
+      border-right-width: 5px;
 
       &.tip {
         border-left-color: #5bc0de;
         border-right-color: #5bc0de;
+        background-color: #eef9fd;
+
+        svg {
+          fill: #4cb3d4;
+        }
       }
+
       &.info {
         border-left-color: #cce5ff;
         border-right-color: #cce5ff;
+        background-color: #f6f7f8;
+
+        svg {
+          fill: #4cb3d4;
+        }
       }
+
       &.warning {
         border-left-color: #f0ad4e;
         border-right-color: #f0ad4e;
+        background-color: #fff8e6;
+
+        svg {
+          fill: #e6a700
+        }
       }
+
       &.error {
         border-left-color: #d9534f;
         border-right-color: #d9534f;
+        background-color: #ffebec;
+
+        svg {
+          fill: #e13238
+        }
       }
+
       &.success {
         border-left-color: #67c23a;
         border-right-color: #67c23a;
+        background-color: #e6f6e6;
+
+        svg {
+          fill: #009400
+        }
       }
     }
 
@@ -40,27 +69,47 @@
       border: 1px solid transparent;
       transition: opacity 0.2s;
 
-      &.alert-tip {
+      &.tip {
         background-color: #5bc0de;
       }
-      &.alert-info {
+
+      &.info {
         background-color: #cce5ff;
       }
-      &.alert-warning {
+
+      &.warning {
         background-color: #f0ad4e;
       }
-      &.alert-error {
+
+      &.error {
         background-color: #d9534f;
       }
-      &.alert-success {
+
+      &.success {
         background-color: #67c23a;
+      }
+    }
+
+    .container-icon {
+      vertical-align: middle;
+      margin-right: .4em;
+      display: inline-block;
+
+      svg {
+        width: 1.5rem;
+        height: 1.5rem;
+        display: inline-block;
       }
     }
 
     .container-title {
       font-size: 1.25rem;
       font-weight: 700;
-      line-height: 1.2;
+      line-height: 1.25;
+    }
+
+    .container-title:not(:last-child) {
+      margin-bottom: .3rem;
     }
   }
 }
