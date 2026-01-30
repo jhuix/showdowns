@@ -63,6 +63,16 @@
           fill: #009400
         }
       }
+
+      &.default {
+        border-left-color: #009400;
+        border-right-color: #009400;
+        background-color: #e6f6e6;
+
+        svg {
+          fill: #009400
+        }
+      }
     }
 
     &.alert {
@@ -88,6 +98,10 @@
       &.success {
         background-color: #67c23a;
       }
+
+      &.default {
+        background-color: #009400;
+      }
     }
 
     .container-icon {
@@ -96,8 +110,8 @@
       display: inline-block;
 
       svg {
-        width: 1.5rem;
-        height: 1.5rem;
+        width: 1.8rem;
+        height: 1.8rem;
         display: inline-block;
       }
     }
@@ -106,6 +120,7 @@
       font-size: 1.25rem;
       font-weight: 700;
       line-height: 1.25;
+      display: inline-block;
     }
 
     .container-title:not(:last-child) {

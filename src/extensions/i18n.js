@@ -34,6 +34,14 @@ const i18nMap = {
     'toc-toggle-prefix': '切换',
     'msg-copy-success': '复制成功！',
     'msg-copy-failed': '复制失败！',
+    'note': '备注',
+    'alert': '注意',
+    'info': '信息',
+    'tip': '提示',
+    'warning': '警告',
+    'error': '错误',
+    'success': '成功',
+    'danger': '危险'
   }
 }
 
