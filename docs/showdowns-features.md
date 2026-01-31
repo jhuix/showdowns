@@ -120,13 +120,11 @@ It's implemented sub-TOC in showdown-toc.js.
 The syntax string is not case sensitive.
 
 ```
-[#... ][[|【]Table[ |-]Of[ |-]Contents[】|]]
+[#... ]【Table[ |-]Of[ |-]Contents】 | [Table[ |-]Of[ |-]Contents]
 or
-[#... ][[|【]目录[】|]]
+[#... ][TOC|目录] | {{TOC|目录}}|【TOC|目录】| [[TOC|目录]]
 or
-[#... ][[|【]TOC[】|]]
-or
-[#... ]{{TOC}}
+[#... ]{{_TOC_}}|【_TOC_】|[[_TOC_]]
 
 ```
 
@@ -159,7 +157,7 @@ It's implemented in showdown-footnotes.js, use for reference the [showdown-footn
 
 ### CSS Defined
 
-Support css be defined. 
+Support css be defined.
 
 #### Markdown Syntax
 
@@ -188,6 +186,39 @@ Which will be append a link element to head as:
     file:///i:/showdowns.min.css
 
     ../dist/showdowns.min.css
+
+OR
+
+```
+
+::css[css content]{attribute}
+
+```
+
+Which will be append a style element to head as:
+
+```
+
+<style ${attribute}>${css content}</style>
+
+```
+
+OR
+
+```
+
+::css-link{attribute}
+
+
+```
+
+Which will be append a link element to head as:
+
+```
+
+<link ${attribute}>
+
+```
 
 #### CSS defined examples
 
@@ -243,7 +274,6 @@ Which will be append a image element as:
 <img class="inline-image" src="logo.png" width="64" heigth="64" />
 
 ```
-
 
 ### Container
 
@@ -363,11 +393,10 @@ It's supported by [showdown-katex](https://github.com/obedm503/showdown-katex.gi
         ```
     ````
 
-  * Inline latex
-
-      * `\\(...\\)` is delimiters of inline latex math
-      * `\\[...\\]` is delimiters of inline block latex math
-      * `$$...$$` is delimiters of inline block latex math
+  - Inline latex
+    - `\\(...\\)` is delimiters of inline latex math
+    - `\\[...\\]` is delimiters of inline block latex math
+    - `$$...$$` is delimiters of inline block latex math
 
 #### LaTex Math examples
 
@@ -415,7 +444,6 @@ where:
 
 #### Markdown Syntax
 
-
 ````
   ```[js|c|c++|go...] {"theme": "ayu-dark"}
   <code content>
@@ -425,7 +453,6 @@ where:
 #### Code Block examples
 
 - For JavaScript:
-
 
 ```javascript {theme="github-dark"}
 /**
@@ -444,13 +471,13 @@ export function deepMerge(target, ...sources) {
       // @ts-ignore
       if (isObject(val) && isObject(target[key])) {
         // @ts-ignore
-        deepMerge(target[key], val)
+        deepMerge(target[key], val);
       } else {
-        Object.assign(target, { [key]: val })
+        Object.assign(target, { [key]: val });
       }
     }
   }
-  return target
+  return target;
 }
 ```
 
@@ -984,7 +1011,7 @@ OR
 
 #### Vega and Vega-Lite example
 
-* Vega example:
+- Vega example:
 
 ```vega {"align":"center"}
 {
@@ -1078,7 +1105,7 @@ OR
 
 <br>
 
-* Vega-Lite example:
+- Vega-Lite example:
 
 ```vega-lite {"align":"right"}
 {
@@ -1385,7 +1412,6 @@ blockdiag {
 
 ```
 
-
 ### Tex
 
 Support remote rendering TEX content to SVG code, for example website: [tex.io](https://tex.io).
@@ -1400,6 +1426,7 @@ Support remote rendering TEX content to SVG code, for example website: [tex.io](
 
 #### Tex example
 
+````
 ```tex
 \documentclass{standalone}
 \usepackage{circuitikz}
@@ -1417,7 +1444,9 @@ to[R=$R_2$, i>_=$i_2$]
 
 \end{document}
 ```
+````
 
+````
 ```tex {"align":"center"}
 \documentclass{standalone}
 \usepackage{pgfplots}
@@ -1438,6 +1467,7 @@ domain=-3:3
 
 \end{document}
 ```
+````
 
 ### Plotly
 
@@ -1604,12 +1634,11 @@ Support local render svg for gnuplot, for example website: [Gnuplot](http://www.
 
 #### Gnuplot example
 
-
 ````
 ```gnuplot
 #
 # Compare surface drawn "with pm3d" colored with a 7-color discrete palette
-# to the same surface drawn "with contourfill" 
+# to the same surface drawn "with contourfill"
 #
 
 set colorbox user origin 0.75,0.2 size 0.15, 0.6
@@ -1642,42 +1671,6 @@ set contourfill cbtics
 splot f(x,y) with contourfill fs border lc "black" lw 0.5
 ```
 ````
-
-```gnuplot
-#
-# Compare surface drawn "with pm3d" colored with a 7-color discrete palette
-# to the same surface drawn "with contourfill" 
-#
-
-set colorbox user origin 0.75,0.2 size 0.15, 0.6
-set cbtics scale .1
-set view ,,,1.2
-unset key
-
-set xrange [-8:8]
-set yrange [-8:8]
-
-set rmargin at screen 0.75
-set xyplane 0
-set isosamples 51
-set samples 51
-
-set pm3d border lt -1 lw 0.5
-set pm3d depth
-
-sinc(x) = (x==0) ? 1.0 : sin(x) / x
-f(x,y) = sinc( sqrt(x*x + y*y) )
-
-set label 1 "set palette cubehelix\nmaxcolors 7"
-set label 1 at screen 0.825, 0.9 center
-set palette cubehelix maxcolors 7
-
-set label 2 at screen 0.4, 0.9 center
-set label 2 "set contourfill cbtics\nsplot with contourfill"
-set contourfill cbtics
-
-splot f(x,y) with contourfill fs border lc "black" lw 0.5
-```
 
 ### AntV Infographic
 
@@ -1749,6 +1742,7 @@ ZenUML options see [ZenumlOptions](https://github.com/mermaid-js/zenuml-core/blo
 
 #### ZenUML example
 
+````
 ```zenuml
 A B C D
 
@@ -1771,8 +1765,9 @@ A->B.method() {
   @return B->A: ret4_annotation_rtl
 }
 ```
+````
 
-
+````
 ```zenuml { "options": {"theme":"theme-woolworths"} }
 // An example for a RESTful endpoint<br>
 // Go to the "Cheat sheet" tab or https://docs.zenuml.com
@@ -1793,3 +1788,4 @@ BookLibService.Borrow(id) {
   return receipt
 }
 ```
+````
