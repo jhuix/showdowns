@@ -922,7 +922,7 @@ It's implemented in showdown-viz.js, render diagrams of wavedrom using [wavedrom
 
 #### Echarts example
 
-```echarts {"align":"center", "width":640, "height":480}
+```echarts {"align":"center", "max-width":640, "max-height":480}
 {
   "title": { "text": "最近 30 天" },
   "tooltip": { "trigger": "axis", "axisPointer": { "lineStyle": { "width": 0 } } },
@@ -952,7 +952,7 @@ It's implemented in showdown-viz.js, render diagrams of wavedrom using [wavedrom
 }
 ```
 
-```echarts {"align":"center", "width":640, "height":480, "type":"javascript"}
+```echarts {"align":"center", "max-width":640, "max-height":480, "type":"javascript"}
 const data = [];
 for (let i = 0; i <= 100; i++) {
   let theta = (i / 100) * 360;
@@ -1199,7 +1199,7 @@ Bob-->Alice: I am good thanks!
 
 #### ABC example
 
-```abc {"width": 640}
+```abc {"max-width": 640}
 T: Cooley's
 M: 4/4
 Q: 1/4=120
@@ -1246,7 +1246,7 @@ K: Em
 
 ##### UML
 
-```kroki-plantuml {"width": 800, "align":"center"}
+```kroki-plantuml {"max-width": 800, "align":"center"}
 @startuml
 skinparam ranksep 20
 skinparam dpi 125
@@ -1273,7 +1273,7 @@ main_ts ==> (main.view)
 
 ##### PacketDiag
 
-```kroki-packetdiag {"width": 800, "align":"center"}
+```kroki-packetdiag {"max-width": 800, "align":"center"}
 packetdiag {
   colwidth = 32;
   node_height = 72;
@@ -1302,7 +1302,7 @@ packetdiag {
 
 ##### DBML
 
-```kroki-dbml {"width": 800, "align":"center"}
+```kroki-dbml {"max-width": 800, "align":"center"}
 Table users {
   id integer
   username varchar
@@ -1330,7 +1330,7 @@ Ref: posts.user_id > users.id // many-to-one
 
 ##### BlockDiag
 
-```kroki-blockdiag {"width": 800, "align":"center"}
+```kroki-blockdiag {"max-width": 800, "align":"center"}
 blockdiag {
   Kroki -> generates -> "Block diagrams";
   Kroki -> is -> "very easy!";
@@ -1343,7 +1343,7 @@ blockdiag {
 
 ##### ByteField
 
-```kroki-bytefield {"width": 800, "align":"center"}
+```kroki-bytefield {"max-width": 800, "align":"center"}
 (defattrs :bg-green {:fill "#a0ffa0"})
 (defattrs :bg-yellow {:fill "#ffffa0"})
 (defattrs :bg-pink {:fill "#ffb0a0"})

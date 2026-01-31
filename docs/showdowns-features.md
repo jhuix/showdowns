@@ -487,102 +487,102 @@ export function deepMerge(target, ...sources) {
 package utils
 
 import (
-	"math"
-	"sync"
+  "math"
+  "sync"
 )
 
 type levelPool struct {
-	size int
-	pool sync.Pool
+  size int
+  pool sync.Pool
 }
 
 func newLevelPool(size int) *levelPool {
-	return &levelPool{
-		size: size,
-		pool: sync.Pool{
-			New: func() interface{} {
-				data := make([]byte, size)
-				return &data
-			},
-		},
-	}
+  return &levelPool{
+    size: size,
+    pool: sync.Pool{
+      New: func() interface{} {
+        data := make([]byte, size)
+        return &data
+      },
+    },
+  }
 }
 
 type LimitedPool struct {
-	minSize int
-	maxSize int
-	pools   []*levelPool
+  minSize int
+  maxSize int
+  pools   []*levelPool
 }
 
 func NewLimitedPool(minSize, maxSize int) *LimitedPool {
-	if maxSize < minSize {
-		panic("maxSize can't be less than minSize")
-	}
-	const multiplier = 2
-	var pools []*levelPool
-	curSize := minSize
-	for curSize < maxSize {
-		pools = append(pools, newLevelPool(curSize))
-		curSize *= multiplier
-	}
-	pools = append(pools, newLevelPool(maxSize))
-	return &LimitedPool{
-		minSize: minSize,
-		maxSize: maxSize,
-		pools:   pools,
-	}
+  if maxSize < minSize {
+    panic("maxSize can't be less than minSize")
+  }
+  const multiplier = 2
+  var pools []*levelPool
+  curSize := minSize
+  for curSize < maxSize {
+    pools = append(pools, newLevelPool(curSize))
+    curSize *= multiplier
+  }
+  pools = append(pools, newLevelPool(maxSize))
+  return &LimitedPool{
+    minSize: minSize,
+    maxSize: maxSize,
+    pools:   pools,
+  }
 }
 
 func (p *LimitedPool) findPool(size int) *levelPool {
-	if size > p.maxSize {
-		return nil
-	}
-	idx := int(math.Ceil(math.Log2(float64(size) / float64(p.minSize))))
-	if idx < 0 {
-		idx = 0
-	}
-	if idx > len(p.pools)-1 {
-		return nil
-	}
-	return p.pools[idx]
+  if size > p.maxSize {
+    return nil
+  }
+  idx := int(math.Ceil(math.Log2(float64(size) / float64(p.minSize))))
+  if idx < 0 {
+    idx = 0
+  }
+  if idx > len(p.pools)-1 {
+    return nil
+  }
+  return p.pools[idx]
 }
 
 func (p *LimitedPool) findPutPool(size int) *levelPool {
-	if size > p.maxSize {
-		return nil
-	}
-	if size < p.minSize {
-		return nil
-	}
+  if size > p.maxSize {
+    return nil
+  }
+  if size < p.minSize {
+    return nil
+  }
 
-	idx := int(math.Floor(math.Log2(float64(size) / float64(p.minSize))))
-	if idx < 0 {
-		idx = 0
-	}
-	if idx > len(p.pools)-1 {
-		return nil
-	}
-	return p.pools[idx]
+  idx := int(math.Floor(math.Log2(float64(size) / float64(p.minSize))))
+  if idx < 0 {
+    idx = 0
+  }
+  if idx > len(p.pools)-1 {
+    return nil
+  }
+  return p.pools[idx]
 }
 
 func (p *LimitedPool) Get(size int) *[]byte {
-	sp := p.findPool(size)
-	if sp == nil {
-		data := make([]byte, size)
-		return &data
-	}
-	buf := sp.pool.Get().(*[]byte)
-	*buf = (*buf)[:size]
-	return buf
+  sp := p.findPool(size)
+  if sp == nil {
+    data := make([]byte, size)
+    return &data
+  }
+  buf := sp.pool.Get().(*[]byte)
+  *buf = (*buf)[:size]
+  return buf
 }
 
 func (p *LimitedPool) Put(b *[]byte) {
-	sp := p.findPutPool(cap(*b))
-	if sp == nil {
-		return
-	}
-	*b = (*b)[:cap(*b)]
-	sp.pool.Put(b)
+  sp := p.findPutPool(cap(*b))
+  if sp == nil {
+    return
+  }
+  *b = (*b)[:cap(*b)]
+  sp.pool.Put(b)
 }
 
 ```
@@ -922,7 +922,7 @@ It's implemented in showdown-viz.js, render diagrams of wavedrom using [wavedrom
 
 #### Echarts example
 
-```echarts {"align":"center", "width":640, "height":480}
+```echarts {"align":"center", "max-width":640, "max-height":480}
 {
   "title": { "text": "最近 30 天" },
   "tooltip": { "trigger": "axis", "axisPointer": { "lineStyle": { "width": 0 } } },
@@ -952,7 +952,7 @@ It's implemented in showdown-viz.js, render diagrams of wavedrom using [wavedrom
 }
 ```
 
-```echarts {"align":"center", "width":640, "height":480, "type":"javascript"}
+```echarts {"align":"center", "max-width":640, "max-height":480, "type":"javascript"}
 const data = [];
 for (let i = 0; i <= 100; i++) {
   let theta = (i / 100) * 360;
@@ -1199,7 +1199,7 @@ Bob-->Alice: I am good thanks!
 
 #### ABC example
 
-```abc {"width": 640}
+```abc {"max-width": 640}
 T: Cooley's
 M: 4/4
 Q: 1/4=120
@@ -1246,7 +1246,7 @@ K: Em
 
 ##### UML
 
-```kroki-plantuml {"width": 800, "align":"center"}
+```kroki-plantuml {"max-width": 800, "align":"center"}
 @startuml
 skinparam ranksep 20
 skinparam dpi 125
@@ -1273,7 +1273,7 @@ main_ts ==> (main.view)
 
 ##### PacketDiag
 
-```kroki-packetdiag {"width": 800, "align":"center"}
+```kroki-packetdiag {"max-width": 800, "align":"center"}
 packetdiag {
   colwidth = 32;
   node_height = 72;
@@ -1302,7 +1302,7 @@ packetdiag {
 
 ##### DBML
 
-```kroki-dbml {"width": 800, "align":"center"}
+```kroki-dbml {"max-width": 800, "align":"center"}
 Table users {
   id integer
   username varchar
@@ -1330,7 +1330,7 @@ Ref: posts.user_id > users.id // many-to-one
 
 ##### BlockDiag
 
-```kroki-blockdiag {"width": 800, "align":"center"}
+```kroki-blockdiag {"max-width": 800, "align":"center"}
 blockdiag {
   Kroki -> generates -> "Block diagrams";
   Kroki -> is -> "very easy!";
@@ -1343,7 +1343,7 @@ blockdiag {
 
 ##### ByteField
 
-```kroki-bytefield {"width": 800, "align":"center"}
+```kroki-bytefield {"max-width": 800, "align":"center"}
 (defattrs :bg-green {:fill "#a0ffa0"})
 (defattrs :bg-yellow {:fill "#ffffa0"})
 (defattrs :bg-pink {:fill "#ffb0a0"})
