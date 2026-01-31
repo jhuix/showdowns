@@ -160,7 +160,7 @@ const cdnSrc = {
      */
     Shiki: {
       type: 'module',
-      src: 'https://esm.sh/shiki'
+      module: 'https://esm.sh/shiki'
     },
     AntVInfographic: 'https://unpkg.com/@antv/infographic/dist/infographic.min.js',
     zenuml: 'https://unpkg.com/@zenuml/core/dist/zenuml.js'
@@ -214,7 +214,7 @@ const cdnSrc = {
     Plotly: 'https://cdn.jsdelivr.net/npm/plotly.js-dist-min/plotly.min.js',
     Shiki: {
       type: 'module',
-      src: 'https://cdn.jsdelivr.net/npm/shiki/+esm'
+      module: 'https://cdn.jsdelivr.net/npm/shiki/+esm'
     },
     AntVInfographic: 'https://cdn.jsdelivr.net/npm/@antv/infographic/dist/infographic.min.js',
     zenuml: 'https://cdn.jsdelivr.net/npm/@zenuml/core/dist/zenuml.min.js'
@@ -379,7 +379,7 @@ function loadLinkScript(name, script) {
           if (script.type === 'module' && script.module) {
             const objName = lowerName.replaceAll(/[-@+.]/g, '');
             s.textContent = `
-import ${objName} from '${script.module}';
+import * as ${objName} from '${script.module}';
 if (!('${name}' in window)) {
   if ('default' in ${objName} && ${objName}['default']) {
     window['${name}'] = ${objName}['default']
@@ -427,14 +427,15 @@ function loadModule(name, module, resolve) {
       importModule = true;
       let importPluginsCode = '';
       let namespaces = '';
-      const pluginnames = [];
       script.onloaded = (args) => {
         resolve(!args ? name : args);
       }
-      for (const [k, v] of Object.entries(module.plugins)) {
-        pluginnames.push(`'${k}'`);
-        const kName = k.toLowerCase().replaceAll(/[-@+.]/g, '');
-        importPluginsCode += `import ${kName} from '${v}';
+      if (module.plugins) {
+        const pluginnames = [];
+        for (const [k, v] of Object.entries(module.plugins)) {
+          pluginnames.push(`'${k}'`);
+          const kName = k.toLowerCase().replaceAll(/[-@+.]/g, '');
+          importPluginsCode += `import * as ${kName} from '${v}';
 if (!('${k}' in window)) {
   if ('default' in ${kName} && ${kName}['default']) {
     window['${k}'] = ${kName}['default']
@@ -443,13 +444,14 @@ if (!('${k}' in window)) {
   }
 }
 `;
-      }
-      if (pluginnames.length > 0) {
-        namespaces = `['${name}',${pluginnames.join(',')}]`;
+        }
+        if (pluginnames.length > 0) {
+          namespaces = `['${name}',${pluginnames.join(',')}]`;
+        }
       }
       const objName = lowerName.replaceAll(/[-@+.]/g, '');
       script.textContent = `
-import ${objName} from '${module.module}';
+import * as ${objName} from '${module.module}';
 if (!('${name}' in window)) {
   if ('default' in ${objName} && ${objName}['default']) {
     window['${name}'] = ${objName}['default']

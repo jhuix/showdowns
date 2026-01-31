@@ -122,6 +122,8 @@ function parseAttribute(attribute, container, exclude) {
 }
 
 function attributeToString(attribute) {
+  if (!attribute) return '';
+
   let result = '';
   for (const [k, v] of Object.entries(attribute)) {
     result += ' ' + k;
