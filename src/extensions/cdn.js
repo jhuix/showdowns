@@ -160,7 +160,7 @@ const cdnSrc = {
      */
     Shiki: {
       type: 'module',
-      module: 'https://esm.sh/shiki'
+      src: 'https://esm.sh/shiki'
     },
     AntVInfographic: 'https://unpkg.com/@antv/infographic/dist/infographic.min.js',
     zenuml: 'https://unpkg.com/@zenuml/core/dist/zenuml.js'
@@ -214,7 +214,7 @@ const cdnSrc = {
     Plotly: 'https://cdn.jsdelivr.net/npm/plotly.js-dist-min/plotly.min.js',
     Shiki: {
       type: 'module',
-      module: 'https://cdn.jsdelivr.net/npm/shiki/+esm'
+      src: 'https://cdn.jsdelivr.net/npm/shiki/+esm'
     },
     AntVInfographic: 'https://cdn.jsdelivr.net/npm/@antv/infographic/dist/infographic.min.js',
     zenuml: 'https://cdn.jsdelivr.net/npm/@zenuml/core/dist/zenuml.min.js'
