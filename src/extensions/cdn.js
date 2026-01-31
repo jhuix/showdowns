@@ -88,7 +88,7 @@ const cdnSrc = {
     echarts: 'https://unpkg.com/echarts/dist/echarts.min.js',
     Viz: 'https://unpkg.com/@viz-js/viz/dist/viz-global.js',
     Raphael: 'https://unpkg.com/raphael/raphael.min.js',
-    flowchart: '../dist/flowchart/flowchart.min.js',
+    flowchart: '../dist/diagrams/flowchart/flowchart.min.js',
     mermaid: {
       src: 'https://unpkg.com/mermaid/dist/mermaid.min.js',
       plugins: {
@@ -173,7 +173,7 @@ const cdnSrc = {
     echarts: 'https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js',
     Viz: 'https://cdn.jsdelivr.net/npm/@viz-js/viz/dist/viz-global.js',
     Raphael: 'https://cdn.jsdelivr.net/npm/raphael/raphael.min.js',
-    flowchart: '../dist/flowchart/flowchart.min.js',
+    flowchart: '../dist/diagrams/flowchart/flowchart.min.js',
     mermaid: {
       type: 'module',
       module: 'https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs',
