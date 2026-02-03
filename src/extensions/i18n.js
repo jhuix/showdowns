@@ -41,7 +41,27 @@ const i18nMap = {
     'warning': '警告',
     'error': '错误',
     'success': '成功',
-    'danger': '危险'
+    'danger': '危险',
+    'summary': '概要',
+    'tldr': '摘要',
+    'abstract': '抽象',
+    'todo': '待办',
+    'hint': '小窍门',
+    'check': '检测',
+    'done': '完成',
+    'help': '帮助',
+    'question': '问题',
+    'faq': '问答',
+    'attention': '关注',
+    'caution': '提醒',
+    'failure': '故障',
+    'fail': '失败',
+    'missing': '缺失',
+    'bug': '缺陷',
+    'example': '示例',
+    'snippet': '片段',
+    'quote': '引用',
+    'cite': '引文'
   }
 }
 

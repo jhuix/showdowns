@@ -2,6 +2,7 @@
  * Copyright (c) 2025-present, Jhuix (Hui Jin) <jhuix0117@gmail.com>. All rights reserved.
  * Use of this source code is governed by a MIT license that can be found in the LICENSE file.
  * Description: showdown shiki extension for markdown
+ * Reference: https://shiki.style
  */
 'use strict';
 
@@ -123,7 +124,16 @@ function loadCodeTools() {
         options.appendChild(item.option);
         items.push(item);
       });
-      themes = { options, items };
+      const langs = []
+      window.Shiki.bundledLanguagesInfo.forEach((info) => {
+        langs.push(info.id);
+        if (info.aliases) {
+          info.aliases.forEach((alias) => {
+            langs.push(alias);
+          })
+        }
+      });
+      themes = { options, items, langs };
       return themes;
     }
 
@@ -283,11 +293,27 @@ function getTempDiv(doc) {
 
 function onRenderShiki(resolve, element, options) {
   if (hasShiki()) {
-    const code = element.textContent.trim();
+    // https://shiki.style/languages
     const language = element.classList[0];
-    const doc = element.ownerDocument;
-    const lang = utils.parseAttribute(element.dataset.lang);
-    const theme = (lang?.theme) ? lang.theme : options.theme;
+    let langName = '';
+    for (let i = 0; i < Shiki.bundledLanguagesInfo.length; i++) {
+      const info = Shiki.bundledLanguagesInfo[i];
+      if (info.id === language) {
+        langName = info.name
+        break;
+      }
+
+      if (info.aliases && info.aliases.includes(language)) {
+        langName = info.name
+        break;
+      }
+    }
+    if (!langName) {
+      console.warn('language be not exist in shiki: ', language)
+      resolve(false);
+      return;
+    }
+
     let themeName = theme;
     for (let i = 0; i < Shiki.bundledThemesInfo.length; i++) {
       if (Shiki.bundledThemesInfo[i].id === themeName) {
@@ -295,13 +321,10 @@ function onRenderShiki(resolve, element, options) {
         break;
       }
     }
-    let langName = language;
-    for (let i = 0; i < Shiki.bundledLanguagesInfo.length; i++) {
-      if (Shiki.bundledLanguagesInfo[i].id === langName) {
-        langName = Shiki.bundledLanguagesInfo[i].name
-        break;
-      }
-    }
+    const code = element.textContent.trim();
+    const doc = element.ownerDocument;
+    const lang = utils.parseAttribute(element.dataset.lang);
+    const theme = (lang?.theme) ? lang.theme : options.theme;
     Shiki.codeToHtml(code, { lang: language, theme: theme }).then((output) => {
       const container = doc.createElement('div');
       container.classList.add('codeblock-container');

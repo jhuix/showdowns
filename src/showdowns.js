@@ -33,7 +33,7 @@ import showdownSequence from './extensions/showdown-sequence.js';
 import showdownWavedrom from './extensions/showdown-wavedrom.js';
 import showdownFootnotes from './extensions/showdown-footnotes.js';
 import showdownFlowchart from './extensions/showdown-flowchart.js';
-import { showdownDirective, showdownAsyncDirective} from './extensions/showdown-directive.js';
+import showdownDirective from './extensions/showdown-directive.js';
 import { showdownImage, showdownAsyncImage, imageResetEventName } from './extensions/showdown-image.js'
 
 import * as zlibcodec from './utils/zlib-codec.js';
@@ -49,6 +49,7 @@ events[imageResetEventName] = imageResetEventName;
 const getOptions = (options = {}) => {
   return {
     flavor: 'github',
+    metadata: true,
     mathEngine: 'mathjax',
     ...options,
   };
@@ -88,7 +89,6 @@ const getAsyncExtensions = (options, extensions = {}) => {
   const asyncExtensions = {
     'showdown-toc': getExtension('showdown-toc', showdownToc),
     'showdown-image': showdownAsyncImage(),
-    'showdown-directive': showdownAsyncDirective(),
     'showdown-mermaid': showdownMermaid(mermaidOptions),
     'showdown-mathjax': showdownMathJax(mathjaxOptions),
     'showdown-katex': showdownKatex(katexOptions),

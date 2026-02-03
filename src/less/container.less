@@ -127,4 +127,498 @@
       margin-bottom: .3rem;
     }
   }
+
+  @font-face {
+    font-family: "admons-icons";
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 400;
+    src: url('data:application/x-font-woff2;charset=utf-8;base64,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') format('woff2');
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  .admonition {
+    position: relative;
+    box-shadow: 0 2px 2px 0 rgba(0, 0, 0, .14), 0 1px 5px 0 rgba(0, 0, 0, .12), 0 3px 1px -2px rgba(0, 0, 0, .2);
+    margin: 1em 0;
+    border-radius: 7px;
+    background-color: rgba(255, 255, 255, 0.05);
+
+    .admonition-title {
+      border-bottom: 1px solid rgba(68, 138, 255, .2);
+      border-radius: 7px 7px 0 0;
+      font-weight: 700;
+      font-size: 1.5rem;
+      padding-left: 1rem;
+      padding-top: 0.8rem;
+      padding-bottom: 0.8rem;
+      padding-right: 1rem;
+      align-items: center;
+      display: inline-flex;
+      width: 100%;
+    }
+
+    .admonition-title:before {
+      font-family: admons-icons;
+      font-style: normal;
+      font-variant: normal;
+      font-weight: normal;
+      font-size: 2rem;
+      line-height: 2rem;
+      text-transform: none;
+      white-space: nowrap;
+      word-wrap: normal;
+      direction: ltr;
+      margin-right: 0.5rem;
+      content: "\e61a";
+    }
+
+    .admonition-content {
+      padding: 1rem 1rem;
+    }
+
+    &.summary,
+    &.tldr {
+      .admonition-title:before {
+        content: "\ebbf";
+      }
+    }
+
+    &.abstract {
+      .admonition-title:before {
+        content: "\e787";
+      }
+    }
+
+    &.hint,
+    &.tip {
+      .admonition-title:before {
+        content: "\e60c";
+      }
+    }
+
+    &.info,
+    &.todo {
+      .admonition-title:before {
+        content: "\e626";
+      }
+    }
+
+    &.success,
+    &.check,
+    &.done {
+      .admonition-title:before {
+        content: "\e608";
+      }
+    }
+
+    &.question,
+    &.help,
+    &.faq {
+      .admonition-title:before {
+        content: "\e606";
+      }
+    }
+
+    &.attention {
+      .admonition-title:before {
+        content: "\e603";
+      }
+    }
+
+    &.warning,
+    &.caution {
+      .admonition-title:before {
+        content: "\e62a";
+      }
+    }
+
+    &.failure,
+    &.fail,
+    &.missing {
+      .admonition-title:before {
+        content: "\e609";
+      }
+    }
+
+    &.danger {
+      .admonition-title:before {
+        content: "\e628";
+      }
+    }
+
+    &.error {
+      .admonition-title:before {
+        content: "\e612";
+      }
+    }
+
+    &.bug {
+      .admonition-title:before {
+        content: "\e61f";
+      }
+    }
+
+    &.example> {
+      .admonition-title:before {
+        content: "\e690";
+      }
+    }
+
+    &.snippet {
+      .admonition-title:before {
+        content: "\e8e9";
+      }
+    }
+
+    &.quote,
+    &.cite {
+      .admonition-title:before {
+        content: "\e618";
+      }
+    }
+
+    &.note {
+      border-left: .4rem solid rgba(68, 138, 255, .8);
+
+      .admonition-title {
+        background-color: rgba(68, 138, 255, .1);
+      }
+
+      .admonition-title:before {
+        color: rgba(68, 138, 255, .8);
+      }
+
+      &.summary,
+      &.tldr,
+      &.abstract {
+        border-left-color: rgba(0, 176, 255, .8);
+
+        .admonition-title {
+          background-color: rgba(0, 176, 255, .1);
+          border-bottom-color: rgba(0, 176, 255, .2);
+        }
+
+        .admonition-title:before {
+          color: rgba(0, 176, 255, 1);
+        }
+      }
+
+      &.hint,
+      &.tip {
+        border-left-color: rgba(0, 191, 165, .8);
+
+        .admonition-title {
+          background-color: rgba(0, 191, 165, .1);
+          border-bottom-color: rgba(0, 191, 165, .2);
+        }
+
+        .admonition-title:before {
+          color: rgba(0, 191, 165, 1);
+        }
+      }
+
+      &.info,
+      &.todo {
+        border-left-color: rgba(0, 184, 212, .8);
+
+        .admonition-title {
+          background-color: rgba(0, 184, 212, .1);
+          border-bottom-color: rgba(0, 184, 212, .2);
+        }
+
+        .admonition-title:before {
+          color: rgba(0, 184, 212, 1);
+        }
+      }
+
+      &.success,
+      &.check,
+      &.done {
+        border-left-color: rgba(0, 200, 83, .8);
+
+        .admonition-title {
+          background-color: rgba(0, 200, 83, .1);
+          border-bottom-color: rgba(0, 200, 83, .2);
+        }
+
+        .admonition-title:before {
+          color: rgba(0, 200, 83, 1);
+        }
+      }
+
+
+      &.question,
+      &.help,
+      &.faq {
+        border-left-color: rgba(100, 221, 23, .8);
+
+        .admonition-title {
+          background-color: rgba(100, 221, 23, .1);
+          border-bottom-color: rgba(100, 221, 23, .2);
+        }
+
+        .admonition-title:before {
+          color: rgba(100, 221, 23, 1);
+        }
+      }
+
+
+      &.warning,
+      &.attention,
+      &.caution {
+        border-left-color: rgba(255, 145, 0, .8);
+
+        .admonition-title {
+          background-color: rgba(255, 145, 0, .1);
+          border-bottom-color: rgba(255, 145, 0, .2);
+        }
+
+        .admonition-title:before {
+          color: rgba(255, 145, 0, 1);
+        }
+      }
+
+      &.failure,
+      &.fail,
+      &.missing {
+        border-left-color: rgba(255, 82, 82, .8);
+
+        .admonition-title {
+          background-color: rgba(255, 82, 82, .1);
+          border-bottom-color: rgba(255, 82, 82, .2);
+        }
+
+        .admonition-title:before {
+          color: rgba(255, 82, 82, 1);
+        }
+      }
+
+      &.danger,
+      &.error,
+      &.bug {
+        border-left-color: rgba(255, 23, 68, .8);
+
+        .admonition-title {
+          background-color: rgba(255, 23, 68, .1);
+          border-bottom-color: rgba(255, 23, 68, .2);
+        }
+
+        .admonition-title:before {
+          color: rgba(255, 23, 68, 1);
+        }
+      }
+
+      &.example,
+      &.snippet {
+        border-left-color: rgba(0, 184, 212, .8);
+
+        .admonition-title {
+          background-color: rgba(0, 184, 212, .1);
+          border-bottom-color: rgba(0, 184, 212, .2);
+        }
+
+        .admonition-title:before {
+          color: rgba(0, 184, 212, 1);
+        }
+      }
+
+      &.quote,
+      &.cite {
+        border-left-color: rgba(158, 158, 158, .8);
+
+        .admonition-title {
+          background-color: rgba(158, 158, 158, .1);
+          border-bottom-color: rgba(158, 158, 158, .2);
+        }
+
+        .admonition-title:before {
+          color: rgba(158, 158, 158, 1);
+        }
+      }
+    }
+
+    &.alert {
+      .admonition-title {
+        background-color: rgba(68, 138, 255, .4);
+      }
+
+      .admonition-title:before {
+        color: rgba(68, 138, 255, 1);
+      }
+
+      .admonition-content {
+        background-color: rgba(68, 138, 255, .1);
+      }
+
+      &.summary,
+      &.tldr,
+      &.abstract {
+        .admonition-title {
+          background-color: rgba(0, 176, 255, .4);
+          border-bottom-color: rgba(0, 176, 255, .2);
+        }
+
+        .admonition-title:before {
+          color: rgba(0, 176, 255, 1);
+        }
+
+        .admonition-content {
+          background-color: rgba(0, 176, 255, .1);
+        }
+      }
+
+      &.hint,
+      &.tip {
+        .admonition-title {
+          background-color: rgba(0, 191, 165, .4);
+          border-bottom-color: rgba(0, 191, 165, .2);
+        }
+
+        .admonition-title:before {
+          color: rgba(0, 191, 165, 1);
+        }
+
+        .admonition-content {
+          background-color: rgba(0, 191, 165, .1);
+        }
+      }
+
+      &.info,
+      &.todo {
+        .admonition-title {
+          background-color: rgba(0, 184, 212, .4);
+          border-bottom-color: rgba(0, 184, 212, .2);
+        }
+
+        .admonition-title:before {
+          color: rgba(0, 184, 212, 1);
+        }
+
+        .admonition-content {
+          background-color: rgba(0, 184, 212, .1);
+        }
+      }
+
+      &.success,
+      &.check,
+      &.done {
+        .admonition-title {
+          background-color: rgba(0, 200, 83, .4);
+          border-bottom-color: rgba(0, 200, 83, .2);
+        }
+
+        .admonition-title:before {
+          color: rgba(0, 200, 83, 1);
+        }
+
+        .admonition-content {
+          background-color: rgba(0, 200, 83, .1);
+        }
+      }
+
+
+      &.question,
+      &.help,
+      &.faq {
+        .admonition-title {
+          background-color: rgba(100, 221, 23, .4);
+          border-bottom-color: rgba(100, 221, 23, .2);
+        }
+
+        .admonition-title:before {
+          color: rgba(100, 221, 23, 1);
+        }
+
+        .admonition-content {
+          background-color: rgba(100, 221, 23, .1);
+        }
+      }
+
+
+      &.warning,
+      &.attention,
+      &.caution {
+        .admonition-title {
+          background-color: rgba(255, 145, 0, .4);
+          border-bottom-color: rgba(255, 145, 0, .2);
+        }
+
+        .admonition-title:before {
+          color: rgba(255, 145, 0, 1);
+        }
+
+        .admonition-content {
+          background-color: rgba(255, 145, 0, .1);
+        }
+      }
+
+      &.failure,
+      &.fail,
+      &.missing {
+        .admonition-title {
+          background-color: rgba(255, 82, 82, .4);
+          border-bottom-color: rgba(255, 82, 82, .2);
+        }
+
+        .admonition-title:before {
+          color: rgba(255, 82, 82, 1);
+        }
+
+        .admonition-content {
+          background-color: rgba(255, 82, 82, .1);
+        }
+      }
+
+      &.danger,
+      &.error,
+      &.bug {
+        .admonition-title {
+          background-color: rgba(255, 23, 68, .4);
+          border-bottom-color: rgba(255, 23, 68, .2);
+        }
+
+        .admonition-title:before {
+          color: rgba(255, 23, 68, 1);
+        }
+
+        .admonition-content {
+          background-color: rgba(255, 23, 68, .1);
+        }
+      }
+
+      &.example,
+      &.snippet {
+        .admonition-title {
+          background-color: rgba(0, 184, 212, .4);
+          border-bottom-color: rgba(0, 184, 212, .2);
+        }
+
+        .admonition-title:before {
+          color: rgba(0, 184, 212, 1);
+        }
+
+        .admonition-content {
+          background-color: rgba(0, 184, 212, .1);
+        }
+      }
+
+      &.quote,
+      &.cite {
+        .admonition-title {
+          background-color: rgba(158, 158, 158, .4);
+          border-bottom-color: rgba(158, 158, 158, .2);
+        }
+
+        .admonition-title:before {
+          color: rgba(158, 158, 158, 1);
+        }
+
+        .admonition-content {
+          background-color: rgba(158, 158, 158, .1);
+        }
+      }
+    }
+  }
 }
