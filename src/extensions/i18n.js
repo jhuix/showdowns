@@ -61,7 +61,9 @@ const i18nMap = {
     'example': '示例',
     'snippet': '片段',
     'quote': '引用',
-    'cite': '引文'
+    'cite': '引文',
+    'important': '重点',
+    'key': '要点'
   }
 }
 

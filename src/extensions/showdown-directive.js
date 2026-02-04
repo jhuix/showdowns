@@ -12,6 +12,7 @@ import i18n from './i18n';
 import EventBus from '../utils/event-bus';
 
 const leafDirectiveEventName = 'leafDirective';
+const textDirectiveEventName = 'textDirective';
 
 const admonTypes = [
   // "note",  //rgba(68,138,255,.1)
@@ -124,6 +125,12 @@ function parseSvgType(name) {
     case 'cite':
     case '引文':
       return 'cite';
+    case 'important':
+    case '重点':
+      return 'important';
+    case 'key':
+    case '要点':
+      return 'key';
     default:
       return name;
   }
@@ -240,10 +247,11 @@ function showdownDirective() {
               };
               let id = '';
               let attrs = '';
-              // let svgContent = '';
-              let defaultTitle = i18n.getLangString('note', 'note');
               if (title0 || (!title && !attribute)) {
                 const classes = name.split('-');
+                if (!classes.includes('alert') && !classes.includes('note')) {
+                  container.classList.push('note');
+                }
                 classes.forEach((classname) => {
                   if (classname) {
                     if (!container.svgType) {
@@ -257,9 +265,6 @@ function showdownDirective() {
                     }
                   }
                 });
-                if (!classes.includes('alert') && !classes.includes('note')) {
-                  container.classList.push('note');
-                }
                 title = title0;
               } else {
                 switch (name) {
@@ -281,12 +286,9 @@ function showdownDirective() {
                       container.classList.push('note');
                     }
                 }
-                // svgContent = `<span class="container-icon"><svg xmlns="http://www.w3.org/2000/svg"><use xlink:href="#${container.svgType.id}"/></svg></span>`;
               }
               if (!container.svgType) {
                 container.svgType = 'default';
-              } else {
-                defaultTitle = i18n.getLangString(container.svgType, container.svgType);
               }
               if (!container.classList.includes(container.svgType)) {
                 container.classList.push(container.svgType);
@@ -295,6 +297,9 @@ function showdownDirective() {
                 title = showdown.subParser('spanGamut')(title, options, globals);
                 title = `<div class="admonition-title">${title}</div>`;
               } else {
+                const defaultTitle = !container.svgType ? i18n.getLangString('note', 'note') :
+                  i18n.getLangString(container.svgType, container.svgType);
+                title = `<div class="admonition-title">${defaultTitle}</div>`;
                 title = `<div class="admonition-title">${defaultTitle}</div>`;
               }
               if (content) {
@@ -314,6 +319,60 @@ function showdownDirective() {
               return showdown.subParser('hashBlock')(code, options, globals);
             },
           );
+
+          text = text.replace(/^!!! ((?:[^"\n]+[ \t]+)*)(?:"([^"\n]+)")?[ \t]*\n((?:(?:    |\t)[^\r\n]*(?:\n|$)|\n)*)/gm,
+            function (wholeMatch, name, title, content) {
+              const container = {
+                classList: ['admonition'],
+              };
+              const classes = name.split(' ');
+              if (!classes.includes('alert') && !classes.includes('note')) {
+                container.classList.push('note');
+              }
+              classes.forEach((classname) => {
+                if (classname) {
+                  if (!container.svgType) {
+                    const svgType = parseSvgType(classname);
+                    if (svgType) {
+                      container.svgType = svgType;
+                    }
+                  }
+                  if (!container.classList.includes(classname)) {
+                    container.classList.push(classname);
+                  }
+                }
+              });
+              if (!container.svgType) {
+                container.svgType = 'default';
+              }
+              if (!container.classList.includes(container.svgType)) {
+                container.classList.push(container.svgType);
+              }
+              if (title) {
+                title = showdown.subParser('spanGamut')(title, options, globals);
+                title = `<div class="admonition-title">${title}</div>`;
+              } else {
+                const defaultTitle = !container.svgType ? i18n.getLangString('note', 'note') :
+                  i18n.getLangString(container.svgType, container.svgType);
+                title = `<div class="admonition-title">${defaultTitle}</div>`;
+              }
+              if (content) {
+                const lines = content.split('\n');
+                lines.forEach((line, index) => {
+                  if (line) {
+                    const pos = line[0] === '\t' ? 1 : 4;
+                    lines[index] = line.substring(pos);
+                  }
+                })
+                content = showdown.subParser('githubCodeBlocks')(lines.join('\n'), options, globals);
+                content = showdown.subParser('blockGamut')(content, options, globals);
+                content = `<div class="admonition-content">${content}</div>`;
+              } else {
+                content = '';
+              }
+              const code = `<div class="${container.classList.join(' ')}">${title}${content}</div>`;
+              return showdown.subParser('hashBlock')(code, options, globals);
+            });
 
           // leaf directive
           text = text.replace(
@@ -373,12 +432,13 @@ function showdownDirective() {
                 return showdown.subParser('hashBlock')(code, options, globals);
               }
 
+              let content = '';
               const callback = (code) => {
-                if (code) {
-                  showdown.subParser('hashBlock')(code, options, globals);
-                }
+                content = code;
               };
-              EventBus.emit(leafDirectiveEventName, name, title, directive, callback);
+              if (EventBus.emit(leafDirectiveEventName, name, title, directive, callback) && content) {
+                return showdown.subParser('hashBlock')(content, options, globals);
+              }
             },
           );
 
@@ -405,8 +465,15 @@ function showdownDirective() {
               } else {
                 title = '';
               }
-              const code = `<${name} ${id}${className}${attrs}>${title}</${name}>`;
-              return showdown.subParser('hashBlock')(code, options, globals);
+
+              let content = '';
+              const callback = (code) => {
+                content = code;
+              };
+              if (!EventBus.emit(textDirectiveEventName, name, title, directive, callback)) {
+                content = `<${name} ${id}${className}${attrs}>${title}</${name}>`;
+              }
+              return showdown.subParser('hashBlock')(content, options, globals);
             },
           );
 
