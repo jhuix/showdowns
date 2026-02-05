@@ -45,7 +45,7 @@ function splitAndStripQuotes(str) {
   });
 }
 
-function parseSvgType(name) {
+function parseContainerStyle(name) {
   switch (name) {
     case 'success':
     case '成功':
@@ -131,13 +131,28 @@ function parseSvgType(name) {
     case 'key':
     case '要点':
       return 'key';
+    case 'container':
+    case '容器':
+      return 'container';
+    case 'row':
+    case '行':
+      return 'row';
+    case 'col':
+    case '列':
+      return 'col';
     default:
       return name;
   }
 }
 
-
-function parseAttribute(attribute, container, exclude) {
+/** Parse attribute string to object
+ *
+ * @param {string} attribute
+ * @param {{}} container
+ * @param {string[]} excludes
+ * @returns {{}|undefined}
+ */
+function parseAttribute(attribute, container, excludes) {
   if (!attribute) return;
 
   const attrs = splitAndStripQuotes(attribute);
@@ -155,7 +170,7 @@ function parseAttribute(attribute, container, exclude) {
           if (!obj.classList) {
             obj.classList = [];
           }
-          if (!exclude) {
+          if (!excludes || excludes.length === 0) {
             classes.forEach((classname) => {
               if (classname && !obj.classList.includes(classname)) {
                 obj.classList.push(classname);
@@ -164,13 +179,13 @@ function parseAttribute(attribute, container, exclude) {
           } else {
             classes.forEach((classname) => {
               if (classname) {
-                if (!obj.svgType) {
-                  const svgType = parseSvgType(classname);
-                  if (svgType) {
-                    obj.svgType = svgType;
+                if (!obj.style) {
+                  const containerStyle = parseContainerStyle(classname);
+                  if (containerStyle) {
+                    obj.style = containerStyle;
                   }
                 }
-                if (classname !== exclude && !obj.classList.includes(classname)) {
+                if (!excludes.includes(classname) && !obj.classList.includes(classname)) {
                   obj.classList.push(classname);
                 }
               }
@@ -240,24 +255,27 @@ function showdownDirective() {
 
           // container directive
           text = text.replace(
-            /^ {0,3}((?::::+)|(?:!!!+))[ \t]*([-\w]+)[ \t]*(?:([^\f\v\r\n\[\]\{\}]*)|(?:\[([^\[\]]*)\])?[ \t]*(?:\{([^\{\}]*)\})?)[: \t]*\n([\s\S]*?)\n {0,3}\1[: \t]*/gm,
+            /^ {0,3}((?::::+)|(?:!!!+))[ \t]*([-\w]*)[ \t]*(?:([^\f\v\r\n\[\]\{\}]*)|(?:\[([^\[\]]*)\])?[ \t]*(?:\{([^\{\}]*)\})?)[: \t]*\n([\s\S]*?)\n {0,3}\1[: \t]*/gm,
             function (wholeMatch, delim, name, title0, title, attribute, content) {
-              const container = {
-                classList: ['admonition'],
-              };
+              name = name.toLowerCase();
+              if (!name) name = 'container';
+              const container = { classList: [] };
               let id = '';
               let attrs = '';
+              let defaultTitle = '';
               if (title0 || (!title && !attribute)) {
                 const classes = name.split('-');
-                if (!classes.includes('alert') && !classes.includes('note')) {
-                  container.classList.push('note');
-                }
-                classes.forEach((classname) => {
-                  if (classname) {
-                    if (!container.svgType) {
-                      const svgType = parseSvgType(classname);
-                      if (svgType) {
-                        container.svgType = svgType;
+                name = classes[0];
+                // if (!classes.includes('alert') && !classes.includes('note') &&
+                //   !classes.includes('container') && !classes.includes('row') && !classes.includes('col')) {
+                //   container.classList.push('admonition', 'note');
+                // }
+                classes.forEach((classname, index) => {
+                  if (index > 0 && classname) {
+                    if (!container.style) {
+                      const containerStyle = parseContainerStyle(classname);
+                      if (containerStyle) {
+                        container.style = containerStyle;
                       }
                     }
                     if (!container.classList.includes(classname)) {
@@ -266,46 +284,74 @@ function showdownDirective() {
                   }
                 });
                 title = title0;
-              } else {
-                switch (name) {
-                  case 'note':
-                  case '备注':
-                    container.classList.push('note');
-                    parseAttribute(attribute, container, 'alert');
-                    break;
-                  case 'alert':
-                  case '注意':
-                    defaultTitle = i18n.getLangString('alert', 'alert');
-                    container.classList.push('alert');
-                    parseAttribute(attribute, container, 'note');
-                    break;
-                  default:
-                    parseAttribute(attribute, container);
-                    container.svgType = parseSvgType(name);
-                    if (!container.classList.includes('alert') && !container.classList.includes('note')) {
-                      container.classList.push('note');
-                    }
+              }
+
+              let admonition = false;
+              switch (name) {
+                case 'note':
+                case '备注':
+                  admonition = true;
+                  container.type = 'admonition';
+                  defaultTitle = i18n.getLangString('note', 'note');
+                  container.classList.unshift('admonition', 'note');
+                  parseAttribute(attribute, container, ['alert', 'container', 'row', 'col']);
+                  break;
+                case 'alert':
+                case '注意':
+                  admonition = true;
+                  container.type = 'admonition';
+                  defaultTitle = i18n.getLangString('alert', 'alert');
+                  container.classList.unshift('admonition', 'alert');
+                  parseAttribute(attribute, container, ['note', 'container', 'row', 'col']);
+                  break;
+                case 'container':
+                case '容器':
+                  container.type = 'container';
+                  parseAttribute(attribute, container);
+                  container.classList.unshift('container');
+                  break;
+                case 'row':
+                case '行':
+                  container.type = 'row';
+                  parseAttribute(attribute, container);
+                  container.classList.unshift('row');
+                  break;
+                case 'col':
+                case '列':
+                  container.type = 'col';
+                  parseAttribute(attribute, container);
+                  container.classList.unshift('col');
+                  break;
+                default:
+                  admonition = true;
+                  container.type = 'admonition';
+                  container.style = parseContainerStyle(name);
+                  parseAttribute(attribute, container, ['container', 'row', 'col']);
+                  if (!container.classList.includes('alert') && !container.classList.includes('note')) {
+                    container.classList.unshift('admonition', 'note');
+                  } else {
+                    container.classList.unshift('admonition');
+                  }
+              }
+              if (admonition) {
+                if (!container.style) {
+                  container.style = 'default';
                 }
-              }
-              if (!container.svgType) {
-                container.svgType = 'default';
-              }
-              if (!container.classList.includes(container.svgType)) {
-                container.classList.push(container.svgType);
+                if (!container.classList.includes(container.style)) {
+                  container.classList.push(container.style);
+                }
               }
               if (title) {
                 title = showdown.subParser('spanGamut')(title, options, globals);
-                title = `<div class="admonition-title">${title}</div>`;
-              } else {
-                const defaultTitle = !container.svgType ? i18n.getLangString('note', 'note') :
-                  i18n.getLangString(container.svgType, container.svgType);
-                title = `<div class="admonition-title">${defaultTitle}</div>`;
+                title = `<div class="${container.type}-title">${title}</div>`;
+              } else if (admonition) {
+                defaultTitle = (defaultTitle || !container.style) ?? i18n.getLangString(container.style, container.style);
                 title = `<div class="admonition-title">${defaultTitle}</div>`;
               }
               if (content) {
                 content = showdown.subParser('githubCodeBlocks')(content, options, globals);
                 content = showdown.subParser('blockGamut')(content, options, globals);
-                content = `<div class="admonition-content">${content}</div>`;
+                content = `<div class="${container.type}-content">${content}</div>`;
               } else {
                 content = '';
               }
@@ -320,21 +366,23 @@ function showdownDirective() {
             },
           );
 
+          // Support rST style (https://docutils.sourceforge.io/docs/ref/rst/directives.html#specific-admonitions)
           text = text.replace(/^!!! ((?:[^"\n]+[ \t]+)*)(?:"([^"\n]+)")?[ \t]*\n((?:(?:    |\t)[^\r\n]*(?:\n|$)|\n)*)/gm,
             function (wholeMatch, name, title, content) {
               const container = {
                 classList: ['admonition'],
               };
+              name = name.toLowerCase();
               const classes = name.split(' ');
               if (!classes.includes('alert') && !classes.includes('note')) {
                 container.classList.push('note');
               }
-              classes.forEach((classname) => {
+              classes.forEach((classname, index) => {
                 if (classname) {
-                  if (!container.svgType) {
-                    const svgType = parseSvgType(classname);
-                    if (svgType) {
-                      container.svgType = svgType;
+                  if (!container.style) {
+                    const containerStyle = parseContainerStyle(classname);
+                    if (containerStyle) {
+                      container.style = containerStyle;
                     }
                   }
                   if (!container.classList.includes(classname)) {
@@ -342,18 +390,18 @@ function showdownDirective() {
                   }
                 }
               });
-              if (!container.svgType) {
-                container.svgType = 'default';
+              if (!container.style) {
+                container.style = 'default';
               }
-              if (!container.classList.includes(container.svgType)) {
-                container.classList.push(container.svgType);
+              if (!container.classList.includes(container.style)) {
+                container.classList.push(container.style);
               }
               if (title) {
                 title = showdown.subParser('spanGamut')(title, options, globals);
                 title = `<div class="admonition-title">${title}</div>`;
               } else {
-                const defaultTitle = !container.svgType ? i18n.getLangString('note', 'note') :
-                  i18n.getLangString(container.svgType, container.svgType);
+                const defaultTitle = !container.style ? i18n.getLangString('note', 'note') :
+                  i18n.getLangString(container.style, container.style);
                 title = `<div class="admonition-title">${defaultTitle}</div>`;
               }
               if (content) {

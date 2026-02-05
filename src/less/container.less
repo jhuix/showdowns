@@ -3,128 +3,48 @@
  * Use of this source code is governed by a MIT license that can be found in the LICENSE file.
  */
 .showdowns {
-  .showdown-container {
+  .container {
+    display: flex;
+    flex-direction: column;
     position: relative;
-    padding: 0.5rem 1rem;
-    margin-bottom: 1rem;
-    border: 1px solid #eee;
-    border-radius: 7px;
 
-    &.note {
-      border-left-width: 5px;
-      border-right-width: 5px;
-
-      &.tip {
-        border-left-color: #5bc0de;
-        border-right-color: #5bc0de;
-        background-color: #eef9fd;
-
-        svg {
-          fill: #4cb3d4;
-        }
-      }
-
-      &.info {
-        border-left-color: #cce5ff;
-        border-right-color: #cce5ff;
-        background-color: #f6f7f8;
-
-        svg {
-          fill: #4cb3d4;
-        }
-      }
-
-      &.warning {
-        border-left-color: #f0ad4e;
-        border-right-color: #f0ad4e;
-        background-color: #fff8e6;
-
-        svg {
-          fill: #e6a700
-        }
-      }
-
-      &.error {
-        border-left-color: #d9534f;
-        border-right-color: #d9534f;
-        background-color: #ffebec;
-
-        svg {
-          fill: #e13238
-        }
-      }
-
-      &.success {
-        border-left-color: #67c23a;
-        border-right-color: #67c23a;
-        background-color: #e6f6e6;
-
-        svg {
-          fill: #009400
-        }
-      }
-
-      &.default {
-        border-left-color: #009400;
-        border-right-color: #009400;
-        background-color: #e6f6e6;
-
-        svg {
-          fill: #009400
-        }
-      }
-    }
-
-    &.alert {
-      border: 1px solid transparent;
-      transition: opacity 0.2s;
-
-      &.tip {
-        background-color: #5bc0de;
-      }
-
-      &.info {
-        background-color: #cce5ff;
-      }
-
-      &.warning {
-        background-color: #f0ad4e;
-      }
-
-      &.error {
-        background-color: #d9534f;
-      }
-
-      &.success {
-        background-color: #67c23a;
-      }
-
-      &.default {
-        background-color: #009400;
-      }
-    }
-
-    .container-icon {
-      vertical-align: middle;
-      margin-right: .4em;
-      display: inline-block;
-
-      svg {
-        width: 1.8rem;
-        height: 1.8rem;
-        display: inline-block;
-      }
-    }
-
-    .container-title {
+    .container-title,
+    .row-title,
+    .col-title {
       font-size: 1.25rem;
       font-weight: 700;
       line-height: 1.25;
       display: inline-block;
     }
 
-    .container-title:not(:last-child) {
+    .container-title:not(:last-child),
+    .row-title:not(:last-child),
+    .col-title:not(:last-child) {
       margin-bottom: .3rem;
+    }
+
+    .container-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .row-content {
+      flex: 1;
+      display: flex;
+      flex-direction: row;
+    }
+
+    .col {
+      flex: 1 1 0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .col-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
     }
   }
 
@@ -150,10 +70,7 @@
       border-radius: 7px 7px 0 0;
       font-weight: 700;
       font-size: 1.5rem;
-      padding-left: 1rem;
-      padding-top: 0.8rem;
-      padding-bottom: 0.8rem;
-      padding-right: 1rem;
+      padding: 0.8rem 1rem;
       align-items: center;
       display: inline-flex;
       width: 100%;
