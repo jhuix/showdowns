@@ -249,14 +249,16 @@ function renderTocElements(wrapper, config) {
     }
   }
 
-  if (currTocNode) {
-    config.symbols = svgSymbols;
-  }
-  if (totalToc) {
-    if (!config.extras) {
-      config.extras = [];
+  if (firstHeadOne) {
+    if (currTocNode) {
+      config.symbols = svgSymbols;
     }
-    config.extras.push(totalToc.outerHTML);
+    if (totalToc) {
+      if (!config.extras) {
+        config.extras = [];
+      }
+      config.extras.push(totalToc.outerHTML);
+    }
   }
 
   // Final, clear all toc node in node list.

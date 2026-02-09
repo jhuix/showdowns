@@ -421,6 +421,16 @@ const showdowns = {
       this.converter.setFlavor(name);
     }
   },
+  getMetaData: function (key) {
+    if (!this.converter) {
+      return null;
+    }
+
+    const meta = this.converter.getMetadata(false);
+    meta.raw = this.converter.getMetadata(true);
+    meta.format = this.converter.getMetadataFormat();
+    return meta;
+  },
   addOptions: function (options) {
     for (const key in options) {
       if (key !== 'flavor' && key !== 'mathEngine') {

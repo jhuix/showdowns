@@ -93,6 +93,14 @@ if (!isFormatCJS) {
 
   if (isMinBuild) {
     flowchartConfig.plugins.push(terserPlugin);
+    // copy license file for flowchart.js when minifying, since flowchart.js doesn't provide a minified version
+    flowchartConfig.plugins.push(
+      copy({
+        targets: [
+          { src: 'node_modules/flowchart.js/license', dest: 'dist/diagrams/flowchart' }
+        ]
+      })
+    );
   }
 
   configs.push(flowchartConfig);
@@ -225,7 +233,8 @@ if (!isFormatCJS) {
           { src: 'logo.png', dest: 'docs' },
           { src: 'favicon.ico', dest: 'docs' },
           { src: 'dist/showdowns.min.*', dest: 'docs/dist' },
-          { src: 'dist/diagrams/flowchart/flowchart.min.*', dest: 'docs/dist/diagrams/flowchart' }
+          { src: 'dist/diagrams/flowchart/flowchart.min.*', dest: 'docs/dist/diagrams/flowchart' },
+          { src: 'dist/diagrams/flowchart/license', dest: 'docs/dist/diagrams/flowchart' }
         ]
       })
     );
