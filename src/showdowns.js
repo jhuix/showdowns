@@ -21,7 +21,7 @@ import showdownAlign from './extensions/showdown-align.js';
 import showdownKatex from './extensions/showdown-katex.js';
 import showdownKroki from './extensions/showdown-kroki.js';
 import showdownShiki from './extensions/showdown-shiki.js';
-import showdownZenuml from './extensions/showdown-zenmuml.js';
+import showdownZenuml from './extensions/showdown-zenuml.js';
 import showdownPlotly from './extensions/showdowns-plotly.js';
 import showdownGnuplot from './extensions/showdonw-gnuplot.js';
 import showdownMathJax from './extensions/showdown-mathjax.js';
