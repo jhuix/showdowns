@@ -23,6 +23,9 @@ const i18nMap = {
     'toc-toggle-prefix': 'Toggle ',
     'msg-copy-success': 'Copy success!',
     'msg-copy-failed': 'Copy failed!',
+    'export-actions-title': 'Click to view actions',
+    'export-svg-action': 'Save as SVG',
+    'export-png-action': 'Save as PNG'
   },
   'zh-cn': {
     'code-copy': '复制代码',
@@ -34,6 +37,9 @@ const i18nMap = {
     'toc-toggle-prefix': '切换',
     'msg-copy-success': '复制成功！',
     'msg-copy-failed': '复制失败！',
+    'export-actions-title': '点击查看操作',
+    'export-svg-action': '保存为 SVG',
+    'export-png-action': '保存为 PNG',
     'note': '备注',
     'alert': '注意',
     'info': '信息',

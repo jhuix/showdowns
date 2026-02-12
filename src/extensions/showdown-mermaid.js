@@ -14,6 +14,8 @@ if (typeof window === 'undefined') {
 import format from './log';
 import cdnjs from './cdn';
 import utils from './utils';
+import i18n from './i18n';
+import { svgAsDataUri, svgAsPngUri } from 'save-svg-as-png';
 
 if (typeof mermaid === 'undefined') {
   var mermaid = window.mermaid || undefined;
@@ -83,6 +85,47 @@ function unloadScript() {
   dync = false;
 }
 
+function loadExportActions(root, svg, id) {
+  const doc = root.ownerDocument;
+  const details = doc.createElement('details');
+  details.setAttribute('title', i18n.getLangString('export-actions-title', 'Click to view actions'));
+  const summary = doc.createElement('summary');
+  summary.innerHTML = `<svg viewBox="0 0 16 16" fill="currentColor" stroke="none" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
+  <circle r="2" cy="8" cx="2"></circle>
+  <circle r="2" cy="8" cx="8"></circle>
+  <circle r="2" cy="8" cx="14"></circle>
+</svg>`;
+  details.append(summary);
+  const documentClickHandler = (ev) => {
+    if (!details.contains(ev.target)) {
+      details.removeAttribute('open');
+    }
+  };
+  document.addEventListener('click', documentClickHandler);
+  const ctrl = doc.createElement('div');
+  ctrl.classList.add('diagram-actions');
+  // add 'Export' action
+  for (const ext of ['svg', 'png']) {
+    const i18nExportAction = i18n.getLangString(`export-${ext}-action`, `Save as ${ext.toUpperCase()}`);
+    const exportLink = doc.createElement('a');
+    // const scaleFactor = isObject(opts.scaleFactor) ? opts.scaleFactor[ext] : opts.scaleFactor;
+    exportLink.text = i18nExportAction;
+    exportLink.href = '#';
+    exportLink.target = '_blank';
+    exportLink.download = `${id}.${ext}`;
+    // add link on mousedown so that it's correct when the click happens
+    exportLink.addEventListener('mousedown', async function (e) {
+      e.preventDefault();
+      const url = (ext === 'svg') ? await svgAsDataUri(svg, { autosize:true, encoderOptions: 1, excludeCss: true }) :
+        await svgAsPngUri(svg, { encoderOptions: 1, excludeCss: true, backgroundColor: '#fff' });
+      this.href = url;
+    });
+    ctrl.append(exportLink);
+  }
+  details.append(ctrl);
+  root.appendChild(details);
+}
+
 function onRenderMermaid(resolve, res) {
   if (hasMermaid()) {
     const id = res.id;
@@ -90,12 +133,23 @@ function onRenderMermaid(resolve, res) {
     const data = res.data;
     const node = res.element.parentNode;
     const element = res.element;
+    const doc = element.ownerDocument;
     mermaid.render(id, data).then((m) => {
       let style = element.style.cssText;
-      if (style.length > 0) {
-        style = ` style="${style}"`;
+      const wrapper = doc.createElement('div');
+      wrapper.classList.add('diagram-container', 'has-actions');
+      const diagramWrapper = doc.createElement('div');
+      if (name) {
+        diagramWrapper.className = name;
       }
-      node.outerHTML = `<div class="${name}"${style}>${m.svg}</div>`;
+      diagramWrapper.classList.add('diagram-wrapper');
+      if (style.length > 0) {
+        diagramWrapper.setAttribute('style', style);
+      }
+      diagramWrapper.innerHTML = m.svg;
+      wrapper.appendChild(diagramWrapper);
+      loadExportActions(wrapper, diagramWrapper.querySelector('svg'), id);
+      node.replaceWith(wrapper);
       resolve(true);
     }).catch((err) => {
       console.log('render mermaid error: ' + err);
