@@ -422,7 +422,7 @@ const showdowns = {
       this.converter.setFlavor(name);
     }
   },
-  getMetaData: function (key) {
+  getMetaData: function () {
     if (!this.converter) {
       return null;
     }

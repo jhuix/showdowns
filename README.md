@@ -230,7 +230,7 @@ Table header can be eliminated.
 
 [Footnotes](https://github.com/jhuix/showdowns/blob/master/docs/showdowns-features.md#footnotes)
 
-[Container](https://github.com/jhuix/showdowns/blob/master/docs/showdowns-features.md#container)
+[Directive](https://github.com/jhuix/showdowns/blob/master/docs/showdowns-features.md#directive)
 
 [CSS defined](https://github.com/jhuix/showdowns/blob/master/docs/showdowns-features.md#css-defined)
 
@@ -563,7 +563,7 @@ Default extensions is described below:
       'showdown-image': showdownImage(),
       'showdown-align': showdownAlign(),
       'showdown-footnotes': showdownFootnotes(),
-      'showdown-container': showdownContainer(),
+      'showdown-directive': showdownDirective(),
       'showdown-sequence': showdownSequence()
     }
 
@@ -645,6 +645,12 @@ Register event to showdowns engine. Currently supporting the following events:
 Type: {name: string} => void
 
 A function to add or update flavor of showdown and showdown.convertor.
+
+#### getMetaData
+
+Type: () => {parsed: object, raw: string, format: string}
+
+Get meta data of doc header.
 
 #### addOptions
 
