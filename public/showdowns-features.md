@@ -872,7 +872,9 @@ Some **content** with _Markdown_ `syntax`. Check [this `api`](#).
 
 The syntax for leaf block directives:
 
+```
 :: name [title | content] {#id.x.y attributes(key=val)}
+```
 
 To be recognized as a directive, this has to form an otherwise empty paragraph. But as opposed to [text directives](#text-directives), there are two colons now, the brackets [] are optional as well, and spaces may be interspersed for readability.
 
@@ -890,7 +892,9 @@ And you can also customize the type that can be triggered by event `leafDirectiv
 
 The syntax for text directives, it is also an inline directives:
 
+```
 :name[content]{#id.x.y attributes(key=val)}
+```
 
 Exactly one colon, followed by the name which is the identifier for the extension and must be a string without spaces, content may be further inline markdown elements to be interpreted and then printed in one way or another and the {#myId.myClass key=val key2="val 2"} contain generic attributes (i.e. key-value pairs) and are optional.
 
