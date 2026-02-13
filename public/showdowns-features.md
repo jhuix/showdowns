@@ -563,7 +563,7 @@ Which will be rendered as:
 
 ##### Container Example
 
-For `note` and `alert` style examples.
+For [note](#note-style) and [alert](#alert-style) style examples.
 
 ###### Note Style
 
