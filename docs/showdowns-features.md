@@ -275,86 +275,632 @@ Which will be append a image element as:
 
 ```
 
-### Container
+### Directives
 
-It's implemented in showdown-container.js, allows you to create block level containers.
-By default, The CSS effect with class name tip|info|warning|error|success|alert-tip|alert-info|alert-warning|alert-error|alert-success is implemented. And you can also customize the class name.
+It's implemented in showdown-directive.js, allows you to create container directive, leaf directive, text directive.
+Generic directives syntax can refer to [generic-directives-plugins-syntax](https://talk.commonmark.org/t/generic-directives-plugins-syntax/444) of commonmark.
 
-#### Markdown Syntax
+#### Container Directives
+
+The special container directive syntax by wrapping text with a set of greater or equal 3 colons or exclamation marks, as seen below:
 
 ```
-    ::: <classname | parentclass-childclass> <title content>
-    *Some text*
-    :::
+::: name [label] {attributes}
+contents, which are sometimes further block elements
+:::
+
+OR
+
+!!! name [label] {attributes}
+contents, which are sometimes further block elements
+!!!
+```
+
+The special container directive syntax is classified as [container syntax](#container-syntax) and admonitions syntax. 
+But the admonitions syntax also includes [rST-style syntax](#rst-style-syntax) and [compatible syntax](#ccompatible-syntax).
+
+::css[.colorpicker-color-decoration {
+    border: solid .1em #eee;
+    box-sizing: border-box;
+    margin: .1em .2em 0;
+    width: .8em;
+    height: .8em;
+    line-height: .8em;
+    display: inline-block;
+}
+.dyn-rule-1 {
+    background-color: rgb(0,176,255);
+}
+.dyn-rule-2 {
+    background-color: rgb(0,184,212);
+}
+.dyn-rule-3 {
+    background-color: rgb(0,191,165);
+}
+.dyn-rule-4 {
+    background-color: rgb(0,200,83);
+}
+.dyn-rule-5 {
+    background-color: rgb(100,221,23);
+}
+.dyn-rule-6 {
+    background-color: rgb(255,145,0);
+}
+.dyn-rule-7 {
+    background-color: rgb(255,82,82);
+}
+.dyn-rule-8 {
+    background-color: rgb(255,23,68);
+}
+.dyn-rule-9 {
+    background-color: rgb(101,31,255);
+}
+.dyn-rule-10 {
+    background-color: rgb(158, 158, 158);
+}
+.dyn-rule-11 {
+    background-color: rgb(230, 32, 196);
+}
+.dyn-flag {
+  font-family: admons-icons;text-align: center;display: inline-block;width: 100%;
+}
+.dyn-flag-rule-1 {
+  color: rgb(0,176,255);
+}
+.dyn-flag-rule-2 {
+    color: rgb(0,184,212);
+}
+.dyn-flag-rule-3 {
+    color: rgb(0,191,165);
+}
+.dyn-flag-rule-4 {
+    color: rgb(0,200,83);
+}
+.dyn-flag-rule-5 {
+    color: rgb(100,221,23);
+}
+.dyn-flag-rule-6 {
+    color: rgb(255,145,0);
+}
+.dyn-flag-rule-7 {
+    color: rgb(255,82,82);
+}
+.dyn-flag-rule-8 {
+    color: rgb(255,23,68);
+}
+.dyn-flag-rule-9 {
+    color: rgb(101,31,255);
+}
+.dyn-flag-rule-10 {
+    color: rgb(158, 158, 158);
+}
+.dyn-flag-rule-11 {
+    color: rgb(230, 32, 196);
+}
+]{}
+
+Default the admonitions styles are `note` and `alert` in admonitions syntax. Each style includes the following types, each type corresponds to a class name of css: 
+
+| Type Name | Flag | Color |
+| ---- | ----- | ----- |
+|`summary`, `tldr`, `概要`, `摘要`| <span class="dyn-flag dyn-flag-rule-1">&#xebbf;</span> | <span class="colorpicker-color-decoration dyn-rule-1"></span>rgb(0,176,255) |
+|`abstract`, `抽象`| <span class="dyn-flag dyn-flag-rule-1">&#xe787;</span> | ^^ |
+|`info`, `todo`, `信息`, `待办`| <span class="dyn-flag dyn-flag-rule-2">&#xe626;</span> | <span class="colorpicker-color-decoration dyn-rule-2"></span>rgb(0,184,212)|
+|`tip`, `hint`, `提示`, `小窍门`| <span class="dyn-flag dyn-flag-rule-3">&#xe60c;</span>| <span class="colorpicker-color-decoration dyn-rule-3"></span>rgb(0,191,165)|
+|`success`, `check`, `done`, `成功`, `检测`, `完成`|<span class="dyn-flag dyn-flag-rule-4">&#xe608;</span> | <span class="colorpicker-color-decoration dyn-rule-4"></span>rgb(0,200,83)|
+|`question`, `help`, `faq`, `问题`, `帮助`, `问答`| <span class="dyn-flag dyn-flag-rule-5">&#xe606;</span>| <span class="colorpicker-color-decoration dyn-rule-5"></span>rgb(100,221,23)|
+|`warning`, `caution`, `警告`, `提醒`| <span class="dyn-flag dyn-flag-rule-6">&#xe62a;</span>| <span class="colorpicker-color-decoration dyn-rule-6"></span>rgb(255,145,0)|
+|`attention`, `关注`| <span class="dyn-flag dyn-flag-rule-6">&#xe603;</span>| ^^ |
+|`failure`, `fail`, `missing`, `故障`, `失败`, `缺失`| <span class="dyn-flag dyn-flag-rule-7">&#xe609;</span>| <span class="colorpicker-color-decoration dyn-rule-7"></span>rgb(255,82,82)|
+|`danger`, `危险`| <span class="dyn-flag dyn-flag-rule-8">&#xe628;</span>| <span class="colorpicker-color-decoration dyn-rule-8"></span>rgb(255,23,68)|
+|`error`, `错误`| <span class="dyn-flag dyn-flag-rule-8">&#xe612;</span>|^^|
+|`bug`, `缺陷`| <span class="dyn-flag dyn-flag-rule-8">&#xe61f;</span>|^^|
+|`example`, `示例`| <span class="dyn-flag dyn-flag-rule-9">&#xe690;</span>| <span class="colorpicker-color-decoration dyn-rule-9"></span>rgb(101,31,255)|
+|`snippet`, `片段`| <span class="dyn-flag dyn-flag-rule-9">&#xe8e9;</span>|^^|
+|`quote`, `cite`, `引用`, `引文`| <span class="dyn-flag dyn-flag-rule-10">&#xe618;</span>| <span class="colorpicker-color-decoration dyn-rule-10"></span>rgb(158, 158, 158)|
+|`important`, `key`, `重点`, `要点`| <span class="dyn-flag dyn-flag-rule-11">&#xe604;</span>| <span class="colorpicker-color-decoration dyn-rule-11"></span>rgb(230, 32, 196)|
+
+And you can also customize the style and type.
+
+##### Container Syntax
+
+Container blocks contain further blocks. The proposed syntax for container block directives is:
+
+```
+::: name [label] {#id.x.y attributes}
+contents, which are sometimes further block elements
+:::
+
+OR
+
+!!! name [label] {#id.x.y attributes}
+contents, which are sometimes further block elements
+!!!
+
+```
+Analogous to fenced code blocks, an arbitrary number of colons or exclamation marks greater or equal three could be used as long as the closing line is longer than the opening line. That way, you can even nest blocks (think divs) by using successively fewer colons for each containing block.
+
+When the name string in the container directive syntax is `container` (also defaults to container when empty string), `row`, or `col`, it is called container syntax, and other strings are called admonitions syntax.
+
+The container syntax, for example:
+
+```
+:::::
+::::row
+
+:::col-one
+!!!tip[tip example]{#example-one.note style="width:100%;"}
+one contents, which are sometimes further block elements
+!!!
+:::
+
+:::col-two
+!!! info [info example] {#example-two.alert style="width:100%;"}
+two contents, which are sometimes further block elements
+!!!
+:::
+
+::::
+:::::
+
 ```
 
 Which will be rendered as:
 
 ```
-<div class="showdown-container [container classname | parentclass parentclass-childclass]">
-  <p class="container-title">title content</p>
-  <p>
-    <em>Some text</em>
-  </p>
+<div class="container">
+  <div class="container-content">
+    <div class="row">
+      <div class="row-content">
+        <div class="col one">
+          <div class="col-content">
+            <div id="example-one" class="admonition note tip" style="width:100%;">
+              <div class="admonition-title">tip example</div>
+              <div class="admonition-content">
+                <p>one contents, which are sometimes further block elements</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col two">
+          <div class="col-content">
+            <div id="example-two" class="admonition alert info" style="width:100%;">
+              <div class="admonition-title">info example</div>
+              <div class="admonition-content">
+                <p>two contents, which are sometimes further block elements</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 ```
 
-#### Container examples
+The admonitions of container syntax, for example:
 
-::: tip
-*A simple tip text!*
+```
+::: tip [tip example] {#example.alert style="width:100%;"}
+contents, which are sometimes further block elements
 :::
 
-::: tip Tip!
-*A simple tip text!*
+OR
+
+!!! tip [tip example] {#example.alert style="width:100%;"}
+contents, which are sometimes further block elements
+!!!
+```
+
+Which will be rendered as:
+
+```
+<div id="example" class="admonition alert tip" style="width:100%;">
+  <div class="admonition-title">
+    <p>tip example</p>
+  </div>
+  <div class="admonition-content">
+    <p>You should info that the title will be automatically capitalized.</p>
+  </div>
+</div>
+```
+
+##### rST-style Syntax
+
+Admonitions of [rST-style](https://docutils.sourceforge.io/docs/ref/rst/directives.html#specific-admonitions) are created using the following syntax:
+
+```
+!!! types "optional explicit title within double quotes"
+    Any number of other indented markdown elements.
+
+    This is the second paragraph.
+```
+
+type will be used as the CSS class name and as default title. It must be a single word. So, for instance:
+
+```
+!!! note info
+    You should type name(info) or style name(note) that the title will be automatically capitalized.
+```
+
+will render:
+
+```
+<div class="admonition note info">
+  <div class="admonition-title">
+    <p>info</p>
+  </div>
+  <div class="admonition-content">
+    <p>You should info that the title will be automatically capitalized.</p>
+  </div>
+</div>
+```
+
+##### Compatible Syntax
+
+A compatible admonitions syntax by wrapping text with a set of greater or equal 3 colons, as seen below:
+
+```
+::: <name | name0-name1-...> <label>
+*Some text*
+:::
+```
+
+Which will be rendered as:
+
+```
+<div class=`admonition [name | name0 name1 ...]`>
+  <div class=`admonition-title`>
+    <p>label</p>
+  </div>
+  <div class=`admonition-content`>
+    <p>
+      <em>Some text</em>
+    </p>
+  </div>
+</div>
+```
+
+##### Container Example
+
+For `note` and `alert` style examples.
+
+###### Note Style
+
+:::::
+!!!key[key]{.note}
+Some **content** with *Markdown* `syntax`. Check [this `api`](#).
+!!!
+
+!!! note info "info"
+    Some **content** with *Markdown* `syntax`. Check [this `api`](#).
+
+::::row
+:::col
+
+!!!key[key]{.note}
+Some **content** with *Markdown* `syntax`. Check [this `api`](#).
+!!!
+
+!!!cite[cite]{.note}
+Some **content** with __Markdown__ `syntax`. Check [this `api`](#).
+!!!
+
+!!!snippet[snippet]{.note}
+Some **content** with _Markdown_ `syntax`. Check [this `api`](#).
+!!!
+
+!!!hint[hint]{.note}
+Some **content** with _Markdown_ `syntax`. Check [this `api`](#).
+!!!
+
+!!!todo[todo]{.note}
+Some **content** with _Markdown_ `syntax`. Check [this `api`](#).
+!!!
+
 :::
 
-::: info Info!
-*A simple info text!*
+
+:::col
+
+!!!important[important]{.note}
+Some **content** with _Markdown_ `syntax`. Check [this `api`](#).
+!!!
+
+!!!quote[quote]{.note}
+Some **content** with _Markdown_ `syntax`. Check [this `api`](#).
+!!!
+
+!!!example[example]{.note}
+Some **content** with _Markdown_ `syntax`. Check [this `api`](#).
+!!!
+
+!!!tip[tip]{.note}
+Some **content** with _Markdown_ `syntax`. Check [this `api`](#).
+!!!
+
+!!!info[info]{.note}
+Some **content** with _Markdown_ `syntax`. Check [this `api`](#).
+!!!
+
+:::
+::::
+
+::::row
+:::col
+
+!!!bug[bug]{.note}
+Some **content** with _Markdown_ `syntax`. Check [this `api`](#).
+!!!
+
+
+!!!missing[missing]{.note}
+Some **content** with _Markdown_ `syntax`. Check [this `api`](#).
+!!!
+
+!!!caution[caution]{.note}
+Some **content** with _Markdown_ `syntax`. Check [this `api`](#).
+!!!
+
+!!!faq[faq]{.note}
+Some **content** with _Markdown_ `syntax`. Check [this `api`](#).
+!!!
+
+!!!done[done]{.note}
+Some **content** with _Markdown_ `syntax`. Check [this `api`](#).
+!!!
+
+!!!tldr[tldr]{.note}
+Some **content** with _Markdown_ `syntax`. Check [this `api`](#).
+!!!
+
 :::
 
-::: warning Warning!
-*A simple warning text!*
+:::col
+
+!!!error[error]{.note}
+Some **content** with _Markdown_ `syntax`. Check [this `api`](#).
+!!!
+
+
+!!!fail[fail]{.note}
+Some **content** with _Markdown_ `syntax`. Check [this `api`](#).
+!!!
+
+!!!attention[attention]{.note}
+Some **content** with _Markdown_ `syntax`. Check [this `api`](#).
+!!!
+
+!!!help[help]{.note}
+Some **content** with _Markdown_ `syntax`. Check [this `api`](#).
+!!!
+
+!!!check[check]{.note}
+Some **content** with _Markdown_ `syntax`. Check [this `api`](#).
+!!!
+
+!!!abstract[abstract]{.note}
+Some **content** with _Markdown_ `syntax`. Check [this `api`](#).
+!!!
+
 :::
 
-::: error Error!
-*A simple error text!*
+:::col
+
+!!!danger[danger]{.note}
+Some **content** with _Markdown_ `syntax`. Check [this `api`](#).
+!!!
+
+!!!failure[failure]{.note}
+Some **content** with _Markdown_ `syntax`. Check [this `api`](#).
+!!!
+
+!!!warning[warning]{.note}
+Some **content** with _Markdown_ `syntax`. Check [this `api`](#).
+!!!
+
+!!!question[question]{.note}
+Some **content** with _Markdown_ `syntax`. Check [this `api`](#).
+!!!
+
+!!!success[success]{.note}
+Some **content** with _Markdown_ `syntax`. Check [this `api`](#).
+!!!
+
+!!!summary[summary]{.note}
+Some **content** with _Markdown_ `syntax`. Check [this `api`](#).
+!!!
+
 :::
 
-::: success Success!
-*A simple success text!*
+::::
+:::::
+
+###### Alert Style
+
+:::::
+
+!!!key[key]{.alert}
+Some **content** with *Markdown* `syntax`. Check [this `api`](#).
+!!!
+
+!!! alert info "info"
+    Some **content** with *Markdown* `syntax`. Check [this `api`](#).
+
+::::row
+:::col
+
+!!!key[key]{.alert}
+Some **content** with _Markdown_ `syntax`. Check [this `api`](#).
+!!!
+
+!!!cite[cite]{.alert}
+Some **content** with _Markdown_ `syntax`. Check [this `api`](#).
+!!!
+
+!!!snippet[snippet]{.alert}
+Some **content** with _Markdown_ `syntax`. Check [this `api`](#).
+!!!
+
+!!!hint[hint]{.alert}
+Some **content** with _Markdown_ `syntax`. Check [this `api`](#).
+!!!
+
+!!!todo[todo]{.alert}
+Some **content** with _Markdown_ `syntax`. Check [this `api`](#).
+!!!
+
 :::
 
-::: alert-tip
-*A simple tip alert text!*
+
+:::col
+
+!!!important[important]{.alert}
+Some **content** with _Markdown_ `syntax`. Check [this `api`](#).
+!!!
+
+!!!quote[quote]{.alert}
+Some **content** with _Markdown_ `syntax`. Check [this `api`](#).
+!!!
+
+!!!example[example]{.alert}
+Some **content** with _Markdown_ `syntax`. Check [this `api`](#).
+!!!
+
+!!!tip[tip]{.alert}
+Some **content** with _Markdown_ `syntax`. Check [this `api`](#).
+!!!
+
+!!!info[info]{.alert}
+Some **content** with _Markdown_ `syntax`. Check [this `api`](#).
+!!!
+
+:::
+::::
+
+::::row
+:::col
+
+!!!bug[bug]{.alert}
+Some **content** with _Markdown_ `syntax`. Check [this `api`](#).
+!!!
+
+
+!!!missing[missing]{.alert}
+Some **content** with _Markdown_ `syntax`. Check [this `api`](#).
+!!!
+
+!!!caution[caution]{.alert}
+Some **content** with _Markdown_ `syntax`. Check [this `api`](#).
+!!!
+
+!!!faq[faq]{.alert}
+Some **content** with _Markdown_ `syntax`. Check [this `api`](#).
+!!!
+
+!!!done[done]{.alert}
+Some **content** with _Markdown_ `syntax`. Check [this `api`](#).
+!!!
+
+!!!tldr[tldr]{.alert}
+Some **content** with _Markdown_ `syntax`. Check [this `api`](#).
+!!!
+
 :::
 
-::: alert-tip Alert Tip!
-*A simple tip alert text!*
+:::col
+
+!!!error[error]{.alert}
+Some **content** with _Markdown_ `syntax`. Check [this `api`](#).
+!!!
+
+
+!!!fail[fail]{.alert}
+Some **content** with _Markdown_ `syntax`. Check [this `api`](#).
+!!!
+
+!!!attention[attention]{.alert}
+Some **content** with _Markdown_ `syntax`. Check [this `api`](#).
+!!!
+
+!!!help[help]{.alert}
+Some **content** with _Markdown_ `syntax`. Check [this `api`](#).
+!!!
+
+!!!check[check]{.alert}
+Some **content** with _Markdown_ `syntax`. Check [this `api`](#).
+!!!
+
+!!!abstract[abstract]{.alert}
+Some **content** with _Markdown_ `syntax`. Check [this `api`](#).
+!!!
+
 :::
 
-::: alert-info Alert Info!
-*A simple info alert text!*
+:::col
+
+!!!danger[danger]{.alert}
+Some **content** with _Markdown_ `syntax`. Check [this `api`](#).
+!!!
+
+!!!failure[failure]{.alert}
+Some **content** with _Markdown_ `syntax`. Check [this `api`](#).
+!!!
+
+!!!warning[warning]{.alert}
+Some **content** with _Markdown_ `syntax`. Check [this `api`](#).
+!!!
+
+!!!question[question]{.alert}
+Some **content** with _Markdown_ `syntax`. Check [this `api`](#).
+!!!
+
+!!!success[success]{.alert}
+Some **content** with _Markdown_ `syntax`. Check [this `api`](#).
+!!!
+
+!!!summary[summary]{.alert}
+Some **content** with _Markdown_ `syntax`. Check [this `api`](#).
+!!!
+
 :::
 
-::: alert-warning Alert Warning!
-*A simple warning alert text!*
-:::
+::::
+:::::
 
-::: alert-error Alert Error!
-*A simple error alert text!*
-:::
+#### Leaf Directives
 
-::: alert-success Alert Success!
-*A simple success alert text!*
-:::
+The syntax for leaf block directives:
 
-::: alert-success-tip Alert Success Tip!
+:: name [title | content] {#id.x.y attributes(key=val)}
 
-<style>.alert-success-tip:after {content: '\00a0';width: 0;height: 0;display: block;border-style: solid;border-width: 15px;border-color: #f3961c transparent transparent transparent;position: absolute;z-index: -1;bottom: -30px;left: 50px;}</style>
+To be recognized as a directive, this has to form an otherwise empty paragraph. But as opposed to [text directives](#text-directives), there are two colons now, the brackets [] are optional as well, and spaces may be interspersed for readability.
 
-*A simple success alert text!*
-:::
+Leaf blocks are defined by default in three types: `media` or `video` or `媒体` or `音视频`, `css-link`, and `css`. See the table below for details:
+
+| Type Name | [] | {} | Rendered content |
+| --------- | -- | -- | ---------------- |
+|`media`,`video`,`媒体`,`音视频`| optional | The `src` attribute is required. | \<iframe id="id" class="x y" src="...">\<div class="media-title">title</div></iframe> |
+|`css-link`| free | The `href` attribute is required. | \<link id="id" class="x y" href="..."> |
+|`css`| css content is required | free | \<style id="id" key=val>content</style> |
+
+And you can also customize the type that can be triggered by event `leafDirective` to output custom HTML code.
+
+#### Text Directives
+
+The syntax for text directives, it is also an inline directives:
+
+:name[content]{#id.x.y attributes(key=val)}
+
+Exactly one colon, followed by the name which is the identifier for the extension and must be a string without spaces, content may be further inline markdown elements to be interpreted and then printed in one way or another and the {#myId.myClass key=val key2="val 2"} contain generic attributes (i.e. key-value pairs) and are optional.
+
+Rendered by default as:
+
+```
+<name id="id" class="x y" key=val>content</name>
+```
+
+And you can also customize the type that can be triggered by event `textDirective` to customize and reset default HTML code.
 
 ### LaTeX math and AsciiMath
 

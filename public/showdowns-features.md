@@ -275,14 +275,14 @@ Which will be append a image element as:
 
 ```
 
-### Directive
+### Directives
 
 It's implemented in showdown-directive.js, allows you to create container directive, leaf directive, text directive.
 Generic directives syntax can refer to [generic-directives-plugins-syntax](https://talk.commonmark.org/t/generic-directives-plugins-syntax/444) of commonmark.
 
-#### Container Directive
+#### Container Directives
 
-The special admonitions syntax by wrapping text with a set of greater or equal 3 colons or exclamation marks, as seen below:
+The special container directive syntax by wrapping text with a set of greater or equal 3 colons or exclamation marks, as seen below:
 
 ```
 ::: name [label] {attributes}
@@ -294,8 +294,10 @@ OR
 !!! name [label] {attributes}
 contents, which are sometimes further block elements
 !!!
-
 ```
+
+The special container directive syntax is classified as [container syntax](#container-syntax) and admonitions syntax. 
+But the admonitions syntax also includes [rST-style syntax](#rst-style-syntax) and [compatible syntax](#ccompatible-syntax).
 
 ::css[.colorpicker-color-decoration {
     border: solid .1em #eee;
@@ -377,9 +379,9 @@ contents, which are sometimes further block elements
 }
 ]{}
 
-Default the admonitions styles are `note` and `alert`. Each style includes the following types, each type corresponds to a class name of css: 
+Default the admonitions styles are `note` and `alert` in admonitions syntax. Each style includes the following types, each type corresponds to a class name of css: 
 
-| type name | flag | color |
+| Type Name | Flag | Color |
 | ---- | ----- | ----- |
 |`summary`, `tldr`, `概要`, `摘要`| <span class="dyn-flag dyn-flag-rule-1">&#xebbf;</span> | <span class="colorpicker-color-decoration dyn-rule-1"></span>rgb(0,176,255) |
 |`abstract`, `抽象`| <span class="dyn-flag dyn-flag-rule-1">&#xe787;</span> | ^^ |
@@ -400,7 +402,7 @@ Default the admonitions styles are `note` and `alert`. Each style includes the f
 
 And you can also customize the style and type.
 
-##### Directive Syntax
+##### Container Syntax
 
 Container blocks contain further blocks. The proposed syntax for container block directives is:
 
@@ -418,7 +420,65 @@ contents, which are sometimes further block elements
 ```
 Analogous to fenced code blocks, an arbitrary number of colons or exclamation marks greater or equal three could be used as long as the closing line is longer than the opening line. That way, you can even nest blocks (think divs) by using successively fewer colons for each containing block.
 
-For example:
+When the name string in the container directive syntax is `container` (also defaults to container when empty string), `row`, or `col`, it is called container syntax, and other strings are called admonitions syntax.
+
+The container syntax, for example:
+
+```
+:::::
+::::row
+
+:::col-one
+!!!tip[tip example]{#example-one.note style="width:100%;"}
+one contents, which are sometimes further block elements
+!!!
+:::
+
+:::col-two
+!!! info [info example] {#example-two.alert style="width:100%;"}
+two contents, which are sometimes further block elements
+!!!
+:::
+
+::::
+:::::
+
+```
+
+Which will be rendered as:
+
+```
+<div class="container">
+  <div class="container-content">
+    <div class="row">
+      <div class="row-content">
+        <div class="col one">
+          <div class="col-content">
+            <div id="example-one" class="admonition note tip" style="width:100%;">
+              <div class="admonition-title">tip example</div>
+              <div class="admonition-content">
+                <p>one contents, which are sometimes further block elements</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col two">
+          <div class="col-content">
+            <div id="example-two" class="admonition alert info" style="width:100%;">
+              <div class="admonition-title">info example</div>
+              <div class="admonition-content">
+                <p>two contents, which are sometimes further block elements</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+```
+
+The admonitions of container syntax, for example:
 
 ```
 ::: tip [tip example] {#example.alert style="width:100%;"}
@@ -508,15 +568,22 @@ For `note` and `alert` style examples.
 ###### Note Style
 
 :::::
+!!!key[key]{.note}
+Some **content** with *Markdown* `syntax`. Check [this `api`](#).
+!!!
+
+!!! note info "info"
+    Some **content** with *Markdown* `syntax`. Check [this `api`](#).
+
 ::::row
 :::col
 
 !!!key[key]{.note}
-Some **content** with _Markdown_ `syntax`. Check [this `api`](#).
+Some **content** with *Markdown* `syntax`. Check [this `api`](#).
 !!!
 
 !!!cite[cite]{.note}
-Some **content** with _Markdown_ `syntax`. Check [this `api`](#).
+Some **content** with __Markdown__ `syntax`. Check [this `api`](#).
 !!!
 
 !!!snippet[snippet]{.note}
@@ -652,6 +719,14 @@ Some **content** with _Markdown_ `syntax`. Check [this `api`](#).
 ###### Alert Style
 
 :::::
+
+!!!key[key]{.alert}
+Some **content** with *Markdown* `syntax`. Check [this `api`](#).
+!!!
+
+!!! alert info "info"
+    Some **content** with *Markdown* `syntax`. Check [this `api`](#).
+
 ::::row
 :::col
 
@@ -792,6 +867,40 @@ Some **content** with _Markdown_ `syntax`. Check [this `api`](#).
 
 ::::
 :::::
+
+#### Leaf Directives
+
+The syntax for leaf block directives:
+
+:: name [title | content] {#id.x.y attributes(key=val)}
+
+To be recognized as a directive, this has to form an otherwise empty paragraph. But as opposed to [text directives](#text-directives), there are two colons now, the brackets [] are optional as well, and spaces may be interspersed for readability.
+
+Leaf blocks are defined by default in three types: `media` or `video` or `媒体` or `音视频`, `css-link`, and `css`. See the table below for details:
+
+| Type Name | [] | {} | Rendered content |
+| --------- | -- | -- | ---------------- |
+|`media`,`video`,`媒体`,`音视频`| optional | The `src` attribute is required. | \<iframe id="id" class="x y" src="...">\<div class="media-title">title</div></iframe> |
+|`css-link`| free | The `href` attribute is required. | \<link id="id" class="x y" href="..."> |
+|`css`| css content is required | free | \<style id="id" key=val>content</style> |
+
+And you can also customize the type that can be triggered by event `leafDirective` to output custom HTML code.
+
+#### Text Directives
+
+The syntax for text directives, it is also an inline directives:
+
+:name[content]{#id.x.y attributes(key=val)}
+
+Exactly one colon, followed by the name which is the identifier for the extension and must be a string without spaces, content may be further inline markdown elements to be interpreted and then printed in one way or another and the {#myId.myClass key=val key2="val 2"} contain generic attributes (i.e. key-value pairs) and are optional.
+
+Rendered by default as:
+
+```
+<name id="id" class="x y" key=val>content</name>
+```
+
+And you can also customize the type that can be triggered by event `textDirective` to customize and reset default HTML code.
 
 ### LaTeX math and AsciiMath
 

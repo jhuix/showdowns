@@ -414,11 +414,15 @@ function showdownDirective() {
 
           // leaf directive
           text = text.replace(
-            /^ {0,3}(?<!:)::[ \t]*([-\w]+)[ \t]*\[([^\[\]]*)\][ \t]*(?:\{([^\{\}]*)\})?[ \t]*(?:¨0)?$/gm,
+            /^ {0,3}(?<!:)::[ \t]*([-\w]+)[ \t]*(?:\[([^\[\]]*)\])?[ \t]*(?:\{([^\{\}]*)\})?[ \t]*(?:¨0)?$/gm,
             function (wholeMatch, name, title, attribute) {
               const directive = {};
               parseAttribute(attribute, directive);
-              if (name === 'media' || name === '媒体') {
+              if (name === 'media' || name==='video' || name === '媒体' || name === '音视频') {
+                if (!directive.attribute || !directive.attribute.src) {
+                  return;
+                }
+
                 let id = '';
                 let attrs = '';
                 let className = '';
@@ -442,31 +446,35 @@ function showdownDirective() {
               }
 
               if (name === 'css-link') {
+                if (!directive.attribute || !directive.attribute.href) {
+                  return;
+                }
+
                 let id = '';
                 let attrs = '';
                 if (directive.id) {
                   id = `id="${directive.id}"`;
                 }
-                if (directive.attribute) {
-                  attrs = attributeToString(directive.attribute);
-                }
+                attrs = attributeToString(directive.attribute);
                 const code = `<link ${id}${attrs}>`;
                 return showdown.subParser('hashBlock')(code, options, globals);
               }
 
-              if (name === 'css' && title) {
+              if (name === 'css') {
+                if (!title) {
+                  return;
+                }
+
                 let id = '';
                 let attrs = '';
+                const content = title;
                 if (directive.id) {
                   id = `id="${directive.id}"`;
-                }
-                if (!title) {
-                  title = '';
                 }
                 if (directive.attribute) {
                   attrs = attributeToString(directive.attribute);
                 }
-                const code = `<style ${id}${attrs}>${title}</style>`;
+                const code = `<style ${id}${attrs}>${content}</style>`;
                 return showdown.subParser('hashBlock')(code, options, globals);
               }
 
@@ -482,8 +490,8 @@ function showdownDirective() {
 
           // text directive
           text = text.replace(
-            /(?<!:):([-\w]+)\[([^\[\]]*)\]\{([^\{\}]*)\}/g,
-            function (wholeMatch, name, title, attribute) {
+            /(?<!:):([-\w]+)\[([^\[\]]*)\](?:\{([^\{\}]*)\})?/g,
+            function (wholeMatch, name, content, attribute) {
               const directive = {};
               parseAttribute(attribute, directive);
               let id = '';
@@ -498,18 +506,17 @@ function showdownDirective() {
               if (directive.classList) {
                 className = ` class="${directive.classList.join(' ')}"`;
               }
-              if (title) {
-                title = showdown.subParser('spanGamut')(title, options, globals);
+              if (content) {
+                content = showdown.subParser('spanGamut')(content, options, globals);
               } else {
-                title = '';
+                content = '';
               }
 
-              let content = '';
               const callback = (code) => {
                 content = code;
               };
-              if (!EventBus.emit(textDirectiveEventName, name, title, directive, callback)) {
-                content = `<${name} ${id}${className}${attrs}>${title}</${name}>`;
+              if (!EventBus.emit(textDirectiveEventName, name, content, directive, callback)) {
+                content = `<${name} ${id}${className}${attrs}>${content}</${name}>`;
               }
               return showdown.subParser('hashBlock')(content, options, globals);
             },

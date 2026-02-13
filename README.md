@@ -230,7 +230,7 @@ Table header can be eliminated.
 
 [Footnotes](https://github.com/jhuix/showdowns/blob/master/docs/showdowns-features.md#footnotes)
 
-[Directive](https://github.com/jhuix/showdowns/blob/master/docs/showdowns-features.md#directive)
+[Directives](https://github.com/jhuix/showdowns/blob/master/docs/showdowns-features.md#directives)
 
 [CSS defined](https://github.com/jhuix/showdowns/blob/master/docs/showdowns-features.md#css-defined)
 
