@@ -297,7 +297,7 @@ contents, which are sometimes further block elements
 ```
 
 The special container directive syntax is classified as [container syntax](#container-syntax) and admonitions syntax. 
-But the admonitions syntax also includes [rST-style syntax](#rst-style-syntax) and [compatible syntax](#ccompatible-syntax).
+But the admonitions syntax also includes [rST-style syntax](#rst-style-syntax) and [compatible syntax](#compatible-syntax).
 
 ::css[.colorpicker-color-decoration {
     border: solid .1em #eee;
@@ -878,11 +878,11 @@ To be recognized as a directive, this has to form an otherwise empty paragraph. 
 
 Leaf blocks are defined by default in three types: `media` or `video` or `媒体` or `音视频`, `css-link`, and `css`. See the table below for details:
 
-| Type Name | [] | {} | Rendered content |
+| Type Name | [title \| content] | {attributes} | Rendered content |
 | --------- | -- | -- | ---------------- |
-|`media`,`video`,`媒体`,`音视频`| optional | The `src` attribute is required. | \<iframe id="id" class="x y" src="...">\<div class="media-title">title</div></iframe> |
-|`css-link`| free | The `href` attribute is required. | \<link id="id" class="x y" href="..."> |
-|`css`| css content is required | free | \<style id="id" key=val>content</style> |
+|`media`,`video`,`媒体`,`音视频`| optional `title` | `src` attribute | \<iframe id="id" class="x y" src="...">\<div class="media-title">title\</div>\</iframe> |
+|`css-link`| free | `href` attribute | \<link id="id" class="x y" href="..."> |
+|`css`| css content | free | \<style id="id" key=val>content\</style> |
 
 And you can also customize the type that can be triggered by event `leafDirective` to output custom HTML code.
 
