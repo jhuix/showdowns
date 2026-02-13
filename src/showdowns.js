@@ -50,6 +50,7 @@ const getOptions = (options = {}) => {
   return {
     flavor: 'github',
     metadata: true,
+    underline: false,
     mathEngine: 'mathjax',
     ...options,
   };

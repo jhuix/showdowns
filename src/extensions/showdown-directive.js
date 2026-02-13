@@ -246,9 +246,66 @@ function showdownDirective() {
           text = converter._dispatch('directive.before', text, options, globals);
           text += '¨0';
 
+          // Support rST style (https://docutils.sourceforge.io/docs/ref/rst/directives.html#specific-admonitions)
+          text = text.replace(/^!!! ((?:[^"\n]+[ \t]+)*)(?:"([^"\n]+)")?[ \t]*\n((?:(?:    |\t)[^\r\n]*(?:\n|$)|\n)*)/gm,
+            function (wholeMatch, name, title, content) {
+              const container = {
+                classList: ['admonition'],
+              };
+              name = name.toLowerCase();
+              const classes = name.split(' ');
+              if (!classes.includes('alert') && !classes.includes('note')) {
+                container.classList.push('note');
+              }
+              classes.forEach((classname, index) => {
+                if (classname) {
+                  if (!container.style) {
+                    const containerStyle = parseContainerStyle(classname);
+                    if (containerStyle) {
+                      container.style = containerStyle;
+                    }
+                  }
+                  if (!container.classList.includes(classname)) {
+                    container.classList.push(classname);
+                  }
+                }
+              });
+              if (!container.style) {
+                container.style = 'default';
+              }
+              if (!container.classList.includes(container.style)) {
+                container.classList.push(container.style);
+              }
+              if (title) {
+                title = showdown.subParser('spanGamut')(title, options, globals);
+                title = `<div class="admonition-title">${title}</div>`;
+              } else {
+                const defaultTitle = !container.style ? i18n.getLangString('note', 'note') :
+                  i18n.getLangString(container.style, container.style);
+                title = `<div class="admonition-title">${defaultTitle}</div>`;
+              }
+              if (content) {
+                const lines = content.split('\n');
+                lines.forEach((line, index) => {
+                  if (line) {
+                    const pos = line[0] === '\t' ? 1 : 4;
+                    lines[index] = line.substring(pos);
+                  }
+                })
+                content = showdown.subParser('githubCodeBlocks')(lines.join('\n'), options, globals);
+                content = showdown.subParser('blockGamut')(content, options, globals);
+                content = `<div class="admonition-content">${content}</div>`;
+              } else {
+                content = '';
+              }
+              const code = `<div class="${container.classList.join(' ')}">${title}${content}</div>`;
+              return showdown.subParser('hashBlock')(code, options, globals);
+            }
+          );
+
           // container directive
           text = text.replace(
-            /^ {0,3}((?::::+)|(?:!!!+))[ \t]*([-\w]*)[ \t]*(?:([^\f\v\r\n\[\]\{\}]*)|(?:\[([^\[\]]*)\])?[ \t]*(?:\{([^\{\}]*)\})?)[: \t]*\n([\s\S]*?)\n {0,3}\1[: \t]*/gm,
+            /^ {0,3}((?::::+)|(?:!!!+))[ \t]*([-\w]*)[ \t]*(?:([^\f\v\r\n\[\]\{\}]*)|(?:\[([^\[\]]*)\])?[ \t]*(?:\{([^\{\}]*)\})?)[: \t]*\n([\s\S]*?)\n {0,3}\1[:! \t]*(?:¨0)?$/gm,
             function (wholeMatch, delim, name, title0, title, attribute, content) {
               name = name.toLowerCase();
               if (!name) name = 'container';
@@ -355,65 +412,9 @@ function showdownDirective() {
             },
           );
 
-          // Support rST style (https://docutils.sourceforge.io/docs/ref/rst/directives.html#specific-admonitions)
-          text = text.replace(/^!!! ((?:[^"\n]+[ \t]+)*)(?:"([^"\n]+)")?[ \t]*\n((?:(?:    |\t)[^\r\n]*(?:\n|$)|\n)*)/gm,
-            function (wholeMatch, name, title, content) {
-              const container = {
-                classList: ['admonition'],
-              };
-              name = name.toLowerCase();
-              const classes = name.split(' ');
-              if (!classes.includes('alert') && !classes.includes('note')) {
-                container.classList.push('note');
-              }
-              classes.forEach((classname, index) => {
-                if (classname) {
-                  if (!container.style) {
-                    const containerStyle = parseContainerStyle(classname);
-                    if (containerStyle) {
-                      container.style = containerStyle;
-                    }
-                  }
-                  if (!container.classList.includes(classname)) {
-                    container.classList.push(classname);
-                  }
-                }
-              });
-              if (!container.style) {
-                container.style = 'default';
-              }
-              if (!container.classList.includes(container.style)) {
-                container.classList.push(container.style);
-              }
-              if (title) {
-                title = showdown.subParser('spanGamut')(title, options, globals);
-                title = `<div class="admonition-title">${title}</div>`;
-              } else {
-                const defaultTitle = !container.style ? i18n.getLangString('note', 'note') :
-                  i18n.getLangString(container.style, container.style);
-                title = `<div class="admonition-title">${defaultTitle}</div>`;
-              }
-              if (content) {
-                const lines = content.split('\n');
-                lines.forEach((line, index) => {
-                  if (line) {
-                    const pos = line[0] === '\t' ? 1 : 4;
-                    lines[index] = line.substring(pos);
-                  }
-                })
-                content = showdown.subParser('githubCodeBlocks')(lines.join('\n'), options, globals);
-                content = showdown.subParser('blockGamut')(content, options, globals);
-                content = `<div class="admonition-content">${content}</div>`;
-              } else {
-                content = '';
-              }
-              const code = `<div class="${container.classList.join(' ')}">${title}${content}</div>`;
-              return showdown.subParser('hashBlock')(code, options, globals);
-            });
-
           // leaf directive
           text = text.replace(
-            /^ {0,3}(?<!:)::[ \t]*([-\w]+)[ \t]*\[([^\[\]]*)\][ \t]*(?:\{([^\{\}]*)\})?[ \t]*$/gm,
+            /^ {0,3}(?<!:)::[ \t]*([-\w]+)[ \t]*\[([^\[\]]*)\][ \t]*(?:\{([^\{\}]*)\})?[ \t]*(?:¨0)?$/gm,
             function (wholeMatch, name, title, attribute) {
               const directive = {};
               parseAttribute(attribute, directive);
