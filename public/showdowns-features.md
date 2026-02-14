@@ -120,11 +120,21 @@ It's implemented sub-TOC in showdown-toc.js.
 The syntax string is not case sensitive.
 
 ```
-[#... ]【Table[ |-]Of[ |-]Contents】 | [Table[ |-]Of[ |-]Contents]
-or
-[#... ][TOC|目录] | {{TOC|目录}}|【TOC|目录】| [[TOC|目录]]
-or
-[#... ]{{_TOC_}}|【_TOC_】|[[_TOC_]]
+【TOC】
+【目录】
+【_TOC_】
+【Table Of Contents】
+【Table-Of-Contents】
+
+[TOC]
+[目录]
+[Table Of Contents]
+[Table-Of-Contents]
+
+{{TOC}}
+[[TOC]]
+{{_TOC_}}
+[[_TOC_]]
 
 ```
 
