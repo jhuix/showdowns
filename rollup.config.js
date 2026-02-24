@@ -197,7 +197,7 @@ const config = {
 };
 
 if (isFormatCJS) {
-  config.external.push('showdown', 'zlib', 'save-svg-as-png', 'showdown-katex/src/asciimath-to-tex');
+  config.external.push('showdown', 'zlib', 'showdown-katex/src/asciimath-to-tex');
 } else {
   config.plugins.push(
     babel({

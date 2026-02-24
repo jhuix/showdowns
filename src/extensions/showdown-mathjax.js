@@ -40,6 +40,17 @@ function dyncLoadScript(config) {
         svg: {
           fontCache: 'global'
         },
+        options: {
+          menuOptions: {
+            settings: {
+              enrich: true,         // true to enable semantic-enrichment
+              collapsible: false,    // true to enable collapsible math
+              speech: false,         // true to enable speech generation
+              braille: false,        // true to enable Braille generation
+              assistiveMml: false,   // true to enable assistive MathML
+            }
+          }
+        },
         startup: {
           pageReady() {
             return window.MathJax.startup.defaultPageReady().then(() => {
@@ -270,7 +281,7 @@ function showdownMathJax(userConfig) {
         if (this.config.engine === 'mathjax') {
           const qes = wrapper.querySelectorAll(':not(code):not(pre)');
           if (qes.length > 0) {
-            for(let i = 0; i < qes.length; i++) {
+            for (let i = 0; i < qes.length; i++) {
               const content = qes[i].textContent
               if (content.match(/(?:@@|\$\$|\\\$|\\\(|\\\[|\\begin\{.*?})/)) {
                 obj.scripts.push({

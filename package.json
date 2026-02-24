@@ -99,7 +99,6 @@
     "plotly.js-dist-min": "^3.3.1",
     "railroad-diagrams": "^1.0.0",
     "raphael": "^2.3.0",
-    "save-svg-as-png": "^1.4.17",
     "showdown": "^2.1.0",
     "snapsvg": "^0.5.1",
     "underscore": "^1.13.7",
