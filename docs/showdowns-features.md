@@ -132,8 +132,8 @@ The syntax string is not case sensitive.
 [Table-Of-Contents]
 
 {{TOC}}
-[[TOC]]
 {{_TOC_}}
+[[TOC]]
 [[_TOC_]]
 
 ```
@@ -2302,7 +2302,6 @@ ZenUML options see [ZenumlOptions](https://github.com/mermaid-js/zenuml-core/blo
 
 #### ZenUML example
 
-````
 ```zenuml
 A B C D
 
@@ -2325,9 +2324,7 @@ A->B.method() {
   @return B->A: ret4_annotation_rtl
 }
 ```
-````
 
-````
 ```zenuml { "options": {"theme":"theme-woolworths"} }
 // An example for a RESTful endpoint<br>
 // Go to the "Cheat sheet" tab or https://docs.zenuml.com
@@ -2348,4 +2345,3 @@ BookLibService.Borrow(id) {
   return receipt
 }
 ```
-````
