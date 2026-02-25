@@ -88,7 +88,7 @@ function unloadScript() {
 function loadExportActions(root, svg, id) {
   const doc = root.ownerDocument;
   const details = doc.createElement('details');
-  details.setAttribute('title', i18n.getLangString('export-actions-title', 'Click to view actions'));
+  details.setAttribute('title', i18n.getLangString('export-actions-title'));
   const summary = doc.createElement('summary');
   summary.innerHTML = `<svg viewBox="0 0 16 16" fill="currentColor" stroke="none" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
   <circle r="2" cy="8" cx="2"></circle>

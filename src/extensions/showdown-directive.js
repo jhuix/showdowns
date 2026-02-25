@@ -308,6 +308,26 @@ function showdownDirective() {
             /^ {0,3}((?::::+)|(?:!!!+))[ \t]*([-\w]*)[ \t]*(?:([^\f\v\r\n\[\]\{\}]*)|(?:\[([^\[\]]*)\])?[ \t]*(?:\{([^\{\}]*)\})?)[: \t]*\n([\s\S]*?)\n {0,3}\1[:! \t]*(?:¨0)?$/gm,
             function (wholeMatch, delim, name, title0, title, attribute, content) {
               name = name.toLowerCase();
+              if (name === 'details') {
+                if (title0 || (!title && !attribute)) {
+                  title = title0 || '';
+                }
+                const container = parseAttribute(attribute, {});
+                if (title) {
+                  title = showdown.subParser('spanGamut')(title, options, globals);
+                }
+                title = `<summary class="details-title">${title}</summary>`;
+                if (content) {
+                  content = showdown.subParser('githubCodeBlocks')(content, options, globals);
+                  content = showdown.subParser('blockGamut')(content, options, globals);
+                  content = `<div class="details-content">${content}</div>`;
+                }
+                const id = container.id ? `id="${container.id}" ` : '';
+                const attrs = container.attribute ? attributeToString(container.attribute) : '';
+                const code = `<details ${id}class="details"${attrs}>${title}${content}</details>`;
+                return showdown.subParser('hashBlock')(code, options, globals);
+              }
+
               if (!name) name = 'container';
               const container = { classList: [] };
               let id = '';
@@ -329,7 +349,7 @@ function showdownDirective() {
                     }
                   }
                 });
-                title = title0;
+                title = title0 || '';
               }
 
               let admonition = false;
@@ -418,7 +438,7 @@ function showdownDirective() {
             function (wholeMatch, name, title, attribute) {
               const directive = {};
               parseAttribute(attribute, directive);
-              if (name === 'media' || name==='video' || name === '媒体' || name === '音视频') {
+              if (name === 'media' || name === 'video' || name === '媒体' || name === '音视频') {
                 if (!directive.attribute || !directive.attribute.src) {
                   return;
                 }
