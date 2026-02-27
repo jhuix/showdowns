@@ -1,0 +1,113 @@
+.showdowns {
+  .tabbed-set>input {
+    height: 0;
+    opacity: 0;
+    position: absolute;
+    width: 0;
+    font-feature-settings: "kern", "liga";
+    color: #000000de;
+    border: 0;
+    outline: none;
+  }
+
+  .tabbed-labels {
+    position: relative;
+  }
+
+  .tabbed-labels {
+    -ms-overflow-style: none;
+    box-shadow: 0 -.05rem #00000012 inset;
+    display: flex;
+    max-width: 100%;
+    font-size: .8rem;
+    line-height: 1.6;
+    overflow: auto;
+    overflow-wrap: break-word;
+    -webkit-scrollbar-width: none;
+    scrollbar-width: none;
+  }
+
+  .tabbed-labels::-webkit-scrollbar {
+    display: none;
+  }
+
+  .tabbed-labels::before {
+    background: #000000de;
+    bottom: 0;
+    content: "";
+    display: block;
+    height: 2px;
+    left: 0;
+    position: absolute;
+    transform: translateX(0);
+    transition: width 225ms, background-color .25s, transform .25s;
+    transition-timing-function: ease, ease, ease;
+    transition-timing-function: cubic-bezier(.4, 0, .2, 1);
+    width: 113px;
+  }
+
+  .tabbed-labels--linked>label {
+    padding: 0;
+  }
+
+  .tabbed-labels>label {
+    border-bottom: .1rem solid #0000;
+    border-radius: .1rem .1rem 0 0;
+    color: #0000008a;
+    cursor: pointer;
+    flex-shrink: 0;
+    font-size: .64rem;
+    font-weight: 700;
+    padding: .78125em 1.25em .625em;
+    scroll-margin-inline-start: 1rem;
+    transition: background-color .25s, color .25s;
+    white-space: nowrap;
+    width: auto;
+  }
+
+  .tabbed-labels--linked>label>a {
+    display: block;
+    padding: .78125em 1.25em .625em;
+    word-break: break-word;
+    text-decoration: none;
+    color: inherit;
+    font-size: .8rem;
+    pointer-events: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+
+  .tabbed-labels a,
+  .tabbed-labels a::before {
+    transition: color 125ms;
+  }
+
+  .tabbed-block {
+    display: none;
+  }
+
+  .tabbed-set>input:nth-child(1):checked~.tabbed-content> :nth-child(1),
+  .tabbed-set>input:nth-child(2):checked~.tabbed-content> :nth-child(2),
+  .tabbed-set>input:nth-child(3):checked~.tabbed-content> :nth-child(3),
+  .tabbed-set>input:nth-child(4):checked~.tabbed-content> :nth-child(4),
+  .tabbed-set>input:nth-child(5):checked~.tabbed-content> :nth-child(5),
+  .tabbed-set>input:nth-child(6):checked~.tabbed-content> :nth-child(6),
+  .tabbed-set>input:nth-child(7):checked~.tabbed-content> :nth-child(7),
+  .tabbed-set>input:nth-child(8):checked~.tabbed-content> :nth-child(8),
+  .tabbed-set>input:nth-child(9):checked~.tabbed-content> :nth-child(9),
+  .tabbed-set>input:nth-child(10):checked~.tabbed-content> :nth-child(10),
+  .tabbed-set>input:nth-child(11):checked~.tabbed-content> :nth-child(11),
+  .tabbed-set>input:nth-child(12):checked~.tabbed-content> :nth-child(12),
+  .tabbed-set>input:nth-child(13):checked~.tabbed-content> :nth-child(13),
+  .tabbed-set>input:nth-child(14):checked~.tabbed-content> :nth-child(14),
+  .tabbed-set>input:nth-child(15):checked~.tabbed-content> :nth-child(15),
+  .tabbed-set>input:nth-child(16):checked~.tabbed-content> :nth-child(16),
+  .tabbed-set>input:nth-child(17):checked~.tabbed-content> :nth-child(17),
+  .tabbed-set>input:nth-child(18):checked~.tabbed-content> :nth-child(18),
+  .tabbed-set>input:nth-child(19):checked~.tabbed-content> :nth-child(19),
+  .tabbed-set>input:nth-child(20):checked~.tabbed-content> :nth-child(20) {
+    display: block;
+  }
+}

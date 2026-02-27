@@ -42,6 +42,7 @@ const i18nMap = {
     'export-png-action': '保存为 PNG',
     'note': '备注',
     'alert': '注意',
+    'simple': '简洁',
     'info': '信息',
     'tip': '提示',
     'warning': '警告',

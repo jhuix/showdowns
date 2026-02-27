@@ -237,6 +237,8 @@ function attributeToString(attribute) {
   return result;
 }
 
+const detailsStrings = ['details', '详情', 'details+', '详情+', 'details-', '详情-'];
+
 function showdownDirective() {
   return [
     {
@@ -246,16 +248,74 @@ function showdownDirective() {
           text = converter._dispatch('directive.before', text, options, globals);
           text += '¨0';
 
-          // Support rST style (https://docutils.sourceforge.io/docs/ref/rst/directives.html#specific-admonitions)
-          text = text.replace(/^!!! ((?:[^"\n]+[ \t]+)*)(?:"([^"\n]+)")?[ \t]*\n((?:(?:    |\t)[^\r\n]*(?:\n|$)|\n)*)/gm,
-            function (wholeMatch, name, title, content) {
+          // Support obsidian callout style (https://help.obsidian.md/callouts)
+          text = text.replace(/^ {0,3}>[ \t]*\[\!([^\f\v\r\n\[\]\{\}]+)\]([\+-]?)[ \t]+([^\r\n]*)[ \t]*\n((?: {0,3}>(?:[^\r\n]*(?:\n|$)))*)/gm,
+            function (wholeMatch, name, details, title, content) {
+              const container = {
+                classList: ['callout', 'note'],
+              };
+              name = name.toLowerCase();
+              container.style = parseContainerStyle(name);
+              container.classList.push(container.style);
+              if (details) {
+                if (title) {
+                  title = showdown.subParser('spanGamut')(title, options, globals);
+                  title = `<summary class="callout-title">${title}</summary>`;
+                } else {
+                  const defaultTitle = !container.style ? i18n.getLangString('note', 'note') :
+                    i18n.getLangString(container.style, container.style);
+                  title = `<summary class="callout-title">${defaultTitle}</summary>`;
+                }
+                if (content) {
+                  content = content.replace(/^ {0,3}>[ \t]?/gm, ''); // trim one level of quoting
+                  content = content.replace(/¨0/g, ''); // clean up hack
+                  content = content.replace(/^[ \t]+$/gm, ''); // trim whitespace-only lines
+                  content = showdown.subParser('githubCodeBlocks')(content, options, globals);
+                  content = showdown.subParser('blockGamut')(content, options, globals);
+                  content = `<div class="callout-content">${content}</div>`;
+                } else {
+                  content = '';
+                }
+                const open = details === '+' ? ' open' : '';
+                const code = `<details class="${container.classList.join(' ')}"${open}>${title}${content}</details>`;
+                return showdown.subParser('hashBlock')(code, options, globals);
+              }
+
+              if (title) {
+                title = showdown.subParser('spanGamut')(title, options, globals);
+                title = `<div class="callout-title">${title}</div>`;
+              } else {
+                const defaultTitle = !container.style ? i18n.getLangString('note', 'note') :
+                  i18n.getLangString(container.style, container.style);
+                title = `<div class="callout-title">${defaultTitle}</div>`;
+              }
+              if (content) {
+                content = content.replace(/^ {0,3}>[ \t]?/gm, ''); // trim one level of quoting
+                content = content.replace(/¨0/g, ''); // clean up hack
+                content = content.replace(/^[ \t]+$/gm, ''); // trim whitespace-only lines
+                content = showdown.subParser('githubCodeBlocks')(content, options, globals);
+                content = showdown.subParser('blockGamut')(content, options, globals);
+                content = `<div class="callout-content">${content}</div>`;
+              } else {
+                content = '';
+              }
+              const code = `<div class="${container.classList.join(' ')}">${title}${content}</div>`;
+              return showdown.subParser('hashBlock')(code, options, globals);
+            }
+          );
+
+
+          // Support rST style (https://docutils.sourceforge.io/docs/ref/rst/directives.html#specific-admonitions),
+          // Also support admonition style of mkdocs-material https://squidfunk.github.io/mkdocs-material/reference/admonitions
+          text = text.replace(/^(!!!|\?\?\?[\+]?) ((?:[^"\f\v\r\n]+[ \t]*)+)(?:"([^"\r\n]*)")?[ \t]*\n((?:(?:    |\t)[^\r\n]*(?:\n|$)|\n(?![\S]))*)/gm,
+            function (wholeMatch, delim, name, title, content) {
               const container = {
                 classList: ['admonition'],
               };
               name = name.toLowerCase();
               const classes = name.split(' ');
-              if (!classes.includes('alert') && !classes.includes('note')) {
-                container.classList.push('note');
+              if (!classes.includes('alert') && !classes.includes('note') && !classes.includes('simple')) {
+                container.classList.push('simple');
               }
               classes.forEach((classname, index) => {
                 if (classname) {
@@ -276,6 +336,37 @@ function showdownDirective() {
               if (!container.classList.includes(container.style)) {
                 container.classList.push(container.style);
               }
+
+              // ??? is rendered as details by default, and can be configured to be open by adding + after ???
+              if (delim.startsWith('???')) {
+                if (title) {
+                  title = showdown.subParser('spanGamut')(title, options, globals);
+                  title = `<summary class="admonition-title">${title}</summary>`;
+                } else {
+                  const defaultTitle = !container.style ? i18n.getLangString('note', 'note') :
+                    i18n.getLangString(container.style, container.style);
+                  title = `<summary class="admonition-title">${defaultTitle}</summary>`;
+                }
+                if (content) {
+                  const lines = content.split('\n');
+                  lines.forEach((line, index) => {
+                    if (line) {
+                      const pos = line[0] === '\t' ? 1 : 4;
+                      lines[index] = line.substring(pos);
+                    }
+                  })
+                  content = showdown.subParser('githubCodeBlocks')(lines.join('\n'), options, globals);
+                  content = showdown.subParser('blockGamut')(content, options, globals);
+                  content = `<div class="admonition-content">${content}</div>`;
+                } else {
+                  content = '';
+                }
+                const open = (delim.length > 3 && delim[3] === '+') ? ' open' : '';
+                const code = `<details class="${container.classList.join(' ')}"${open}>${title}${content}</details>`;
+                return showdown.subParser('hashBlock')(code, options, globals);
+              }
+
+              // !!! is rendered as div by default
               if (title) {
                 title = showdown.subParser('spanGamut')(title, options, globals);
                 title = `<div class="admonition-title">${title}</div>`;
@@ -305,10 +396,10 @@ function showdownDirective() {
 
           // container directive
           text = text.replace(
-            /^ {0,3}((?::::+)|(?:!!!+))[ \t]*([-\w]*)[ \t]*(?:([^\f\v\r\n\[\]\{\}]*)|(?:\[([^\[\]]*)\])?[ \t]*(?:\{([^\{\}]*)\})?)[: \t]*\n([\s\S]*?)\n {0,3}\1[:! \t]*(?:¨0)?$/gm,
+            /^ {0,3}((?::::+)|(?:!!!+))[ \t]*([^\f\v\r\n\[\]\{\}]*)[ \t]*(?:([^\f\v\r\n\[\]\{\}]*)|(?:\[([^\[\]]*)\])?[ \t]*(?:\{([^\{\}]*)\})?)[: \t]*\n([\s\S]*?)\n {0,3}\1[:! \t]*(?:¨0)?$/gm,
             function (wholeMatch, delim, name, title0, title, attribute, content) {
               name = name.toLowerCase();
-              if (name === 'details') {
+              if (detailsStrings.includes(name)) {
                 if (title0 || (!title && !attribute)) {
                   title = title0 || '';
                 }
@@ -324,7 +415,16 @@ function showdownDirective() {
                 }
                 const id = container.id ? `id="${container.id}" ` : '';
                 const attrs = container.attribute ? attributeToString(container.attribute) : '';
-                const code = `<details ${id}class="details"${attrs}>${title}${content}</details>`;
+                let folder = '';
+                let open = '';
+                const lastChar = name[name.length - 1];
+                if (lastChar === '+' || lastChar === '-') {
+                  folder = ' folder';
+                  if (lastChar === '+') {
+                    open = ' open';
+                  }
+                }
+                const code = `<details ${id}class="details${folder}"${attrs}${open}>${title}${content}</details>`;
                 return showdown.subParser('hashBlock')(code, options, globals);
               }
 
@@ -360,7 +460,7 @@ function showdownDirective() {
                   container.type = 'admonition';
                   defaultTitle = i18n.getLangString('note', 'note');
                   container.classList.unshift('admonition', 'note');
-                  parseAttribute(attribute, container, ['alert', 'container', 'row', 'col']);
+                  parseAttribute(attribute, container, ['simple', 'alert', 'container', 'row', 'col']);
                   break;
                 case 'alert':
                 case '注意':
@@ -368,7 +468,15 @@ function showdownDirective() {
                   container.type = 'admonition';
                   defaultTitle = i18n.getLangString('alert', 'alert');
                   container.classList.unshift('admonition', 'alert');
-                  parseAttribute(attribute, container, ['note', 'container', 'row', 'col']);
+                  parseAttribute(attribute, container, ['simple', 'note', 'container', 'row', 'col']);
+                  break;
+                case 'simple':
+                case '简单':
+                  admonition = true;
+                  container.type = 'admonition';
+                  defaultTitle = i18n.getLangString('simple', 'simple');
+                  container.classList.unshift('admonition', 'simple');
+                  parseAttribute(attribute, container, ['note', 'alert', 'container', 'row', 'col']);
                   break;
                 case 'container':
                 case '容器':
@@ -393,10 +501,10 @@ function showdownDirective() {
                   container.type = 'admonition';
                   container.style = parseContainerStyle(name);
                   parseAttribute(attribute, container, ['container', 'row', 'col']);
-                  if (!container.classList.includes('alert') && !container.classList.includes('note')) {
-                    container.classList.unshift('admonition', 'note');
-                  } else {
+                  if (container.classList.includes('alert') || container.classList.includes('note') || container.classList.includes('simple')) {
                     container.classList.unshift('admonition');
+                  } else {
+                    container.classList.unshift('admonition', 'note');
                   }
               }
               if (admonition) {
@@ -434,7 +542,7 @@ function showdownDirective() {
 
           // leaf directive
           text = text.replace(
-            /^ {0,3}(?<!:)::[ \t]*([-\w]+)[ \t]*(?:\[([^\[\]]*)\])?[ \t]*(?:\{([^\{\}]*)\})?[ \t]*(?:¨0)?$/gm,
+            /^ {0,3}(?<!:)::[ \t]*([^\f\v\r\n\[\]\{\}]+)[ \t]*(?:\[([^\[\]]*)\])?[ \t]*(?:\{([^\{\}]*)\})?[ \t]*(?:¨0)?$/gm,
             function (wholeMatch, name, title, attribute) {
               const directive = {};
               parseAttribute(attribute, directive);

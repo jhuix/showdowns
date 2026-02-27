@@ -8,6 +8,7 @@ import './less/toc.less';
 import './less/container.less';
 import './less/codetools.less';
 import './less/preview.less';
+import './less/tabs.less';
 
 import showdown from './parser/showdown.js';
 import showdownAbc from './extensions/showdown-abc.js';

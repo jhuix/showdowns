@@ -27,33 +27,42 @@ showdown.subParser('githubCodeBlocks', function (text, options, globals) {
 
   text += '¨0';
 
+  const matchProcess = function (wholeMatch, delim, language, langattr, codeblock) {
+    const _ = delim;
+    var end = options.omitExtraWLInCodeBlocks ? '' : '\n';
+
+    // First parse the github code block
+    codeblock = showdown.subParser('encodeCode')(codeblock, options, globals);
+    codeblock = showdown.subParser('detab')(codeblock, options, globals);
+    codeblock = codeblock.replace(/^\n+/g, ''); // trim leading newlines
+    codeblock = codeblock.replace(/\n+$/g, ''); // trim trailing whitespace
+
+    codeblock =
+      '<pre><code' +
+      (language ? ' class="' + language + ' language-' + language + '"' : '') +
+      (langattr ? ` data-lang='${langattr}'` : '') +
+      '>' +
+      codeblock +
+      end +
+      '</code></pre>';
+
+    codeblock = showdown.subParser('hashBlock')(codeblock, options, globals);
+
+    // Since GHCodeblocks can be false positives, we need to
+    // store the primitive text and the parsed text in a global var,
+    // and then return a token
+    return ('\n\n¨G' + (globals.ghCodeBlocks.push({ text: wholeMatch, codeblock: codeblock }) - 1) + 'G\n\n');
+  }
+
   text = text.replace(
     /(?:^|\n)(?: {0,3})(```+|~~~+)(?: *)([^\s`~]*?)(?:[ \t]*?)((?:\{[\S\t ]*\}|\[[\S\t ]*\])?)\n([\s\S]*?)\n(?: {0,3})\1/g,
-    function (wholeMatch, delim, language, langattr, codeblock) {
-      var end = options.omitExtraWLInCodeBlocks ? '' : '\n';
+    matchProcess
+  );
 
-      // First parse the github code block
-      codeblock = showdown.subParser('encodeCode')(codeblock, options, globals);
-      codeblock = showdown.subParser('detab')(codeblock, options, globals);
-      codeblock = codeblock.replace(/^\n+/g, ''); // trim leading newlines
-      codeblock = codeblock.replace(/\n+$/g, ''); // trim trailing whitespace
-
-      codeblock =
-        '<pre><code' +
-        (language ? ' class="' + language + ' language-' + language + '"' : '') +
-        (langattr ? ` data-lang='${langattr}'` : '') +
-        '>' +
-        codeblock +
-        end +
-        '</code></pre>';
-
-      codeblock = showdown.subParser('hashBlock')(codeblock, options, globals);
-
-      // Since GHCodeblocks can be false positives, we need to
-      // store the primitive text and the parsed text in a global var,
-      // and then return a token
-      return ('\n\n¨G' + (globals.ghCodeBlocks.push({ text: wholeMatch, codeblock: codeblock }) - 1) + 'G\n\n');
-    }
+  // Support mermaid code of azure syntax
+  text = text.replace(
+    /(?:^|\n)(?: {0,3})(:::+)(?: *)(mermaid)(?:[ \t]*?)((?:\{[\S\t ]*\}|\[[\S\t ]*\])?)\n([\s\S]*?)\n(?: {0,3})\1/g,
+    matchProcess
   );
 
   // attacklab: strip sentinel

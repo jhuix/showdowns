@@ -306,7 +306,7 @@ contents, which are sometimes further block elements
 !!!
 ```
 
-The special container directive syntax is classified as [container syntax](#container-syntax) and admonitions syntax. 
+The special container directive syntax is classified as [container syntax](#container-syntax) and [callout syntax](#callout-syntax) and admonitions syntax. 
 But the admonitions syntax also includes [rST-style syntax](#rst-style-syntax) and [compatible syntax](#compatible-syntax).
 
 ::css[.colorpicker-color-decoration {
@@ -389,7 +389,7 @@ But the admonitions syntax also includes [rST-style syntax](#rst-style-syntax) a
 }
 ]{}
 
-Default the admonitions styles are `note` and `alert` in admonitions syntax. Each style includes the following types, each type corresponds to a class name of css: 
+Default the admonitions styles are [note style](#note-style) , [alert style](#alert-style), [simple style](#simple-style) in admonitions syntax. Each style includes the following types, each type corresponds to a class name of css: 
 
 | Type Name | Flag | Color |
 | ---- | ----- | ----- |
@@ -430,9 +430,9 @@ contents, which are sometimes further block elements
 ```
 Analogous to fenced code blocks, an arbitrary number of colons or exclamation marks greater or equal three could be used as long as the closing line is longer than the opening line. That way, you can even nest blocks (think divs) by using successively fewer colons for each containing block.
 
-When the name string in the container directive syntax is `container` (also defaults to container when empty string), `row`, or `col`, it is called container syntax, and other strings are called admonitions syntax.
+When the name string in the container directive syntax is `container` (also defaults to container when empty string), `row`, or `col`, it is called container syntax; `details` string is called details-summary syntax; other strings are called admonitions syntax.
 
-The container syntax, for example:
+- The container syntax, for example:
 
 ```
 :::::
@@ -488,17 +488,38 @@ Which will be rendered as:
 </div>
 ```
 
-The admonitions of container syntax, for example:
+- The details-summary syntax, for example:
+
+```
+::: details[summary title]{#example}
+contents, which are sometimes further block elements
+:::
+```
+
+Which will be rendered as:
+```
+<details id="example" class="details">
+  <summary class="details-title">
+    summary title
+  </summary>
+  <div class="details-content">
+    <p>contents, which are sometimes further block elements</p>
+  </div>
+</details>
+```
+
+
+- The admonitions of container syntax, for example:
 
 ```
 ::: tip [tip example] {#example.alert style="width:100%;"}
-contents, which are sometimes further block elements
+You should info that the title will be automatically capitalized.
 :::
 
 OR
 
 !!! tip [tip example] {#example.alert style="width:100%;"}
-contents, which are sometimes further block elements
+You should info that the title will be automatically capitalized.
 !!!
 ```
 
@@ -507,7 +528,7 @@ Which will be rendered as:
 ```
 <div id="example" class="admonition alert tip" style="width:100%;">
   <div class="admonition-title">
-    <p>tip example</p>
+    tip example
   </div>
   <div class="admonition-content">
     <p>You should info that the title will be automatically capitalized.</p>
@@ -517,34 +538,108 @@ Which will be rendered as:
 
 ##### rST-style Syntax
 
-Admonitions of [rST-style](https://docutils.sourceforge.io/docs/ref/rst/directives.html#specific-admonitions) are created using the following syntax:
+Admonitions of [rST-style](https://docutils.sourceforge.io/docs/ref/rst/directives.html#specific-admonitions) or [mkdocs-material](https://squidfunk.github.io/mkdocs-material/reference/admonitions) are created using the following syntax:
 
-```
+```markdown
 !!! types "optional explicit title within double quotes"
     Any number of other indented markdown elements.
 
     This is the second paragraph.
 ```
 
-type will be used as the CSS class name and as default title. It must be a single word. So, for instance:
+Type will be used as the CSS class name and as default title. It must be a single word and default style is [simple](#simple-style). So, for instance:
 
 ```
-!!! note info
-    You should type name(info) or style name(note) that the title will be automatically capitalized.
+!!! info
+    You should type name(info) or style name(simple) that the title will be automatically capitalized.
 ```
 
 will render:
 
 ```
-<div class="admonition note info">
+<div class="admonition simple info">
   <div class="admonition-title">
-    <p>info</p>
+    info
   </div>
   <div class="admonition-content">
     <p>You should info that the title will be automatically capitalized.</p>
   </div>
 </div>
 ```
+
+- Changing the title
+
+By default, the title will equal the type qualifier in titlecase. However, it can be changed by adding a quoted string containing valid Markdown (including links, formatting, ...) after the type qualifier:
+
+```markdown
+!!! info "Phasellus posuere in sem ut cursus"
+
+    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla et euismod nulla. Curabitur feugiat, tortor non consequat finibus, justo purus auctor massa, nec semper lorem quam in massa.
+```
+
+will render:
+
+```html
+<div class="admonition simple info">
+  <div class="admonition-title">
+    Phasellus posuere in sem ut cursus
+  </div>
+  <div class="admonition-content">
+    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla et euismod nulla. Curabitur feugiat, tortor non consequat finibus, justo purus auctor massa, nec semper lorem quam in massa.</p>
+  </div>
+</div>
+```
+
+- Collapsible blocks
+
+When Details is enabled and an admonition block is started with ??? instead of !!!, the admonition is rendered as an expandable block with a small toggle on the right side:
+Admonition, collapsible
+
+```markdown
+??? tip
+
+    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla et euismod
+    nulla. Curabitur feugiat, tortor non consequat finibus, justo purus auctor
+    massa, nec semper lorem quam in massa.
+```
+
+will render:
+
+```html
+<details class="admonition simple tip">
+  <summary class="admonition-title">
+    note
+  </summary>
+  <div class="admonition-content">
+    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla et euismod nulla. Curabitur feugiat, tortor non consequat finibus, justo purus auctor massa, nec semper lorem quam in massa.</p>
+  </div>
+</details>
+```
+
+Adding a + after the ??? token renders the block expanded:
+Admonition, collapsible and initially expanded
+
+```markdown
+???+ info
+
+    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla et euismod
+    nulla. Curabitur feugiat, tortor non consequat finibus, justo purus auctor
+    massa, nec semper lorem quam in massa.
+```
+
+will render:
+
+```html
+<details class="admonition simple info" open>
+  <summary class="admonition-title">
+    note
+  </summary>
+  <div class="admonition-content">
+    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla et euismod nulla. Curabitur feugiat, tortor non consequat finibus, justo purus auctor massa, nec semper lorem quam in massa.</p>
+  </div>
+</details>
+```
+
 
 ##### Compatible Syntax
 
@@ -571,9 +666,80 @@ Which will be rendered as:
 </div>
 ```
 
+##### Callout Syntax
+
+A callout syntax by wrapping text with below:
+
+```
+> [!name] title
+> content line 1
+> content line 2
+> ...
+```
+
+For example:
+
+```
+> [!tip] Callouts can have custom titles
+> Like this one.
+```
+
+will render:
+
+```
+<div class="callout note tip">
+  <div class="callout-title">
+    Callouts can have custom titles
+  </div>
+  <div class="callout-content">
+    <p>Like this one.</p>
+  </div>
+</div>
+```
+
+You can even omit the body to create title-only callouts:
+
+```
+> [!tip] Title-only callout
+```
+
+will render:
+
+```
+<div class="callout note tip">
+  <div class="callout-title">
+    Title-only callout
+  </div>
+</div>
+```
+
+- Foldable callouts
+
+You can make a callout foldable by adding a plus (+) or a minus (-) directly after the type identifier.
+
+A plus sign expands the callout by default, and a minus sign collapses it instead.
+
+```
+> [!faq]- Are callouts foldable?
+> Yes! In a foldable callout, the contents are hidden when the callout is collapsed.
+```
+
+will render:
+
+```
+<details class="callout note faq">
+  <summary class="callout-title">
+    Are callouts foldable?
+  </summary>
+  <div class="callout-content">
+    <p>Yes! In a foldable callout, the contents are hidden when the callout is collapsed.</p>
+  </div>
+</details>
+```
+
 ##### Container Example
 
-For [note](#note-style) and [alert](#alert-style) style examples.
+For [note](#note-style), [alert](#alert-style), [simple](#simple-style) style examples.
 
 ###### Note Style
 
@@ -583,6 +749,9 @@ Some **content** with *Markdown* `syntax`. Check [this `api`](#).
 !!!
 
 !!! note info "info"
+    Some **content** with *Markdown* `syntax`. Check [this `api`](#).
+
+???+ note tip "tip"
     Some **content** with *Markdown* `syntax`. Check [this `api`](#).
 
 ::::row
@@ -737,6 +906,9 @@ Some **content** with *Markdown* `syntax`. Check [this `api`](#).
 !!! alert info "info"
     Some **content** with *Markdown* `syntax`. Check [this `api`](#).
 
+???+ alert tip "tip"
+    Some **content** with *Markdown* `syntax`. Check [this `api`](#).
+
 ::::row
 :::col
 
@@ -870,6 +1042,160 @@ Some **content** with _Markdown_ `syntax`. Check [this `api`](#).
 !!!
 
 !!!summary[summary]{.alert}
+Some **content** with _Markdown_ `syntax`. Check [this `api`](#).
+!!!
+
+:::
+
+::::
+:::::
+
+###### Simple Style
+
+:::::
+!!!key[key]{.simple}
+Some **content** with *Markdown* `syntax`. Check [this `api`](#).
+!!!
+
+!!! info "info"
+    Some **content** with *Markdown* `syntax`. Check [this `api`](#).
+
+???+ tip "tip"
+    Some **content** with *Markdown* `syntax`. Check [this `api`](#).
+
+::::row
+:::col
+
+!!!key[key]{.simple}
+Some **content** with *Markdown* `syntax`. Check [this `api`](#).
+!!!
+
+!!!cite[cite]{.simple}
+Some **content** with __Markdown__ `syntax`. Check [this `api`](#).
+!!!
+
+!!!snippet[snippet]{.simple}
+Some **content** with _Markdown_ `syntax`. Check [this `api`](#).
+!!!
+
+!!!hint[hint]{.simple}
+Some **content** with _Markdown_ `syntax`. Check [this `api`](#).
+!!!
+
+!!!todo[todo]{.simple}
+Some **content** with _Markdown_ `syntax`. Check [this `api`](#).
+!!!
+
+:::
+
+
+:::col
+
+!!!important[important]{.simple}
+Some **content** with _Markdown_ `syntax`. Check [this `api`](#).
+!!!
+
+!!!quote[quote]{.simple}
+Some **content** with _Markdown_ `syntax`. Check [this `api`](#).
+!!!
+
+!!!example[example]{.simple}
+Some **content** with _Markdown_ `syntax`. Check [this `api`](#).
+!!!
+
+!!!tip[tip]{.simple}
+Some **content** with _Markdown_ `syntax`. Check [this `api`](#).
+!!!
+
+!!!info[info]{.simple}
+Some **content** with _Markdown_ `syntax`. Check [this `api`](#).
+!!!
+
+:::
+::::
+
+::::row
+:::col
+
+!!!bug[bug]{.simple}
+Some **content** with _Markdown_ `syntax`. Check [this `api`](#).
+!!!
+
+
+!!!missing[missing]{.simple}
+Some **content** with _Markdown_ `syntax`. Check [this `api`](#).
+!!!
+
+!!!caution[caution]{.simple}
+Some **content** with _Markdown_ `syntax`. Check [this `api`](#).
+!!!
+
+!!!faq[faq]{.simple}
+Some **content** with _Markdown_ `syntax`. Check [this `api`](#).
+!!!
+
+!!!done[done]{.simple}
+Some **content** with _Markdown_ `syntax`. Check [this `api`](#).
+!!!
+
+!!!tldr[tldr]{.simple}
+Some **content** with _Markdown_ `syntax`. Check [this `api`](#).
+!!!
+
+:::
+
+:::col
+
+!!!error[error]{.simple}
+Some **content** with _Markdown_ `syntax`. Check [this `api`](#).
+!!!
+
+
+!!!fail[fail]{.simple}
+Some **content** with _Markdown_ `syntax`. Check [this `api`](#).
+!!!
+
+!!!attention[attention]{.simple}
+Some **content** with _Markdown_ `syntax`. Check [this `api`](#).
+!!!
+
+!!!help[help]{.simple}
+Some **content** with _Markdown_ `syntax`. Check [this `api`](#).
+!!!
+
+!!!check[check]{.simple}
+Some **content** with _Markdown_ `syntax`. Check [this `api`](#).
+!!!
+
+!!!abstract[abstract]{.simple}
+Some **content** with _Markdown_ `syntax`. Check [this `api`](#).
+!!!
+
+:::
+
+:::col
+
+!!!danger[danger]{.simple}
+Some **content** with _Markdown_ `syntax`. Check [this `api`](#).
+!!!
+
+!!!failure[failure]{.simple}
+Some **content** with _Markdown_ `syntax`. Check [this `api`](#).
+!!!
+
+!!!warning[warning]{.simple}
+Some **content** with _Markdown_ `syntax`. Check [this `api`](#).
+!!!
+
+!!!question[question]{.simple}
+Some **content** with _Markdown_ `syntax`. Check [this `api`](#).
+!!!
+
+!!!success[success]{.simple}
+Some **content** with _Markdown_ `syntax`. Check [this `api`](#).
+!!!
+
+!!!summary[summary]{.simple}
 Some **content** with _Markdown_ `syntax`. Check [this `api`](#).
 !!!
 
