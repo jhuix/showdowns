@@ -389,7 +389,9 @@ But the admonitions syntax also includes [rST-style syntax](#rst-style-syntax) a
 }
 ]{}
 
-Default the admonitions styles are [note style](#note-style) , [alert style](#alert-style), [simple style](#simple-style) in admonitions syntax. Each style includes the following types, each type corresponds to a class name of css: 
+Default the admonitions styles are [note](#note-style) , [alert](#alert-style), [simple](#simple-style) style name in admonitions syntax.
+**Also customize the type name as a custom style name.**
+Each style includes the following types, each type corresponds to a class name of css: 
 
 | Type Name | Flag | Color |
 | ---- | ----- | ----- |
@@ -488,6 +490,24 @@ Which will be rendered as:
 </div>
 ```
 
+:::::
+::::row
+
+:::col-one
+!!!tip[tip example]{#example-one.note style="width:100%;"}
+one contents, which are sometimes further block elements
+!!!
+:::
+
+:::col-two
+!!! info [info example] {#example-two.alert style="width:100%;"}
+two contents, which are sometimes further block elements
+!!!
+:::
+
+::::
+:::::
+
 - The details-summary syntax, for example:
 
 ```
@@ -507,6 +527,17 @@ Which will be rendered as:
   </div>
 </details>
 ```
+
+::: details[summary title]{#example}
+contents, which are sometimes further block elements
+:::
+
+
+When adding a '+' or '-' after the `details` token, the admonition is rendered as an expandable block with a small toggle on the right side:
+
+::: details+[summary title]{#example}
+Admonition, collapsible and initially expanded
+:::
 
 
 - The admonitions of container syntax, for example:
@@ -535,6 +566,10 @@ Which will be rendered as:
   </div>
 </div>
 ```
+
+!!! tip [tip example] {#example.alert style="width:100%;"}
+You should info that the title will be automatically capitalized.
+!!!
 
 ##### rST-style Syntax
 
@@ -567,6 +602,9 @@ will render:
 </div>
 ```
 
+!!! info
+    You should type name(info) or style name(simple) that the title will be automatically capitalized.
+
 - Changing the title
 
 By default, the title will equal the type qualifier in titlecase. However, it can be changed by adding a quoted string containing valid Markdown (including links, formatting, ...) after the type qualifier:
@@ -590,9 +628,13 @@ will render:
 </div>
 ```
 
+!!! info "Phasellus posuere in sem ut cursus"
+
+    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla et euismod nulla. Curabitur feugiat, tortor non consequat finibus, justo purus auctor massa, nec semper lorem quam in massa.
+
 - Collapsible blocks
 
-When Details is enabled and an admonition block is started with ??? instead of !!!, the admonition is rendered as an expandable block with a small toggle on the right side:
+When an admonition block is started with ??? instead of !!!, the admonition is rendered as an expandable block with a small toggle on the right side:
 Admonition, collapsible
 
 ```markdown
@@ -616,8 +658,13 @@ will render:
 </details>
 ```
 
+??? tip
+
+    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla et euismod
+    nulla. Curabitur feugiat, tortor non consequat finibus, justo purus auctor
+    massa, nec semper lorem quam in massa.
+
 Adding a + after the ??? token renders the block expanded:
-Admonition, collapsible and initially expanded
 
 ```markdown
 ???+ info
@@ -640,6 +687,11 @@ will render:
 </details>
 ```
 
+???+ info
+
+    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla et euismod
+    nulla. Curabitur feugiat, tortor non consequat finibus, justo purus auctor
+    massa, nec semper lorem quam in massa.
 
 ##### Compatible Syntax
 
@@ -651,12 +703,20 @@ A compatible admonitions syntax by wrapping text with a set of greater or equal 
 :::
 ```
 
+For Example:
+
+```
+::: simple-warning A Compatible Syntax
+*Some text*
+:::
+```
+
 Which will be rendered as:
 
 ```
-<div class=`admonition [name | name0 name1 ...]`>
+<div class=`admonition simple warning`>
   <div class=`admonition-title`>
-    <p>label</p>
+    A Compatible Syntax
   </div>
   <div class=`admonition-content`>
     <p>
@@ -665,6 +725,10 @@ Which will be rendered as:
   </div>
 </div>
 ```
+
+::: simple-warning A Compatible Syntax
+*Some text*
+:::
 
 ##### Callout Syntax
 
@@ -697,6 +761,9 @@ will render:
 </div>
 ```
 
+> [!tip] Callouts can have custom titles
+> Like this one.
+
 You can even omit the body to create title-only callouts:
 
 ```
@@ -712,6 +779,8 @@ will render:
   </div>
 </div>
 ```
+
+> [!tip] Title-only callout
 
 - Foldable callouts
 
@@ -736,6 +805,9 @@ will render:
   </div>
 </details>
 ```
+
+> [!faq]- Are callouts foldable?
+> Yes! In a foldable callout, the contents are hidden when the callout is collapsed.
 
 ##### Container Example
 
@@ -1373,102 +1445,102 @@ export function deepMerge(target, ...sources) {
 package utils
 
 import (
-	"math"
-	"sync"
+  "math"
+  "sync"
 )
 
 type levelPool struct {
-	size int
-	pool sync.Pool
+  size int
+  pool sync.Pool
 }
 
 func newLevelPool(size int) *levelPool {
-	return &levelPool{
-		size: size,
-		pool: sync.Pool{
-			New: func() interface{} {
-				data := make([]byte, size)
-				return &data
-			},
-		},
-	}
+  return &levelPool{
+    size: size,
+    pool: sync.Pool{
+      New: func() interface{} {
+        data := make([]byte, size)
+        return &data
+      },
+    },
+  }
 }
 
 type LimitedPool struct {
-	minSize int
-	maxSize int
-	pools   []*levelPool
+  minSize int
+  maxSize int
+  pools   []*levelPool
 }
 
 func NewLimitedPool(minSize, maxSize int) *LimitedPool {
-	if maxSize < minSize {
-		panic("maxSize can't be less than minSize")
-	}
-	const multiplier = 2
-	var pools []*levelPool
-	curSize := minSize
-	for curSize < maxSize {
-		pools = append(pools, newLevelPool(curSize))
-		curSize *= multiplier
-	}
-	pools = append(pools, newLevelPool(maxSize))
-	return &LimitedPool{
-		minSize: minSize,
-		maxSize: maxSize,
-		pools:   pools,
-	}
+  if maxSize < minSize {
+    panic("maxSize can't be less than minSize")
+  }
+  const multiplier = 2
+  var pools []*levelPool
+  curSize := minSize
+  for curSize < maxSize {
+    pools = append(pools, newLevelPool(curSize))
+    curSize *= multiplier
+  }
+  pools = append(pools, newLevelPool(maxSize))
+  return &LimitedPool{
+    minSize: minSize,
+    maxSize: maxSize,
+    pools:   pools,
+  }
 }
 
 func (p *LimitedPool) findPool(size int) *levelPool {
-	if size > p.maxSize {
-		return nil
-	}
-	idx := int(math.Ceil(math.Log2(float64(size) / float64(p.minSize))))
-	if idx < 0 {
-		idx = 0
-	}
-	if idx > len(p.pools)-1 {
-		return nil
-	}
-	return p.pools[idx]
+  if size > p.maxSize {
+    return nil
+  }
+  idx := int(math.Ceil(math.Log2(float64(size) / float64(p.minSize))))
+  if idx < 0 {
+    idx = 0
+  }
+  if idx > len(p.pools)-1 {
+    return nil
+  }
+  return p.pools[idx]
 }
 
 func (p *LimitedPool) findPutPool(size int) *levelPool {
-	if size > p.maxSize {
-		return nil
-	}
-	if size < p.minSize {
-		return nil
-	}
+  if size > p.maxSize {
+    return nil
+  }
+  if size < p.minSize {
+    return nil
+  }
 
-	idx := int(math.Floor(math.Log2(float64(size) / float64(p.minSize))))
-	if idx < 0 {
-		idx = 0
-	}
-	if idx > len(p.pools)-1 {
-		return nil
-	}
-	return p.pools[idx]
+  idx := int(math.Floor(math.Log2(float64(size) / float64(p.minSize))))
+  if idx < 0 {
+    idx = 0
+  }
+  if idx > len(p.pools)-1 {
+    return nil
+  }
+  return p.pools[idx]
 }
 
 func (p *LimitedPool) Get(size int) *[]byte {
-	sp := p.findPool(size)
-	if sp == nil {
-		data := make([]byte, size)
-		return &data
-	}
-	buf := sp.pool.Get().(*[]byte)
-	*buf = (*buf)[:size]
-	return buf
+  sp := p.findPool(size)
+  if sp == nil {
+    data := make([]byte, size)
+    return &data
+  }
+  buf := sp.pool.Get().(*[]byte)
+  *buf = (*buf)[:size]
+  return buf
 }
 
 func (p *LimitedPool) Put(b *[]byte) {
-	sp := p.findPutPool(cap(*b))
-	if sp == nil {
-		return
-	}
-	*b = (*b)[:cap(*b)]
-	sp.pool.Put(b)
+  sp := p.findPutPool(cap(*b))
+  if sp == nil {
+    return
+  }
+  *b = (*b)[:cap(*b)]
+  sp.pool.Put(b)
 }
 
 ```

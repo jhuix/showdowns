@@ -307,7 +307,7 @@ function showdownDirective() {
 
           // Support rST style (https://docutils.sourceforge.io/docs/ref/rst/directives.html#specific-admonitions),
           // Also support admonition style of mkdocs-material https://squidfunk.github.io/mkdocs-material/reference/admonitions
-          text = text.replace(/^(!!!|\?\?\?[\+]?) ((?:[^"\f\v\r\n]+[ \t]*)+)(?:"([^"\r\n]*)")?[ \t]*\n((?:(?:    |\t)[^\r\n]*(?:\n|$)|\n(?![\S]))*)/gm,
+          text = text.replace(/^(!!!|\?\?\?[\+]?) ((?:[^"\f\v\r\n\[\]\{\}]+[ \t]*)+)(?:"([^"\r\n]*)")?[ \t]*\n((?:(?:    |\t)[^\r\n]*(?:\n|$)|\n(?![\S]))*)/gm,
             function (wholeMatch, delim, name, title, content) {
               const container = {
                 classList: ['admonition'],
