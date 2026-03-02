@@ -236,6 +236,8 @@ Table header can be eliminated.
 
 [Inline Image](https://github.com/jhuix/showdowns/blob/master/docs/showdowns-features.md#inline-image)
 
+[Content Tabs](https://github.com/jhuix/showdowns/blob/master/docs/showdowns-features.md#content-tabs)
+
 [Table of Contents](https://github.com/jhuix/showdowns/blob/master/docs/showdowns-features.md#table-of-contents)
 
 [LaTeX math and AsciiMath](https://github.com/jhuix/showdowns/blob/master/docs/showdowns-features.md#latex-math-and-asciimath)
@@ -563,6 +565,7 @@ Default extensions is described below:
       'showdown-image': showdownImage(),
       'showdown-align': showdownAlign(),
       'showdown-footnotes': showdownFootnotes(),
+      'showdown-tabs': showdownTabs(),
       'showdown-directive': showdownDirective(),
       'showdown-sequence': showdownSequence()
     }
@@ -595,7 +598,9 @@ Default async extensions is described below:
       'showdown-echarts': showdownEcharts(),
       'showdown-gnuplot': showdownShiki(gnuplotOptions),
       'showdown-antv': showdownAntV(),
+      'showdown-zenuml': showdownZenuml(),
       'showdown-sequence': getExtension('showdown-sequence', showdownSequence),
+      'showdown-tabs': showdownAsyncTabs(),      
       'showdown-shiki': showdownShiki(shikiOptions),
       'showdow-css': showdownCss(),
     }
