@@ -317,7 +317,7 @@ function onRenderShiki(resolve, element, options) {
     const code = element.textContent.trim();
     const doc = element.ownerDocument;
     const lang = utils.parseAttribute(element.dataset.lang);
-    const theme = (lang?.theme) ? lang.theme : options.theme;
+    const theme = (lang?.theme) ? lang.theme : (language === 'markdown' || language === 'md') ? options.markdownTheme : options.theme;
     let themeName = theme;
     for (let i = 0; i < Shiki.bundledThemesInfo.length; i++) {
       if (Shiki.bundledThemesInfo[i].id === themeName) {
@@ -386,6 +386,7 @@ function renderBlockElements(elements, config) {
 
 const getConfig = (config = {}) => ({
   theme: 'ayu-dark',
+  markdownTheme: 'catppuccin-latte',
   ...config
 });
 

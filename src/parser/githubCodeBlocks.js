@@ -44,6 +44,7 @@ showdown.subParser('githubCodeBlocks', function (text, options, globals) {
       title = '';
     }
 
+    language = language || 'markdown';
     const dataLanguage = language ? ` data-language='${language}'` : '';
     language = language ? ` class="${language} language-${language}"` : '';
     langattr = langattr ? ` data-lang='${langattr}'` : '';

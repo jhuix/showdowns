@@ -1330,7 +1330,6 @@ Table content two
 
 ```
 
-
 #### Grouping code blocks
 
 Code blocks are one of the primary targets to be grouped, and can be considered
@@ -1550,18 +1549,38 @@ where:
 
 ### Code Block Theme
 
+Code blocks must be enclosed with two separate lines containing at least three  '\`\`\`' or '~~~'.
+
 #### Markdown Syntax
 
-##### 
+- Syntax
 
 ````
-  ```[js|c|c++|go...] {"theme": "ayu-dark"}
+  ```[js|c|c++|go...] {"theme": "ayu-dark"} title="<custom title>"
   <code content>
-  ```  
+  ``` 
+  OR
+
+  ~~~[js|c|c++|go...] {"theme": "ayu-dark"} title="<custom title>"
+  <code content>
+  ~~~ 
+
 ````
-##### Adding a title¶
+
+- Adding a title
 
 In order to provide additional context, a custom title can be added to a code block by using the title="<custom title>" option directly after the shortcode, e.g. to display the name of a file:
+
+```` title="Code block with title"
+
+  ``` py title="bubble_sort.py"
+  def bubble_sort(items):
+      for i in range(len(items)):
+          for j in range(len(items) - 1 - i):
+              if items[j] > items[j + 1]:
+                  items[j], items[j + 1] = items[j + 1], items[j]
+  ```
+````
 
 #### Code Block examples
 
@@ -1732,6 +1751,14 @@ It's implemented in showdown-mermaid.js, render diagrams of Flowchart or Sequenc
     <code content>
     ```
   ````
+
+* Support mermaid code of azure syntax
+
+  ````
+    :::mermaid 
+      mermaid syntax content
+    :::
+  ````  
 
 #### Mermaid examples
 
