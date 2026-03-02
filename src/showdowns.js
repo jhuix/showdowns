@@ -35,6 +35,7 @@ import showdownWavedrom from './extensions/showdown-wavedrom.js';
 import showdownFootnotes from './extensions/showdown-footnotes.js';
 import showdownFlowchart from './extensions/showdown-flowchart.js';
 import showdownDirective from './extensions/showdown-directive.js';
+import { showdownTabs, showdownAsyncTabs} from './extensions/showdown-tabs.js';
 import { showdownImage, showdownAsyncImage, imageResetEventName } from './extensions/showdown-image.js'
 
 import * as zlibcodec from './utils/zlib-codec.js';
@@ -109,6 +110,7 @@ const getAsyncExtensions = (options, extensions = {}) => {
     'showdown-kroki': showdownKroki(krokiOptions),
     'showdown-tex': showdownTex(texOptions),
     'showdown-gnuplot': showdownGnuplot(gnuplotOptions),
+    'showdown-tabs': showdownAsyncTabs(),
     ...extensions,
     'showdown-shiki': showdownShiki(shikiOptions),
     'showdow-css': showdownCss(),
@@ -130,6 +132,7 @@ const getExtensions = (options, extensions = {}) => {
     'showdown-image': showdownImage(),
     'showdown-align': showdownAlign(),
     'showdown-footnotes': showdownFootnotes(),
+    'showdown-tabs': showdownTabs(),
     'showdown-directive': showdownDirective(),
     'showdown-sequence': showdownSequence(),
     ...extensions,

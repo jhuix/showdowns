@@ -314,6 +314,10 @@ function onRenderShiki(resolve, element, options) {
       return;
     }
 
+    const code = element.textContent.trim();
+    const doc = element.ownerDocument;
+    const lang = utils.parseAttribute(element.dataset.lang);
+    const theme = (lang?.theme) ? lang.theme : options.theme;
     let themeName = theme;
     for (let i = 0; i < Shiki.bundledThemesInfo.length; i++) {
       if (Shiki.bundledThemesInfo[i].id === themeName) {
@@ -321,25 +325,33 @@ function onRenderShiki(resolve, element, options) {
         break;
       }
     }
-    const code = element.textContent.trim();
-    const doc = element.ownerDocument;
-    const lang = utils.parseAttribute(element.dataset.lang);
-    const theme = (lang?.theme) ? lang.theme : options.theme;
     Shiki.codeToHtml(code, { lang: language, theme: theme }).then((output) => {
-      const container = doc.createElement('div');
-      container.classList.add('codeblock-container');
+      let container = element.closest('.codeblock-container');
+      const tools = createCodeTools(doc, langName, themeName);
+      if (!container) {
+        container = doc.createElement('div');
+        container.dataset.theme = theme;
+        container.dataset.themeName = themeName;
+        container.dataset.language = language;
+        container.dataset.langName = langName;
+        container.appendChild(tools);
+        const temp = getTempDiv(doc);
+        temp.innerHTML = output;
+        const codeblock = temp.children[0];
+        codeblock.remove();
+        container.appendChild(codeblock);
+        element.parentNode.replaceWith(container);
+        return resolve(true);
+      }
       container.dataset.theme = theme;
       container.dataset.themeName = themeName;
       container.dataset.language = language;
       container.dataset.langName = langName;
-      const tools = createCodeTools(doc, langName, themeName);
+      const parent = element.parentNode;
+      parent.remove();
       container.appendChild(tools);
-      const temp = getTempDiv(doc);
-      temp.innerHTML = output;
-      const codeblock = temp.children[0];
-      codeblock.remove();
-      container.appendChild(codeblock);
-      element.parentNode.replaceWith(container);
+      container.appendChild(parent);
+      parent.outerHTML = output;
       resolve(true);
     }).catch((err) => {
       console.error('Shiki render failed:', err)

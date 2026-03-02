@@ -172,14 +172,6 @@
     line-height: inherit;
   }
 
-  code {
-    border-style: solid;
-    border-width: 1px;
-    font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, Courier, monospace;
-    font-weight: normal;
-    padding: 0.1em 0.25em;
-  }
-
   ul,
   ol,
   dl {
@@ -191,7 +183,7 @@
   }
 
   ul {
-    margin-left: 1.1em;
+    margin-left: 1.5em;
   }
 
   ul.no-bullet {
@@ -203,6 +195,10 @@
     margin-left: 1.25em;
     margin-bottom: 0;
     list-style: none;
+  }
+
+  ul li {
+    margin-bottom: 0.5em;
   }
 
   ul li ul,
@@ -237,7 +233,11 @@
   }
 
   ol {
-    margin-left: 1.4em;
+    margin-left: 1.5em;
+  }
+
+  ol li {
+    margin-bottom: 0.5em;
   }
 
   ol li ul,
@@ -294,7 +294,12 @@
     color: #555;
   }
 
-  pre {
+  code {
+    font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, Courier, monospace;
+    font-weight: normal;
+    background-color: #f5f5f5;
+    padding: 0.5em 0.5em;
+    display: block;
     /* css-3 */
     white-space: -moz-pre-wrap;
     /* Mozilla, since 1999 */
@@ -304,16 +309,16 @@
     white-space: pre-wrap;
     /* Opera 7 */
     word-wrap: break-word;
-    /* Internet Explorer 5.5+ */
+  }
+
+  pre {
+    display: flow-root;
     border: 1px solid #dfdfdf;
-    margin-bottom: 1.5em;
-    padding: 0.125em 0.3125em 0.0625em;
+    margin-bottom: 1em;
   }
 
   pre code {
     background-color: transparent;
-    border: 0;
-    padding: 0;
   }
 
   table {
@@ -425,6 +430,7 @@
 
   .asciimath:not(.diagram-center):not(.diagram-right),
   .katex:not(.diagram-center):not(.diagram-right) {
+
     .katex-display,
     .katex {
       text-align: unset;
@@ -433,6 +439,7 @@
 
   .asciimath.diagram-center,
   .katex.diagram-center {
+
     .katex-display,
     .katex {
       text-align: center;
@@ -441,9 +448,27 @@
 
   .asciimath.diagram-right,
   .katex.diagram-right {
+
     .katex-display,
     .katex {
       text-align: right;
+    }
+  }
+
+  .codeblock-container {
+    display: block;
+
+    .code-title {
+      display: flow-root;
+      padding: .5em .5em;
+      font-weight: bold;
+      background-color: #f5f5f5;
+      border-bottom: 1px solid #00000012;
+    }
+
+    pre {
+      border: 0;
+      background-color: #f5f5f5;
     }
   }
 }

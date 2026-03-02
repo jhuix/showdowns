@@ -27,7 +27,7 @@ showdown.subParser('githubCodeBlocks', function (text, options, globals) {
 
   text += '¨0';
 
-  const matchProcess = function (wholeMatch, delim, language, langattr, codeblock) {
+  const matchProcess = function (wholeMatch, delim, language, langattr, title, codeblock) {
     const _ = delim;
     var end = options.omitExtraWLInCodeBlocks ? '' : '\n';
 
@@ -37,15 +37,17 @@ showdown.subParser('githubCodeBlocks', function (text, options, globals) {
     codeblock = codeblock.replace(/^\n+/g, ''); // trim leading newlines
     codeblock = codeblock.replace(/\n+$/g, ''); // trim trailing whitespace
 
-    codeblock =
-      '<pre><code' +
-      (language ? ' class="' + language + ' language-' + language + '"' : '') +
-      (langattr ? ` data-lang='${langattr}'` : '') +
-      '>' +
-      codeblock +
-      end +
-      '</code></pre>';
+    if (title) {
+      title = showdown.subParser('spanGamut')(title, options, globals);
+      title = `<span class="code-title">${title}</span>`;
+    } else {
+      title = '';
+    }
 
+    const dataLanguage = language ? ` data-language='${language}'` : '';
+    language = language ? ` class="${language} language-${language}"` : '';
+    langattr = langattr ? ` data-lang='${langattr}'` : '';
+    codeblock = `<div class="codeblock-container"${dataLanguage}>${title}<pre><code${language}${langattr}>${codeblock}${end}</code></pre></div>`;
     codeblock = showdown.subParser('hashBlock')(codeblock, options, globals);
 
     // Since GHCodeblocks can be false positives, we need to
@@ -55,13 +57,13 @@ showdown.subParser('githubCodeBlocks', function (text, options, globals) {
   }
 
   text = text.replace(
-    /(?:^|\n)(?: {0,3})(```+|~~~+)(?: *)([^\s`~]*?)(?:[ \t]*?)((?:\{[\S\t ]*\}|\[[\S\t ]*\])?)\n([\s\S]*?)\n(?: {0,3})\1/g,
+    /(?:^|\n)(?: {0,3})(```+|~~~+)(?: *)([^\s`~]*?)(?:[ \t]*?)((?:\{[\S\t ]*\}|\[[\S\t ]*\])?)(?:title="([\S\t ]*)"[ \t]*)?\n([\s\S]*?)\n(?: {0,3})\1/g,
     matchProcess
   );
 
   // Support mermaid code of azure syntax
   text = text.replace(
-    /(?:^|\n)(?: {0,3})(:::+)(?: *)(mermaid)(?:[ \t]*?)((?:\{[\S\t ]*\}|\[[\S\t ]*\])?)\n([\s\S]*?)\n(?: {0,3})\1/g,
+    /(?:^|\n)(?: {0,3})(:::+)(?: *)(mermaid)(?:[ \t]*?)((?:\{[\S\t ]*\}|\[[\S\t ]*\])?)(?:title="([\S\t ]*)"[ \t]*)?\n([\s\S]*?)\n(?: {0,3})\1/g,
     matchProcess
   );
 

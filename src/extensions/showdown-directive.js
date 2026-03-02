@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2020-present, Jhuix (Hui Jin) <jhuix0117@gmail.com>. All rights reserved.
  * Use of this source code is governed by a MIT license that can be found in the LICENSE file.
- * Description: showdown container extension for markdown
+ * Description: showdown directive extension for markdown
  * https://talk.commonmark.org/t/generic-directives-plugins-syntax/444
  * https://github.com/micromark/micromark-extension-directive#syntax
  */
