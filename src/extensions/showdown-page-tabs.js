@@ -117,12 +117,12 @@ function observeraPageTabsClick() {
     const target = event.target;
     const navLink = target.closest('a.nav-link');
     if (navLink) {
-      event.stopImmediatePropagation();
-      event.preventDefault();
       const navItem = target.closest('.nav-item');
       const pageSidebar = target.closest('.page-sidebar');
       const navPage = target.closest('.page-navigation');
       if (!navItem || !pageSidebar || !navPage) return;
+      event.stopImmediatePropagation();
+      event.preventDefault();
       const navItems = pageSidebar.querySelectorAll('.nav-item');
       navItems.forEach((item) => {
         item.classList.remove('nav-item-active');
