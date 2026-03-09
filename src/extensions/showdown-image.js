@@ -16,9 +16,30 @@ function showdownImage() {
       type: 'listener',
       listeners: {
         'images.after': (_, text) =>
-          text.replace(/!\[\[([^\[\]]*)\]\](?:\{([^\{\}]*)\})?/gm, (_, filepath, attrs) => {
-            if (!attrs) attrs = '';
-            return `<img class="inline-image" data-src="${filepath}" ${attrs}/>`;
+          text.replace(/!\[\[([^\f\v\r\n\[\]]*)\]\](?:\{([^\f\v\r\n\{\}]*)\})?/gm, (_, filepath, attrs) => {
+            if (attrs) {
+              attrs = attrs.trim();
+              if (attrs) {
+                let id = '';
+                let classes = [];
+                const attrMatchs = attrs.match(/^(?:(?:#([-\w]+))?((?:\.[-\w]+)*))?[ \t]*([\S\t ]*)/);
+                if (attrMatchs) {
+                  const names = Array.from(attrMatchs);
+                  if (names) {
+                    attrs = names[3] || '';
+                    id = names[1] || '';
+                    classes = names[2] ? names[2].split('.').filter((n) => { return n.trim(); }) : [];
+                    if (id) {
+                      id = `id="${id}" `;
+                    }
+                  }
+                }
+                classes.unshift('inline-image');
+                return `<img ${id}class="${classes.join(' ')}" data-src="${filepath}" ${attrs}/>`;
+              };
+            }
+
+            return `<img class="inline-image" data-src="${filepath}" />`;
           })
       }
     }

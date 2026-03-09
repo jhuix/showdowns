@@ -7,12 +7,13 @@
  */
 'use strict';
 
-import showdown from 'showdown';
 import i18n from './i18n';
+import showdown from 'showdown';
 import EventBus from '../utils/event-bus';
 
-const leafDirectiveEventName = 'leafDirective';
-const textDirectiveEventName = 'textDirective';
+export const leafDirectiveEventName = 'leafDirective';
+export const textDirectiveEventName = 'textDirective';
+export const embedDirectiveEventName = 'embedDirective';
 
 const admonTypes = [
   // "default", "note",  //rgba(68,138,255,.1)
@@ -28,15 +29,6 @@ const admonTypes = [
   "quote", "cite",   //rgba(158, 158, 158, .1)
   "important", "key", //rgba(230, 32, 196, .1)
 ];
-
-function splitAndStripQuotes(str) {
-  return str.match(/(?:[^\s"']+|"[^"]*"|'[^']*')+/g).map((token) => {
-    if ((token.startsWith('"') && token.endsWith('"')) || (token.startsWith("'") && token.endsWith("'"))) {
-      return token.slice(1, -1);
-    }
-    return token;
-  });
-}
 
 function parseContainerStyle(name) {
   switch (name) {
@@ -136,6 +128,16 @@ function parseContainerStyle(name) {
     default:
       return name;
   }
+}
+
+
+function splitAndStripQuotes(str) {
+  return str.match(/(?:[^\s"']+|"[^"]*"|'[^']*')+/g).map((token) => {
+    if ((token.startsWith('"') && token.endsWith('"')) || (token.startsWith("'") && token.endsWith("'"))) {
+      return token.slice(1, -1);
+    }
+    return token;
+  });
 }
 
 /** Parse attribute string to object
@@ -239,7 +241,84 @@ function attributeToString(attribute) {
 
 const detailsStrings = ['details', '详情', 'details+', '详情+', 'details-', '详情-'];
 
-function showdownDirective() {
+showdown.subParser('textDirective', function (text, options, globals) {
+  'use strict';
+
+  text = globals.converter._dispatch('textdirective.before', text, options, globals);
+
+  // embed text directive
+  text = text.replace(
+    /(?<!:):([-\w]+)\[([^\f\v\r\n]*)\](?:\{([^\f\v\r\n]*)\})?\!\!/g,
+    function (wholeMatch, name, content, attribute) {
+      const directive = {};
+      parseAttribute(attribute, directive);
+      let id = '';
+      let attrs = '';
+      if (directive.id) {
+        id = ` id="${directive.id}"`;
+      }
+      if (directive.attribute) {
+        attrs = attributeToString(directive.attribute);
+      }
+      let className = '';
+      if (directive.classList) {
+        className = ` class="${directive.classList.join(' ')}"`;
+      }
+      if (content) {
+        content = showdown.subParser('spanGamut')(content, options, globals);
+      } else {
+        content = '';
+      }
+
+      const callback = (code) => {
+        content = code;
+      };
+      if (!EventBus.emit(embedDirectiveEventName, name, content, directive, callback)) {
+        content = `<${name}${id}${className}${attrs}>${content}</${name}>`;
+      }
+      return showdown.subParser('hashBlock')(content, options, globals);
+    },
+  );
+
+
+  // text directive
+  text = text.replace(
+    /(?<!:):([-\w]+)\[([^\f\v\r\n\[\]]*)\](?:\{([^\f\v\r\n\{\}]*)\})?(?!\{|\!\!)/g,
+    function (wholeMatch, name, content, attribute) {
+      const directive = {};
+      parseAttribute(attribute, directive);
+      let id = '';
+      let attrs = '';
+      if (directive.id) {
+        id = ` id="${directive.id}"`;
+      }
+      if (directive.attribute) {
+        attrs = attributeToString(directive.attribute);
+      }
+      let className = '';
+      if (directive.classList) {
+        className = ` class="${directive.classList.join(' ')}"`;
+      }
+      if (content) {
+        content = showdown.subParser('spanGamut')(content, options, globals);
+      } else {
+        content = '';
+      }
+
+      const callback = (code) => {
+        content = code;
+      };
+      if (!EventBus.emit(textDirectiveEventName, name, content, directive, callback)) {
+        content = `<${name}${id}${className}${attrs}>${content}</${name}>`;
+      }
+      return showdown.subParser('hashBlock')(content, options, globals);
+    },
+  );
+
+  return globals.converter._dispatch('textdirective.after', text, options, globals);
+});
+
+export function showdownDirective() {
   return [
     {
       type: 'listener',
@@ -305,7 +384,7 @@ function showdownDirective() {
           );
 
 
-          // Support rST style (https://docutils.sourceforge.io/docs/ref/rst/directives.html#specific-admonitions),
+          // Support rST style (https://docsourceforge.io/docs/ref/rst/directives.html#specific-admonitions),
           // Also support admonition style of mkdocs-material https://squidfunk.github.io/mkdocs-material/reference/admonitions
           text = text.replace(/^(!!!|\?\?\?[\+]?) ((?:[^"\f\v\r\n\[\]\{\}]+[ \t]*)+)(?:"([^"\r\n]*)")?[ \t]*\n((?:(?:    |\t)[^\r\n]*(?:\n|$)|\n(?![\S]))*)/gm,
             function (wholeMatch, delim, name, title, content) {
@@ -542,7 +621,7 @@ function showdownDirective() {
 
           // leaf directive
           text = text.replace(
-            /^ {0,3}(?<!:)::[ \t]*([^\f\v\r\n\[\]\{\}]+)[ \t]*(?:\[([^\[\]]*)\])?[ \t]*(?:\{([^\{\}]*)\})?[ \t]*(?:¨0)?$/gm,
+            /^ {0,3}(?<!:)::[ \t]*([^\f\v\r\n\[\]\{\}]+)[ \t]*(?:\[([^\[\]]*)\])?[ \t]*(?:\{([^\{\}]*)\})?[ \t]*$/gm,
             function (wholeMatch, name, title, attribute) {
               const directive = {};
               parseAttribute(attribute, directive);
@@ -616,39 +695,7 @@ function showdownDirective() {
             },
           );
 
-          // text directive
-          text = text.replace(
-            /(?<!:):([-\w]+)\[([^\[\]]*)\](?:\{([^\{\}]*)\})?/g,
-            function (wholeMatch, name, content, attribute) {
-              const directive = {};
-              parseAttribute(attribute, directive);
-              let id = '';
-              let attrs = '';
-              if (directive.id) {
-                id = `id="${directive.id}"`;
-              }
-              if (directive.attribute) {
-                attrs = attributeToString(directive.attribute);
-              }
-              let className = '';
-              if (directive.classList) {
-                className = ` class="${directive.classList.join(' ')}"`;
-              }
-              if (content) {
-                content = showdown.subParser('spanGamut')(content, options, globals);
-              } else {
-                content = '';
-              }
-
-              const callback = (code) => {
-                content = code;
-              };
-              if (!EventBus.emit(textDirectiveEventName, name, content, directive, callback)) {
-                content = `<${name} ${id}${className}${attrs}>${content}</${name}>`;
-              }
-              return showdown.subParser('hashBlock')(content, options, globals);
-            },
-          );
+          text = showdown.subParser('textDirective')(text, options, globals);
 
           // attacklab: strip sentinel
           text = text.replace(/¨0/, '');
@@ -656,6 +703,14 @@ function showdownDirective() {
           return converter._dispatch('directive.after', text, options, globals);
         },
       },
+    },
+    {
+      type: 'listener',
+      listeners: {
+        'spanGamut.before': (_, text, converter, options, globals) => {
+          return showdown.subParser('textDirective')(text, options, globals);
+        }
+      }
     },
   ];
 }

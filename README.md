@@ -565,7 +565,7 @@ Default extensions is described below:
       'showdown-image': showdownImage(),
       'showdown-align': showdownAlign(),
       'showdown-footnotes': showdownFootnotes(),
-      'showdown-tabs': showdownTabs(),
+      'showdown-content-tabs': showdownContentTabs(),
       'showdown-directive': showdownDirective(),
       'showdown-sequence': showdownSequence()
     }
@@ -600,7 +600,7 @@ Default async extensions is described below:
       'showdown-antv': showdownAntV(),
       'showdown-zenuml': showdownZenuml(),
       'showdown-sequence': getExtension('showdown-sequence', showdownSequence),
-      'showdown-tabs': showdownAsyncTabs(),      
+      'showdown-content-tabs': showdownAsyncContentTabs(),      
       'showdown-shiki': showdownShiki(shikiOptions),
       'showdow-css': showdownCss(),
     }

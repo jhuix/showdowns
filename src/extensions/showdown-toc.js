@@ -118,6 +118,8 @@ function renderTocElements(wrapper, config) {
   let result = false;
   let firstHeadOne = false;
   let totalToc = null;
+  config.extras = [];
+  config.symbols = [];
 
   const test = (config.toc instanceof RegExp) ? config.toc : new RegExp(`^(${config.toc})$`, 'i');
 
@@ -261,9 +263,6 @@ function renderTocElements(wrapper, config) {
       config.symbols = svgSymbols;
     }
     if (totalToc) {
-      if (!config.extras) {
-        config.extras = [];
-      }
       config.extras.push(totalToc.outerHTML);
     }
   }
@@ -284,9 +283,6 @@ function renderTocElements(wrapper, config) {
 function loadTocEvent() {
   const totalToc = document.querySelector('#total-showdown-toc');
   if (!totalToc) return;
-
-  // if (totalShowdownToc.parentNode)
-  //   totalShowdownToc.parentNode.classList.add('main-toc-row');
 
   const tocFoldIcon = document.querySelector('#toc-fold-icon');
   if (tocFoldIcon) {
@@ -411,9 +407,11 @@ function showdownToc(options) {
         this.config.extras.forEach((doc) => {
           utils.addExtra(obj, doc);
         });
+        delete this.config.extras;
         if (this.config.symbols?.length > 0) {
           obj.symbols.push(...this.config.symbols);
-        }
+          delete this.config.symbols;
+        };
         // 附加动态脚本
         const script = {
           inner: [

@@ -28,7 +28,8 @@
   h4,
   h5,
   h6,
-  div.paragraph {
+  div,
+  header {
     &.align-right {
       text-align: right;
     }
@@ -195,10 +196,6 @@
     margin-left: 1.25em;
     margin-bottom: 0;
     list-style: none;
-  }
-
-  ul li {
-    margin-bottom: 0.5em;
   }
 
   ul li ul,
@@ -383,13 +380,125 @@
     border: 1px solid #d6d6d6;
   }
 
-  .plantuml,
-  .mermaid,
-  .flow,
-  .flowchart,
-  .sequence,
-  .wavedrom {
-    background-color: #f9f9f9;
+  .title1,
+  .title2,
+  .title3,
+  .title4,
+  .title5,
+  .title6 {
+    font-style: normal;
+    font-weight: bold;
+    line-height: 1.25;
+    text-rendering: optimizeLegibility;
+  }
+
+  .title1 {
+    font-size: 2rem;
+
+    .inline-image {
+      width: 2.5rem;
+      height: 2.5rem;
+      vertical-align: middle;
+    }
+  }
+
+  .title2 {
+    font-size: 1.5rem;
+
+    .inline-image {
+      width: 1.5rem;
+      height: 1.5rem;
+      vertical-align: middle;
+    }
+  }
+
+  .title3 {
+    font-size: 1.375rem;
+
+    .inline-image {
+      width: 1.375rem;
+      height: 1.375rem;
+      vertical-align: middle;
+    }
+  }
+
+  .title4 {
+    font-size: 1.25rem;
+
+    .inline-image {
+      width: 1.25rem;
+      height: 1.25rem;
+      vertical-align: middle;
+    }
+  }
+
+  .title5 {
+    font-size: 1.125rem;
+
+    .inline-image {
+      width: 1.125rem;
+      height: 1.125rem;
+      vertical-align: middle;
+    }
+  }
+
+  .title6 {
+    font-size: 1rem;
+
+    .inline-image {
+      width: 1rem;
+      height: 1rem;
+      vertical-align: middle;
+    }
+  }
+
+  .title1 small,
+  .title2 small,
+  .title3 small,
+  .title4 small,
+  .title5 small,
+  .title6 small {
+    font-size: 60%;
+    line-height: 0;
+  }
+
+  .sticky-top {
+    top: 0;
+    position: sticky;
+  }
+
+  header {
+    background-color: #4051b5;
+    box-shadow: rgba(0, 0, 0, 0) 0px 0px 0.2rem, rgba(0, 0, 0, 0) 0px 0.2rem 0.4rem;
+    color: #fff;
+    display: block;
+    position: sticky;
+    left: 0px;
+    right: 0px;
+    top: 0px;
+    z-index: 4;
+    padding: .5rem 1rem;
+    margin-left: -1rem;
+    margin-right: -1rem;
+
+    &.header-shadow {
+      box-shadow: rgba(0, 0, 0, 0.1) 0px 0px 0.2rem, rgba(0, 0, 0, 0.2) 0px 0.2rem 0.4rem;
+      transition: transform 0.25s cubic-bezier(0.1, 0.7, 0.1, 1), box-shadow 0.25s;
+    }
+
+    img {
+      margin-left: .5rem;
+      margin-right: .5rem;
+    }
+
+    a {
+      color: #fff;
+      vertical-align: middle;
+    }
+
+    a:hover {
+      text-decoration: none;
+    }
   }
 
   .diagram-left:not(.asciimath):not(.katex):not(.mermaid):not(.abc) {

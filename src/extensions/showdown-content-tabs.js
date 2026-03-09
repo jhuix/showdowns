@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-present, Jhuix (Hui Jin) <jhuix0117@gmail.com>. All rights reserved.
+ * Copyright (c) 2025-present, Jhuix (Hui Jin) <jhuix0117@gmail.com>. All rights reserved.
  * Use of this source code is governed by a MIT license that can be found in the LICENSE file.
  * Description: showdown content-tabs extension for markdown
  * https://squidfunk.github.io/mkdocs-material/reference/content-tabs
@@ -11,7 +11,7 @@ import utils from './utils';
 
 let hasTabs = false;
 
-export function showdownTabs() {
+export function showdownContentTabs() {
   return [
     {
       type: 'listener',
@@ -21,36 +21,6 @@ export function showdownTabs() {
           text += '¨0';
 
           // Support content-tabs of mkdocs-material https://squidfunk.github.io/mkdocs-material/reference/content-tabs
-          /**
-<div class="tabbed-set tabbed-alternate" data-tabs="4:2" style="--md-indicator-x: 0px; --md-indicator-width: 113px;">
-  <input checked="checked" id="grouping-other-content-unordered-list" name="__tabbed_4" type="radio"/>
-  <input id="grouping-other-content-ordered-list" name="__tabbed_4" type="radio"/>
-  <div class="tabbed-labels tabbed-labels--linked">
-    <label for="grouping-other-content-unordered-list">
-      Unordered list
-    </label>
-    <label for="grouping-other-content-ordered-list">
-      Ordered list
-    </label>
-  </div>
-  <div class="tabbed-content">
-    <div class="tabbed-block">
-      <ul>
-        <li>Sed sagittis eleifend rutrum</li>
-        <li>Donec vitae suscipit est</li>
-        <li>Nulla tempor lobortis orci</li>
-      </ul>
-    </div>
-    <div class="tabbed-block">
-      <ol>
-        <li>Sed sagittis eleifend rutrum</li>
-        <li>Donec vitae suscipit est</li>
-        <li>Nulla tempor lobortis orci</li>
-      </ol>
-    </div>
-  </div>
-</div>
-           */
           text = text.replace(/^=== (?:(?:[^"\f\v\r\n\{\}\[\]]+[ \t]*)*)"(?:[^"\r\n]+)"[ \t]*(?:(?:\n(?:    |\t)[^\r\n]*$|\n=== (?:(?:[^"\f\v\r\n\{\}\[\]]+[ \t]*)*)"(?:[^"\r\n]+)"[ \t]*$|\n$|\n(?![^ \t\r\n]))*)/gm,
             function (wholeMatch) {
               const wholeMatchs = wholeMatch.matchAll(/^=== ((?:[^"\f\v\r\n\{\}\[\]]+[ \t]*)*)"([^"\r\n]+)"[ \t]*((?:\n(?:    |\t)[^\r\n]*$|\n$|\n(?![^ \t\r\n]))*)/gm);
@@ -132,7 +102,7 @@ function observerTabsClick() {
   });
 }
 
-export function showdownAsyncTabs() {
+export function showdownAsyncContentTabs() {
   return [
     {
       type: 'output',
@@ -143,7 +113,7 @@ export function showdownAsyncTabs() {
         }
 
         const script = {
-          id: 'showdown-tabs',
+          id: 'showdown-content-tabs',
           code: observerTabsClick
         };
         obj.scripts.push(script);
@@ -154,4 +124,4 @@ export function showdownAsyncTabs() {
 }
 
 
-export default showdownTabs;
+export default showdownContentTabs;

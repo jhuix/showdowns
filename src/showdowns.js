@@ -24,7 +24,7 @@ import showdownKroki from './extensions/showdown-kroki.js';
 import showdownShiki from './extensions/showdown-shiki.js';
 import showdownZenuml from './extensions/showdown-zenuml.js';
 import showdownPlotly from './extensions/showdowns-plotly.js';
-import showdownGnuplot from './extensions/showdonw-gnuplot.js';
+import showdownGnuplot from './extensions/showdown-gnuplot.js';
 import showdownMathJax from './extensions/showdown-mathjax.js';
 import showdownEcharts from './extensions/showdown-echarts.js';
 import showdownMermaid from './extensions/showdown-mermaid.js';
@@ -34,8 +34,9 @@ import showdownSequence from './extensions/showdown-sequence.js';
 import showdownWavedrom from './extensions/showdown-wavedrom.js';
 import showdownFootnotes from './extensions/showdown-footnotes.js';
 import showdownFlowchart from './extensions/showdown-flowchart.js';
-import showdownDirective from './extensions/showdown-directive.js';
-import { showdownTabs, showdownAsyncTabs} from './extensions/showdown-tabs.js';
+import { showdownDirective, leafDirectiveEventName, textDirectiveEventName, embedDirectiveEventName } from './extensions/showdown-directive.js';
+import { showdownContentTabs, showdownAsyncContentTabs} from './extensions/showdown-content-tabs.js';
+import { showdownPageTabs, showdownAsyncPageTabs} from './extensions/showdown-page-tabs.js';
 import { showdownImage, showdownAsyncImage, imageResetEventName } from './extensions/showdown-image.js'
 
 import * as zlibcodec from './utils/zlib-codec.js';
@@ -46,6 +47,10 @@ import EventBus from './utils/event-bus.js';
 
 const events = {};
 events[imageResetEventName] = imageResetEventName;
+events[leafDirectiveEventName] = leafDirectiveEventName;
+events[textDirectiveEventName] = textDirectiveEventName;
+events[embedDirectiveEventName] = embedDirectiveEventName;
+
 
 //////////////////////////////////////////////////////////////////////
 const getOptions = (options = {}) => {
@@ -110,7 +115,8 @@ const getAsyncExtensions = (options, extensions = {}) => {
     'showdown-kroki': showdownKroki(krokiOptions),
     'showdown-tex': showdownTex(texOptions),
     'showdown-gnuplot': showdownGnuplot(gnuplotOptions),
-    'showdown-tabs': showdownAsyncTabs(),
+    'showdown-content-tabs': showdownAsyncContentTabs(),
+    'showdown-page-tabs': showdownAsyncPageTabs(),
     ...extensions,
     'showdown-shiki': showdownShiki(shikiOptions),
     'showdow-css': showdownCss(),
@@ -132,7 +138,8 @@ const getExtensions = (options, extensions = {}) => {
     'showdown-image': showdownImage(),
     'showdown-align': showdownAlign(),
     'showdown-footnotes': showdownFootnotes(),
-    'showdown-tabs': showdownTabs(),
+    'showdown-content-tabs': showdownContentTabs(),
+    'showdown-page-tabs': showdownPageTabs(),
     'showdown-directive': showdownDirective(),
     'showdown-sequence': showdownSequence(),
     ...extensions,
@@ -696,6 +703,7 @@ const showdowns = {
           };
           content += extras[i];
         }
+
       }
       return { html: content, scripts: obj.scripts, cssLinks: obj.cssLinks };
     });
