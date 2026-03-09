@@ -1,3 +1,7 @@
+# [[TOC]]
+
+# Showdown's Markdown syntax
+
 ## Table of contents
 
 - [Introduction](#introduction)
