@@ -32,12 +32,12 @@ import showdownPlantuml from './extensions/showdown-plantuml.js';
 import showdownRailroad from './extensions/showdown-railroad.js';
 import showdownSequence from './extensions/showdown-sequence.js';
 import showdownWavedrom from './extensions/showdown-wavedrom.js';
-import showdownFootnotes from './extensions/showdown-footnotes.js';
 import showdownFlowchart from './extensions/showdown-flowchart.js';
 import { showdownDirective, leafDirectiveEventName, textDirectiveEventName, embedDirectiveEventName } from './extensions/showdown-directive.js';
 import { showdownContentTabs, showdownAsyncContentTabs} from './extensions/showdown-content-tabs.js';
 import { showdownPageTabs, showdownAsyncPageTabs} from './extensions/showdown-page-tabs.js';
 import { showdownImage, showdownAsyncImage, imageResetEventName } from './extensions/showdown-image.js'
+import { showdownFootnotes, showdownAyncFootnotes } from './extensions/showdown-footnotes.js';
 
 import * as zlibcodec from './utils/zlib-codec.js';
 import cdnjs from './extensions/cdn';
@@ -96,6 +96,7 @@ const getAsyncExtensions = (options, extensions = {}) => {
 
   const asyncExtensions = {
     'showdown-toc': getExtension('showdown-toc', showdownToc),
+    'showdown-footnotes': showdownAyncFootnotes(),
     'showdown-image': showdownAsyncImage(),
     'showdown-mermaid': showdownMermaid(mermaidOptions),
     'showdown-mathjax': showdownMathJax(mathjaxOptions),

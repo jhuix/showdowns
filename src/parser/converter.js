@@ -6,7 +6,7 @@
 
 import showdown from 'showdown';
 
-showdown.ConverterExtObj = function(flavor, asyncExtensions) {
+showdown.ConverterExtObj = function (flavor, asyncExtensions) {
   'use strict';
 
   let outputAsyncModifiers = [],
@@ -65,12 +65,12 @@ showdown.ConverterExtObj = function(flavor, asyncExtensions) {
     }
   }
 
-  this.addAsyncExtension = function(extension, name) {
+  this.addAsyncExtension = function (extension, name) {
     name = name || null;
     _parseAsyncExtension(extension, name);
   };
 
-  this.removeAsyncExtension = function(extension) {
+  this.removeAsyncExtension = function (extension) {
     if (!showdown.helper.isArray(extension)) {
       extension = [extension];
     }
@@ -84,7 +84,7 @@ showdown.ConverterExtObj = function(flavor, asyncExtensions) {
     }
   };
 
-  this.getAsyncExtensions = function() {
+  this.getAsyncExtensions = function () {
     return outputAsyncModifiers;
   };
 
@@ -92,7 +92,7 @@ showdown.ConverterExtObj = function(flavor, asyncExtensions) {
    * Get the currently flavor name of this converter
    * @returns {string}
    */
-  this.getCurrFlavor = function() {
+  this.getCurrFlavor = function () {
     return currConvFlavor;
   };
 
@@ -100,15 +100,15 @@ showdown.ConverterExtObj = function(flavor, asyncExtensions) {
    * Set the currently flavor name of this converter
    * @param {string} flavor name
    */
-  this.setCurrFlavor = function(name) {
+  this.setCurrFlavor = function (name) {
     currConvFlavor = name;
   };
 };
 
-showdown.Converter.prototype.initConvertExtObj = function(flavor, asyncExtensions) {
+showdown.Converter.prototype.initConvertExtObj = function (flavor, asyncExtensions) {
   this.extObj = new showdown.ConverterExtObj(flavor, asyncExtensions);
 
-  this.resetOptions = function(converterOptions) {
+  this.resetOptions = function (converterOptions) {
     converterOptions = converterOptions || {};
 
     const globalOptions = showdown.getOptions();
@@ -133,7 +133,7 @@ showdown.Converter.prototype.initConvertExtObj = function(flavor, asyncExtension
    * Set the flavor THIS converter should use
    * @param {string} name
    */
-  this.setFlavor = function(name) {
+  this.setFlavor = function (name) {
     let preset = showdown.getFlavorOptions(name);
     if (showdown.helper.isUndefined(preset)) return;
     this.extObj.setCurrFlavor(name);
@@ -154,21 +154,21 @@ showdown.Converter.prototype.initConvertExtObj = function(flavor, asyncExtension
    * Get the currently set flavor of this converter
    * @returns {string}
    */
-  this.getFlavor = function() {
+  this.getFlavor = function () {
     return this.extObj.getCurrFlavor();
   };
 
-  this.addAsyncExtension = function(extension, name) {
+  this.addAsyncExtension = function (extension, name) {
     this.extObj.addAsyncExtension(extension, name);
   };
 
-  this.removeAsyncExtension = function(extension) {
+  this.removeAsyncExtension = function (extension) {
     this.extObj.removeAsyncExtension(extension);
   };
 
   // Because removeExtension function of converter has bug in showdown.js,
   // it needs to be overrode.
-  this.removeExtension = function(extension) {
+  this.removeExtension = function (extension) {
     if (!showdown.helper.isArray(extension)) {
       extension = [extension];
     }
@@ -195,11 +195,11 @@ showdown.Converter.prototype.initConvertExtObj = function(flavor, asyncExtension
    * @param {string} text
    * @returns {*}
    */
-  this.asyncMakeHtml = function(text, callback) {
+  this.asyncMakeHtml = function (text, callback) {
     const content = `<div class='showdowns'>${this.makeHtml(text)}</div>`;
     const outputs = this.extObj.getAsyncExtensions();
     if (!outputs.length) {
-      return Promise.resolve({html: content});
+      return Promise.resolve({ html: content });
     }
 
     var globals = {
@@ -214,11 +214,12 @@ showdown.Converter.prototype.initConvertExtObj = function(flavor, asyncExtension
     const options = this.getOptions();
     let scripts = [];
     let cssLinks = [];
+    let inners = [];
     let extras = [];
     let symbols = [];
-    let result = Promise.resolve({ wrapper, options, globals, scripts, extras, symbols, cssLinks });
+    let result = Promise.resolve({ wrapper, options, globals, scripts, inners, extras, symbols, cssLinks });
     //forEach写法
-    outputs.forEach(function(ext) {
+    outputs.forEach(function (ext) {
       result = result.then(obj => {
         const filter = ext.filter(obj);
         return filter ? filter : obj;
@@ -228,6 +229,20 @@ showdown.Converter.prototype.initConvertExtObj = function(flavor, asyncExtension
       if (obj.symbols.length > 0) {
         const globalSymbols = `<div id="global-showdowns-svgs" class="none hidden"><svg xmlns="http://www.w3.org/2000/svg">${obj.symbols.join('')}</svg></div>`;
         obj.extras.unshift(globalSymbols);
+      }
+      if (obj.inners.length > 0) {
+        const div = document.createElement('div');
+        obj.inners.forEach(inner => {
+          if (typeof inner !== 'string') {
+            wrapper.appendChild(inner);
+          } else {
+            div.innerHTML = inner;
+            div.childNodes.forEach(node => {
+              wrapper.appendChild(node);
+            });
+            div.replaceChildren();
+          }
+        });
       }
       if (typeof callback === 'function' && callback) {
         const promise = callback(obj);
