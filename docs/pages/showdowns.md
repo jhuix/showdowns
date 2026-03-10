@@ -17,6 +17,7 @@
       * **The common "codeblock" field value of json is "true" or "false" in syntax language attribute, and it is empty means "false". It is "true" means the codeblock is forced to display as normal code block, otherwise the codeblock is tried to parse as corresponding diagrams.**
 
 --- [.page-icons.icon-info Markdown syntax](../Showdown's-Markdown-syntax.md)
+--- [.page-icons.icon-pages Page Tabs](../pages/page-tabs.md)
 --- [.page-icons.icon-admontions Directives](../pages/directives.md)
 --- [.page-icons.icon-contenttabs Content Tabs](../pages/content-tabs.md)
 --- [.page-icons.icon-toc Table Of Content](../pages/toc.md)
