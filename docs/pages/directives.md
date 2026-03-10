@@ -1013,13 +1013,15 @@ And you can also customize the type that can be triggered by event `leafDirectiv
 
 ## Text Directives
 
-The syntax for text directives, it is also an inline directives:
+- Common text directive
+
+The syntax for common text directives, it is also an inline directives:
 
 ```
-:name[content]{#id.x.y attributes(key=val)}
+:name[content without `\f\v\r\n\[\]`]{#id.x.y attributes(key=val)}
 ```
 
-Exactly one colon, followed by the name which is the identifier for the extension and must be a string without spaces, content may be further inline markdown elements to be interpreted and then printed in one way or another and the {#myId.myClass key=val key2="val 2"} contain generic attributes (i.e. key-value pairs) and are optional.
+Exactly one colon, followed by the name which is the identifier for the extension and must be a string without spaces, content without `\f\v\r\n\[\]` char may be further inline markdown elements to be interpreted and then printed in one way or another and the {#myId.myClass key=val key2="val 2"} contain generic attributes (i.e. key-value pairs) and are optional.
 
 Rendered by default as:
 
@@ -1027,4 +1029,27 @@ Rendered by default as:
 <name id="id" class="x y" key=val>content</name>
 ```
 
+```markdown title="Content without '\f\v\r\n\[\]'"
+:div[*This is a common text directive*]{#hello-1 style="font-size: 2rem;font-height: bold;"}
+```
+:div[*This is a common text directive*]{#hello-1 style="font-size: 2rem;font-height: bold;"}
+
 And you can also customize the type that can be triggered by event `textDirective` to customize and reset default HTML code.
+
+- Embed text directive
+
+The syntax for embed text directives, it is also an inline and embed directives:
+
+```
+:name[content without '\f\v\r\n']{#id.x.y attributes(key=val)}!!
+```
+
+Exactly one colon, followed by the name which is the identifier for the extension and must be a string without spaces, content without `\f\v\r\n` char may be further inline markdown elements to be interpreted and then printed in one way or another and the {#myId.myClass key=val key2="val 2"} contain generic attributes (i.e. key-value pairs) and are optional, finally use two `!!` end.
+
+And you can also customize the type that can be triggered by event `embedDirective` to customize and reset default HTML code.
+
+```markdown title="Content without '\f\v\r\n'"
+:header[![[../logo.png]][Showdowns Features](https://jhuix.github.io/showdowns)]{.doc-title.align-center.header-shadow.title3}!!
+```
+
+:header[![[../logo.png]][Showdowns Features](https://jhuix.github.io/showdowns)]{.doc-title.align-center.header-shadow.title3}!!
