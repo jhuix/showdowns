@@ -3,18 +3,39 @@
 --- :a[Reference]{.nav-link href="."}
 
     <br/>![Showdowns](../logo.png)
-    
-    [Showdowns](https://github.com/jhuix/showdowns) is a lib that make markdown to html with some extensions of showdown.js.Click the link to preview the [showdowns features](https://jhuix.github.io/showdowns).
+   
+    [Showdowns](https://github.com/jhuix/showdowns) is a lib that make markdown to html with some extensions of showdown.js.
 
-    Showdowns Markdown Syntax, refer to the document -- [Showdown's Markdown Syntax](https://github.com/showdownjs/showdown/wiki/Showdown's-Markdown-syntax).
+    :::attention[Please pay more attention to us]
+    If you think the showdowns library can help you or also hope to encourage the author, click on the top right corner to give me a [Star](https://github.com/jhuix/showdowns)⭐️.
+    :::
 
-    * **In browser environment, it is implemented to dynamically load js lib files related to more showdown diagrams extension for using [showdowns >= 0.3.0 version](https://github.com/jhuix/showdowns).**
+    Showdowns Markdown Syntax, refer to the document -- [Showdowns Features](https://jhuix.github.io/showdowns).
 
-    * **In codeblock of markdown, expanded syntax language attribute from "\`\`\`language" to "\`\`\`language {json}" or "\`\`\`language \[json]".**
+    The showdowns lib supports the following diagram rendering:
 
-      * **The common "align" field value of json is "left" or "center" or "right" in syntax language attribute, and it is empty means "left" align.**
+    :::tip[Diagram Render]
 
-      * **The common "codeblock" field value of json is "true" or "false" in syntax language attribute, and it is empty means "false". It is "true" means the codeblock is forced to display as normal code block, otherwise the codeblock is tried to parse as corresponding diagrams.**
+    | Diagram | Render |
+    | ------- | :------: |
+    | ABCJS | ✔ |
+    | AntV infographic| ✔ |
+    | Echarts | ✔ |
+    | Flowchart | ✔ |
+    | Gnuplot | Registration rendering method |
+    | LaTex | Registration rendering method |
+    | kroki | https://kroki.io |
+    | Mermaid | ✔ |
+    | Plantuml | http://plantuml.com |
+    | Plotly | ✔ |  
+    | Railroad | ✔ |
+    | Vega | ✔ |
+    | Viz | ✔ |
+    | WaveDrom | ✔ |    
+    | ZenUML for mermaid | ✔ |
+    | ZenUML | ✔ |
+
+    :::
 
 --- [.page-icons.icon-info Markdown syntax](../Showdown's-Markdown-syntax.md)
 --- [.page-icons.icon-pages Page Tabs](../pages/page-tabs.md)
