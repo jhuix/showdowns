@@ -28,42 +28,20 @@ Syntax of page tabs as follow:
 --- :a[Reference]{.nav-link href="."}
 
     <br/>![Showdowns](../logo.png)
-   
-    [Showdowns](https://github.com/jhuix/showdowns) is a lib that make markdown to html with some extensions of showdown.js.
+    
+    [Showdowns](https://github.com/jhuix/showdowns) is a lib that make markdown to html with some extensions of showdown.js.Click the link to preview the [showdowns features](https://jhuix.github.io/showdowns).
 
-    :::attention[Please pay more attention to us]
-    If you think the showdowns library can help you or also hope to encourage the author, click on the top right corner to give me a [Star](https://github.com/jhuix/showdowns)⭐️.
-    :::
+    Showdowns Markdown Syntax, refer to the document -- [Showdown's Markdown Syntax](https://github.com/showdownjs/showdown/wiki/Showdown's-Markdown-syntax).
 
-    Showdowns Markdown Syntax, refer to the document -- [Showdowns Features](https://jhuix.github.io/showdowns).
+    * **In browser environment, it is implemented to dynamically load js lib files related to more showdown diagrams extension for using [showdowns >= 0.3.0 version](https://github.com/jhuix/showdowns).**
 
-    The showdowns lib supports the following diagram rendering:
+    * **In codeblock of markdown, expanded syntax language attribute from "\`\`\`language" to "\`\`\`language {json}" or "\`\`\`language \[json]".**
 
-    :::tip[Diagram Render]
+      * **The common "align" field value of json is "left" or "center" or "right" in syntax language attribute, and it is empty means "left" align.**
 
-    | Diagram | Render |
-    | ------- | :------: |
-    | ABCJS | ✔ |
-    | AntV infographic| ✔ |
-    | Echarts | ✔ |
-    | Flowchart | ✔ |
-    | Gnuplot | Registration rendering method |
-    | LaTex | Registration rendering method |
-    | kroki | https://kroki.io |
-    | Mermaid | ✔ |
-    | Plantuml | http://plantuml.com |
-    | Plotly | ✔ |  
-    | Railroad | ✔ |
-    | Vega | ✔ |
-    | Viz | ✔ |
-    | WaveDrom | ✔ |    
-    | ZenUML for mermaid | ✔ |
-    | ZenUML | ✔ |
-
-    :::
+      * **The common "codeblock" field value of json is "true" or "false" in syntax language attribute, and it is empty means "false". It is "true" means the codeblock is forced to display as normal code block, otherwise the codeblock is tried to parse as corresponding diagrams.**
 
 --- [.page-icons.icon-info Markdown syntax](../Showdown's-Markdown-syntax.md)
---- [.page-icons.icon-pages Page Tabs](../pages/page-tabs.md)
 --- [.page-icons.icon-admontions Directives](../pages/directives.md)
 --- [.page-icons.icon-contenttabs Content Tabs](../pages/content-tabs.md)
 --- [.page-icons.icon-toc Table Of Content](../pages/toc.md)
@@ -94,39 +72,18 @@ Syntax of page tabs as follow:
 --- :a[Reference]{.nav-link href="."}
 
     <br/>![Showdowns](../logo.png)
-   
-    [Showdowns](https://github.com/jhuix/showdowns) is a lib that make markdown to html with some extensions of showdown.js.
+    
+    [Showdowns](https://github.com/jhuix/showdowns) is a lib that make markdown to html with some extensions of showdown.js.Click the link to preview the [showdowns features](https://jhuix.github.io/showdowns).
 
-    :::attention[Please pay more attention to us]
-    If you think the showdowns library can help you or also hope to encourage the author, click on the top right corner to give me a [Star](https://github.com/jhuix/showdowns)⭐️.
-    :::
+    Showdowns Markdown Syntax, refer to the document -- [Showdown's Markdown Syntax](https://github.com/showdownjs/showdown/wiki/Showdown's-Markdown-syntax).
 
-    Showdowns Markdown Syntax, refer to the document -- [Showdowns Features](https://jhuix.github.io/showdowns).
+    * **In browser environment, it is implemented to dynamically load js lib files related to more showdown diagrams extension for using [showdowns >= 0.3.0 version](https://github.com/jhuix/showdowns).**
 
-    The showdowns lib supports the following diagram rendering:
+    * **In codeblock of markdown, expanded syntax language attribute from "\`\`\`language" to "\`\`\`language {json}" or "\`\`\`language \[json]".**
 
-    :::tip[Diagram Render]
+      * **The common "align" field value of json is "left" or "center" or "right" in syntax language attribute, and it is empty means "left" align.**
 
-    | Diagram | Render |
-    | ------- | :------: |
-    | ABCJS | ✔ |
-    | AntV infographic| ✔ |
-    | Echarts | ✔ |
-    | Flowchart | ✔ |
-    | Gnuplot | Registration rendering method |
-    | LaTex | Registration rendering method |
-    | kroki | https://kroki.io |
-    | Mermaid | ✔ |
-    | Plantuml | http://plantuml.com |
-    | Plotly | ✔ |  
-    | Railroad | ✔ |
-    | Vega | ✔ |
-    | Viz | ✔ |
-    | WaveDrom | ✔ |    
-    | ZenUML for mermaid | ✔ |
-    | ZenUML | ✔ |
-
-    :::
+      * **The common "codeblock" field value of json is "true" or "false" in syntax language attribute, and it is empty means "false". It is "true" means the codeblock is forced to display as normal code block, otherwise the codeblock is tried to parse as corresponding diagrams.**
 
 --- [.page-icons.icon-info Markdown syntax](../Showdown's-Markdown-syntax.md)
 --- [.page-icons.icon-pages Page Tabs](../pages/page-tabs.md)

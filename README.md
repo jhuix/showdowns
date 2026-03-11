@@ -4,8 +4,6 @@
 
 [Showdowns](https://github.com/jhuix/showdowns) is a lib that make markdown to html with some extensions features(include more diagrams extensions) of showdown.js.
 
-**In browser environment, it is implemented to dynamically load js lib files related to more showdown diagrams extension for using [showdowns >= 0.3.0 version](https://github.com/jhuix/showdowns).**
-
 > If you think the showdowns library can help you or also hope to encourage the author, click on the top right corner to give me a [Star](https://github.com/jhuix/showdowns)⭐️.
 
 ## Markdown To Html
@@ -14,7 +12,7 @@
 
 [Showdown](https://github.com/showdownjs/showdown) is a Javascript Markdown to HTML converter, based on the original works by John Gruber. Showdown can be used client side (in the browser) or server side (with NodeJs). For more information, refer to the following document:
 
-- [Showdowns Features Syntax](https://jhuix.github.io/showdowns/demo/index.html)
+- [Showdowns Features Syntax](https://jhuix.github.io/showdowns)
 - [Showdown's Markdown Syntax](https://github.com/showdownjs/showdown/wiki/Showdown's-Markdown-syntax)
 - [Showdown Options](https://github.com/showdownjs/showdown/wiki/Showdown-options)
 
@@ -228,57 +226,59 @@ Table header can be eliminated.
 
 ### Supporting some markdown extension features
 
-[Footnotes](https://github.com/jhuix/showdowns/blob/master/docs/showdowns-features.md#footnotes)
+[Footnotes](https://jhuix.github.io/showdowns/?page=footnotes)
 
-[Directives](https://github.com/jhuix/showdowns/blob/master/docs/showdowns-features.md#directives)
+[Directives](https://jhuix.github.io/showdowns/?page=directives)
 
-[CSS defined](https://github.com/jhuix/showdowns/blob/master/docs/showdowns-features.md#css-defined)
+[CSS defined](https://jhuix.github.io/showdowns/?page=css)
 
-[Inline Image](https://github.com/jhuix/showdowns/blob/master/docs/showdowns-features.md#inline-image)
+[Inline Image](https://jhuix.github.io/showdowns/?page=images)
 
-[Content Tabs](https://github.com/jhuix/showdowns/blob/master/docs/showdowns-features.md#content-tabs)
+[Content Tabs](https://jhuix.github.io/showdowns/?page=content-tabs)
 
-[Table of Contents](https://github.com/jhuix/showdowns/blob/master/docs/showdowns-features.md#table-of-contents)
+[Page Tabs](https://jhuix.github.io/showdowns/?page=page-tabs)
 
-[LaTeX math and AsciiMath](https://github.com/jhuix/showdowns/blob/master/docs/showdowns-features.md#latex-math-and-asciimath)
+[Table of Contents](https://jhuix.github.io/showdowns/?page=toc)
 
-[Code Block Theme](https://github.com/jhuix/showdowns/blob/master/docs/showdowns-features.md#code-block-theme)
+[LaTeX math and AsciiMath](https://jhuix.github.io/showdowns/?page=math)
 
-[Mermaid](https://github.com/jhuix/showdowns/blob/master/docs/showdowns-features.md#mermaid)
+[Code Blocks Theme](https://jhuix.github.io/showdowns/?page=code-blocks)
 
-[Plantuml](https://github.com/jhuix/showdowns/blob/master/docs/showdowns-features.md#plantuml)
+[Mermaid](https://jhuix.github.io/showdowns/?page=mermaid)
 
-[Flowchart](https://github.com/jhuix/showdowns/blob/master/docs/showdowns-features.md#flowchart)
+[Plantuml](https://jhuix.github.io/showdowns/?page=plantuml)
 
-[Network Sequence](https://github.com/jhuix/showdowns/blob/master/docs/showdowns-features.md#network-sequence)
+[Flowchart](https://jhuix.github.io/showdowns/?page=flowchart)
 
-[Graphviz's dot](https://github.com/jhuix/showdowns/blob/master/docs/showdowns-features.md#graphviz-s-dot)
+[Network Sequence](https://jhuix.github.io/showdowns/?page=sequence)
 
-[Railroad diagrams](https://github.com/jhuix/showdowns/blob/master/docs/showdowns-features.md#railroad-diagrams)
+[Graphviz's dot](https://jhuix.github.io/showdowns/?page=viz)
 
-[WaveDrom](https://github.com/jhuix/showdowns/blob/master/docs/showdowns-features.md#wavedrom)
+[Railroad diagrams](https://jhuix.github.io/showdowns/?page=railroad)
 
-[Vega and Vega-Lite](https://github.com/jhuix/showdowns/blob/master/docs/showdowns-features.md#vega-and-vega-lite)
+[WaveDrom](https://jhuix.github.io/showdowns/?page=wavedrom)
 
-[Echarts](https://github.com/jhuix/showdowns/blob/master/docs/showdowns-features.md#echarts)
+[Vega and Vega-Lite](https://jhuix.github.io/showdowns/?page=vega)
 
-[ABCJS](https://github.com/jhuix/showdowns/blob/master/docs/showdowns-features.md#abc)
+[Echarts](https://jhuix.github.io/showdowns/?page=echarts)
 
-[Kroki](https://github.com/jhuix/showdowns/blob/master/docs/showdowns-features.md#kroki)
+[ABCJS](https://jhuix.github.io/showdowns/?page=abc)
 
-[Plotly](https://github.com/jhuix/showdowns/blob/master/docs/showdowns-features.md#plotly)
+[Kroki](https://jhuix.github.io/showdowns/?page=kroki)
 
-[AntV Infographic](https://github.com/jhuix/showdowns/blob/master/docs/showdowns-features.md#antv-infographic)
+[Plotly](https://jhuix.github.io/showdowns/?page=plotly)
 
-[ZenUML](https://github.com/jhuix/showdowns/blob/master/docs/showdowns-features.md#zenuml)
+[AntV Infographic](https://jhuix.github.io/showdowns/?page=antv)
+
+[ZenUML](https://jhuix.github.io/showdowns/?page=zenuml)
 
 See more information, refer to the following document:
 
-[Extensions Examples](https://github.com/jhuix/showdowns/blob/master/docs/showdowns-features.md)
+[Extensions Examples](https://jhuix.github.io/showdowns)
 
 ### Preview
 
-- View [Extensions Examples](https://github.com/jhuix/showdowns/blob/master/docs/showdowns-features.md) is previewed as [Showdowns Features](https://jhuix.github.io/showdowns/)
+- View Extensions Examples is previewed as [Showdowns Features](https://jhuix.github.io/showdowns/)
 
 - View video
 
