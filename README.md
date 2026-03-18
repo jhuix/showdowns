@@ -429,7 +429,8 @@ Default options is described below:
       vega: { theme: 'vox' },
       tex: { serverUrl: 'tex.io', buildType: 'pdflatex' },
       shiki: { theme: 'ayu-dark' },
-      gnuplot: {}
+      gnuplot: {},
+      pagetabs:{}
     };
 
 - showdown: showdown options object
@@ -554,6 +555,14 @@ Default options is described below:
         svgRender: (id:string, code:string) => string
       }
 
+- pagetabs: page tabs options object
+
+  For more page tabs options:
+
+      {
+        pageRender: (pageId: string) => void
+      }
+
 #### defaultExtensions
 
 Type: Array of showdown extensions
@@ -566,6 +575,7 @@ Default extensions is described below:
       'showdown-align': showdownAlign(),
       'showdown-footnotes': showdownFootnotes(),
       'showdown-content-tabs': showdownContentTabs(),
+      'showdown-page-tabs': showdownPageTabs(),
       'showdown-directive': showdownDirective(),
       'showdown-sequence': showdownSequence()
     }
@@ -600,7 +610,8 @@ Default async extensions is described below:
       'showdown-antv': showdownAntV(),
       'showdown-zenuml': showdownZenuml(),
       'showdown-sequence': getExtension('showdown-sequence', showdownSequence),
-      'showdown-content-tabs': showdownAsyncContentTabs(),      
+      'showdown-content-tabs': showdownAsyncContentTabs(), 
+      'showdown-page-tabs': showdownAsyncPageTabs(pagetabsOptions),     
       'showdown-shiki': showdownShiki(shikiOptions),
       'showdow-css': showdownCss(),
     }
@@ -812,7 +823,17 @@ Type: interface csslink {
   link: string
 }
 
-Type: ({type:'zip', content: string, output: 'dom'} | string) => Promise\<{html: string | HTMLElement[], scripts: script[], cssLinks: csslink[]}>
+Type: ({
+  type:'zip',
+  content: string,
+  output: 'dom',
+  exclusive: boolean,
+  pageRender: (pageId: string) => void
+} | string) => Promise\<{
+  html: string | HTMLElement[],
+  scripts: script[],
+  cssLinks: csslink[]
+}>
 
 A async function to make markdown to html that showdown.convertor converte it in current showdowns instance.
 
