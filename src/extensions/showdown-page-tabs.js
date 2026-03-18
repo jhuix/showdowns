@@ -92,8 +92,8 @@ export function showdownPageTabs() {
                 }
 
                 const navLinks = `<div class="nav-container"><ul class="nav-list">${links.join('')}</ul></div>`;
-                const id = converter.context.id ? `id="page-${converter.context.id}" ` : '';
-                const code = `<div ${id}class="page-navigation"><div class="page-sidebar">${title}${navLinks}</div><div class="page-doc">${desc}</div></div>`;
+                const id = converter.context.id ? `id="page-side${converter.context.id}" ` : '';
+                const code = `<div class="page-navigation"><div ${id}class="page-sidebar">${title}${navLinks}</div><div class="page-doc">${desc}</div></div>`;
                 converter.context.hasTabs = true;
                 return showdown.subParser('hashBlock')(code, options, globals);
               }
@@ -112,7 +112,7 @@ export function showdownPageTabs() {
 
 function renderLocalPage(pageId, pageRender) {
   return () => {
-    pageRender(`page-${pageId}`);
+    pageRender(`page-side${pageId}`);
   };
 }
 
@@ -160,8 +160,6 @@ function observeraPageTabsClick() {
 
       const navItem = target.closest('.nav-item');
       if (!navItem) return;
-      event.stopImmediatePropagation();
-      event.preventDefault();
       if (navItem !== currNavItem) {
         if (currNavItem) {
           currNavItem.classList.remove('nav-item-active')
@@ -170,15 +168,16 @@ function observeraPageTabsClick() {
         navItem.classList.add('nav-item-active');
       }
 
+      if (!window.showdowns) return;
+      event.stopImmediatePropagation();
+      event.preventDefault();
       const navDesc = navPage.querySelector('.page-desc');
       let navContent = navPage.querySelector('.page-content');
       if (!navContent) {
         navContent = document.createElement('div');
         navContent.classList.add('page-content', 'hidden');
-        navDesc.parentNode.replaceChildren(navContent);
+        navDesc.parentNode.appendChild(navContent);
       }
-
-      if (!window.showdowns) return;
       const showdowns = window.showdowns;
       const genHtml = (md) => {
         showdowns
@@ -237,10 +236,11 @@ export function showdownAsyncPageTabs(options) {
           return false;
         }
 
-        if (this.config.pageRender) {
+        const pageRender = converter.context.pageRender || this.config.pageRender;
+        if (pageRender) {
           obj.scripts.push({
             id: `showdowns-get-page${converter.context.id}`,
-            code: renderLocalPage(converter.context.id, this.config.pageRender),
+            code: renderLocalPage(converter.context.id, pageRender),
             once: true
           })
         }

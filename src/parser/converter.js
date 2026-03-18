@@ -196,9 +196,9 @@ showdown.Converter.prototype.initConvertExtObj = function (flavor, asyncExtensio
    * @param {string} text
    * @returns {*}
    */
-  this.asyncMakeHtml = function (text, id) {
-    this.context.id = id;
-    const showdownsId = id ? `id="showdowns-${id}" ` : '';
+  this.asyncMakeHtml = function (text, context) {
+    if (context) this.context = context;
+    const showdownsId = this.context.id ? `id="showdowns-${this.context.id}" ` : '';
     const content = `<div ${showdownsId}class='showdowns'>${this.makeHtml(text)}</div>`;
     const outputs = this.extObj.getAsyncExtensions();
     if (!outputs.length) {
@@ -207,7 +207,6 @@ showdown.Converter.prototype.initConvertExtObj = function (flavor, asyncExtensio
 
     var globals = {
       outputs: outputs,
-      id: id,
       converter: this,
     };
     const parser = new DOMParser();

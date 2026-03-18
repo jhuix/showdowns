@@ -482,7 +482,7 @@ const showdowns = {
           showdown.extension(name, extension);
         }
         if (currConverter) {
-          currConverter.addExtension(name);
+          currConverter.addExtension(extension, name);
         }
       } catch (err) {
         console.log(err);
@@ -517,7 +517,7 @@ const showdowns = {
           showdown.asyncExtension(name, extension);
         }
         if (currConverter) {
-          currConverter.addAsyncExtension(name);
+          currConverter.addAsyncExtension(extension, name);
         }
       } catch (err) {
         console.log(err);
@@ -686,6 +686,7 @@ const showdowns = {
     let content = '';
     let output = 'html';
     let converter = this.converter;
+    let context = {};
     if (typeof doc === 'object') {
       if (typeof doc.content === 'string') {
         if (typeof doc.type === 'string') {
@@ -713,6 +714,9 @@ const showdowns = {
         }).initConvertExtObj(this.defaultOptions.showdown.flavor, asyncExtensions);
         this.addOptions(this.defaultOptions.showdown, converter);
       }
+      if (doc.pageRender) {
+        context.pageRender = doc.pageRender;
+      }
     } else {
       content = doc;
     }
@@ -721,7 +725,8 @@ const showdowns = {
       return Promise.reject(!content ? 'Content is empty.' : 'Converter is invaild.');
     }
 
-    return converter.asyncMakeHtml(content, utils.hashString(content)).then((obj) => {
+    context.id = utils.hashString(content + `<<${Math.floor(Math.random() * 10000)}>>`);
+    return converter.asyncMakeHtml(content, context).then((obj) => {
       if (typeof document !== 'undefined' && output === 'dom') {
         let doms = [obj.html];
         if (obj.extras) {
