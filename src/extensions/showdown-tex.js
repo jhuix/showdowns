@@ -166,8 +166,8 @@ const getConfig = (config = {}) => ({
   ...config
 });
 
-function showdownTex(userConfig) {
-  const config = getConfig(userConfig);
+function showdownTex(options) {
+  const config = getConfig(options);
 
   return [
     {
@@ -193,7 +193,7 @@ function showdownTex(userConfig) {
         }
         Tex.svgRender =this.config.svgRender;
         obj.scripts.push({
-          id: 'showdown-tex',
+          id: 'showdowns-tex',
           code: renderTexElements,
           once: true
         })

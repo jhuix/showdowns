@@ -111,6 +111,12 @@ function renderPlotly(element, scripts) {
 function renderPlotlyElements(elements, scripts) {
   dyncLoadScript();
   const script = {
+    outer: [
+      {
+        name: 'Plotly',
+        src: cdnjs.getSrc(false, 'Plotly', 'jsdelivr'),
+      },
+    ],
     inner: []
   }
   scripts.push(script);
@@ -128,7 +134,6 @@ function renderPlotlyElements(elements, scripts) {
 // plotly configuration: https://plotly.com/javascript/configuration-options/
 // see https://github.com/plotly/plotly.js/blob/master/src/plot_api/plot_config.js
 function showdownPlotly() {
-
   return [
     {
       type: 'output',

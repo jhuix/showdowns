@@ -111,7 +111,7 @@ const svgSymbols = [
 
 const defaultToc = /^((?:\[(?:Table[ -]Of[ -]Contents|目录|TOC)\])|(?:【(?:Table[ -]Of[ -]Contents|目录|TOC|_TOC_)】)|(?:\{\{([_]?)TOC\2\}\})|(?:\[\[([_]?)TOC\3\]\]))$/i;
 
-function renderTocElements(wrapper, config) {
+function renderTocElements(wrapper, id, config) {
   let element = null;
   let headingLevel = 0;
   let currTocNode = null;
@@ -151,13 +151,13 @@ function renderTocElements(wrapper, config) {
           tocTitle = config.title
         }
         const swtichToc = wrapper.ownerDocument.createElement('div');
-        swtichToc.id = 'toc-switch-button';
+        swtichToc.id = `toc-switch-button${id}`;
         swtichToc.classList.add('toc-switch');
         swtichToc.title = showTitle + tocTitle
         swtichToc.innerHTML = '<svg class="icon"><use xlink:href="#icon-chapter-l"></use></svg>';
         element.parentNode.insertBefore(swtichToc, element);
 
-        showdownToc.id = 'total-showdown-toc';
+        showdownToc.id = `total-showdown-toc${id}`;
         showdownToc.classList.add('total-toc');
         showdownToc.innerHTML =
           `<div class="toc-pin"><span class="toc-pin-text">${tocTitle}</span><div class="toc-fold-wrap"><div id="toc-fold-icon" class="toc-fold toc-icon" data-name="toc-expand" title="${tocToggle + tocTitle}"><svg class="icon" aria-hidden="true"><use xlink:href="#icon-toc"></use></svg></div><div id="toc-close-icon" class="toc-close toc-icon" title="${hideTitle + tocTitle}"><svg class="icon" aria-hidden="true"><use xlink:href="#icon-chapter-s"></use></svg></div></div></div>`;
@@ -280,77 +280,26 @@ function renderTocElements(wrapper, config) {
   return result;
 }
 
-function loadTocEvent() {
-  const totalToc = document.querySelector('#total-showdown-toc');
-  if (!totalToc) return;
+function loadTocEvent(id) {
+  const script = `function(){
+    const totalToc = document.querySelector('#total-showdown-toc${id}');
+    if (!totalToc) return;
 
-  const tocFoldIcon = document.querySelector('#toc-fold-icon');
-  if (tocFoldIcon) {
-    tocFoldIcon.onclick = (e) => {
-      const chapters = document.querySelectorAll('.total-toc ul');
-      const icons = document.querySelectorAll('.total-toc ul:not(.toc-main) .toc-multi-chapter use');
-      if (tocFoldIcon.dataset.name === 'toc-expand') {
-        chapters.forEach((element) => {
-          if (!element.classList.contains('toc-main') && !element.classList.contains('toc-level-2')) {
-            element.classList.add('hidden');
-          }
-        });
-        icons.forEach((icon) => {
-          icon.setAttributeNS('http://www.w3.org/1999/xlink', 'href', '#icon-collapse');
-        });
-        tocFoldIcon.dataset.name = 'toc-fold';
-        return;
-      }
-
-      chapters.forEach((element) => {
-        element.classList.remove('hidden');
-      });
-      icons.forEach((icon) => {
-        icon.setAttributeNS('http://www.w3.org/1999/xlink', 'href', '#icon-expand');
-      });
-      tocFoldIcon.dataset.name = 'toc-expand';
-    };
-  }
-
-  const tocCloseIcon = document.querySelector('#toc-close-icon');
-  if (tocCloseIcon) {
-    tocCloseIcon.onclick = (e) => {
-      const totalToc = document.querySelector('#total-showdown-toc');
-      if (totalToc) totalToc.classList.add('hidden');
-      const switchToc = document.querySelector('#toc-switch-button');
-      if (switchToc) switchToc.classList.remove('hidden');
-    };
-  }
-
-  const tocSwitch = document.querySelector('#toc-switch-button');
-  if (tocSwitch) {
-    tocSwitch.onclick = (e) => {
-      e.currentTarget.classList.add('hidden');
-      const totalToc = document.querySelector('#total-showdown-toc');
-      if (totalToc) totalToc.classList.remove('hidden');
-    };
-  }
-
-  const chapterIcons = document.querySelectorAll('.total-toc .toc-multi-chapter');
-  chapterIcons.forEach((icon) => {
-    icon.onclick = (e) => {
-      let parent = e.currentTarget.parentNode;
-      if (!parent) return;
-      parent = parent.parentNode;
-      if (!parent) return;
-
-      const chapters = parent.querySelectorAll('ul');
-      const icons = parent.querySelectorAll('.toc-multi-chapter use');
-      const iconUse = e.currentTarget.querySelector('use');
-      if (iconUse) {
-        const href = iconUse.getAttributeNS('http://www.w3.org/1999/xlink', 'href');
-        if (href === '#icon-expand') {
+    const tocFoldIcon = totalToc.querySelector('#toc-fold-icon');
+    if (tocFoldIcon) {
+      tocFoldIcon.onclick = (e) => {
+        const chapters = totalToc.querySelectorAll('.total-toc ul');
+        const icons = totalToc.querySelectorAll('.total-toc ul:not(.toc-main) .toc-multi-chapter use');
+        if (tocFoldIcon.dataset.name === 'toc-expand') {
           chapters.forEach((element) => {
-            element.classList.add('hidden');
+            if (!element.classList.contains('toc-main') && !element.classList.contains('toc-level-2')) {
+              element.classList.add('hidden');
+            }
           });
           icons.forEach((icon) => {
             icon.setAttributeNS('http://www.w3.org/1999/xlink', 'href', '#icon-collapse');
           });
+          tocFoldIcon.dataset.name = 'toc-fold';
           return;
         }
 
@@ -360,9 +309,153 @@ function loadTocEvent() {
         icons.forEach((icon) => {
           icon.setAttributeNS('http://www.w3.org/1999/xlink', 'href', '#icon-expand');
         });
-      }
-    };
-  });
+        tocFoldIcon.dataset.name = 'toc-expand';
+      };
+    }
+
+    const tocCloseIcon = totalToc.querySelector('#toc-close-icon');
+    if (tocCloseIcon) {
+      tocCloseIcon.onclick = (e) => {
+        const totalToc = document.querySelector('#total-showdown-toc${id}');
+        if (totalToc) totalToc.classList.add('hidden');
+        const switchToc = document.querySelector('#toc-switch-button${id}');
+        if (switchToc) switchToc.classList.remove('hidden');
+      };
+    }
+
+    const tocSwitch = document.querySelector('#toc-switch-button${id}');
+    if (tocSwitch) {
+      tocSwitch.onclick = (e) => {
+        e.currentTarget.classList.add('hidden');
+        const totalToc = document.querySelector('#total-showdown-toc${id}');
+        if (totalToc) totalToc.classList.remove('hidden');
+      };
+    }
+
+    const chapterIcons = document.querySelectorAll('#total-showdown-toc${id}.total-toc .toc-multi-chapter');
+    chapterIcons.forEach((icon) => {
+      icon.onclick = (e) => {
+        let parent = e.currentTarget.parentNode;
+        if (!parent) return;
+        parent = parent.parentNode;
+        if (!parent) return;
+
+        const chapters = parent.querySelectorAll('ul');
+        const icons = parent.querySelectorAll('.toc-multi-chapter use');
+        const iconUse = e.currentTarget.querySelector('use');
+        if (iconUse) {
+          const href = iconUse.getAttributeNS('http://www.w3.org/1999/xlink', 'href');
+          if (href === '#icon-expand') {
+            chapters.forEach((element) => {
+              element.classList.add('hidden');
+            });
+            icons.forEach((icon) => {
+              icon.setAttributeNS('http://www.w3.org/1999/xlink', 'href', '#icon-collapse');
+            });
+            return;
+          }
+
+          chapters.forEach((element) => {
+            element.classList.remove('hidden');
+          });
+          icons.forEach((icon) => {
+            icon.setAttributeNS('http://www.w3.org/1999/xlink', 'href', '#icon-expand');
+          });
+        }
+      };
+    });
+  }`;
+
+  function tocEvent() {
+    const totalToc = document.querySelector(`#total-showdown-toc${id}`);
+    if (!totalToc) return;
+
+    const tocFoldIcon = totalToc.querySelector('#toc-fold-icon');
+    if (tocFoldIcon) {
+      tocFoldIcon.onclick = (e) => {
+        const chapters = totalToc.querySelectorAll('.total-toc ul');
+        const icons = totalToc.querySelectorAll('.total-toc ul:not(.toc-main) .toc-multi-chapter use');
+        if (tocFoldIcon.dataset.name === 'toc-expand') {
+          chapters.forEach((element) => {
+            if (!element.classList.contains('toc-main') && !element.classList.contains('toc-level-2')) {
+              element.classList.add('hidden');
+            }
+          });
+          icons.forEach((icon) => {
+            icon.setAttributeNS('http://www.w3.org/1999/xlink', 'href', '#icon-collapse');
+          });
+          tocFoldIcon.dataset.name = 'toc-fold';
+          return;
+        }
+
+        chapters.forEach((element) => {
+          element.classList.remove('hidden');
+        });
+        icons.forEach((icon) => {
+          icon.setAttributeNS('http://www.w3.org/1999/xlink', 'href', '#icon-expand');
+        });
+        tocFoldIcon.dataset.name = 'toc-expand';
+      };
+    }
+
+    const tocCloseIcon = totalToc.querySelector('#toc-close-icon');
+    if (tocCloseIcon) {
+      tocCloseIcon.onclick = (e) => {
+        const totalToc = document.querySelector(`#total-showdown-toc${id}`);
+        if (totalToc) totalToc.classList.add('hidden');
+        const switchToc = document.querySelector(`#toc-switch-button${id}`);
+        if (switchToc) switchToc.classList.remove('hidden');
+      };
+    }
+
+    const tocSwitch = document.querySelector(`#toc-switch-button${id}`);
+    if (tocSwitch) {
+      tocSwitch.onclick = (e) => {
+        e.currentTarget.classList.add('hidden');
+        const totalToc = document.querySelector(`#total-showdown-toc${id}`);
+        if (totalToc) totalToc.classList.remove('hidden');
+      };
+    }
+
+    const chapterIcons = document.querySelectorAll(`#total-showdown-toc${id}.total-toc .toc-multi-chapter`);
+    chapterIcons.forEach((icon) => {
+      icon.onclick = (e) => {
+        let parent = e.currentTarget.parentNode;
+        if (!parent) return;
+        parent = parent.parentNode;
+        if (!parent) return;
+
+        const chapters = parent.querySelectorAll('ul');
+        const icons = parent.querySelectorAll('.toc-multi-chapter use');
+        const iconUse = e.currentTarget.querySelector('use');
+        if (iconUse) {
+          const href = iconUse.getAttributeNS('http://www.w3.org/1999/xlink', 'href');
+          if (href === '#icon-expand') {
+            chapters.forEach((element) => {
+              element.classList.add('hidden');
+            });
+            icons.forEach((icon) => {
+              icon.setAttributeNS('http://www.w3.org/1999/xlink', 'href', '#icon-collapse');
+            });
+            return;
+          }
+
+          chapters.forEach((element) => {
+            element.classList.remove('hidden');
+          });
+          icons.forEach((icon) => {
+            icon.setAttributeNS('http://www.w3.org/1999/xlink', 'href', '#icon-expand');
+          });
+        }
+      };
+    });
+  }
+
+  tocEvent.toString = () => {
+    return script;
+  }
+
+  return tocEvent;
 }
 
 const getConfig = (config = {}) => ({
@@ -381,7 +474,7 @@ function showdownToc(options) {
     {
       type: 'output',
       config: config,
-      filter: function (html) {
+      filter: function (html, converter) {
         if (typeof html === 'string') {
           // parse html
           const parser = new DOMParser();
@@ -391,7 +484,7 @@ function showdownToc(options) {
           if (!this.config.toc) {
             this.config.toc = defaultToc;
           }
-          if (!renderTocElements(wrapper, this.config)) {
+          if (!renderTocElements(wrapper, converter.context.id, this.config)) {
             return html;
           }
           // return html text content
@@ -404,6 +497,7 @@ function showdownToc(options) {
         }
 
         const obj = html;
+        converter = obj.globals.converter;
         this.config.extras.forEach((doc) => {
           utils.addExtra(obj, doc);
         });
@@ -416,9 +510,9 @@ function showdownToc(options) {
         const script = {
           inner: [
             {
-              id: 'showdown-toc',
-              code: loadTocEvent,
-              host: '#total-showdown-toc',
+              id: `showdowns-toc${converter.context.id}`,
+              code: loadTocEvent(converter.context.id),
+              host: `#total-showdown-toc${converter.context.id}`,
             },
           ],
         };

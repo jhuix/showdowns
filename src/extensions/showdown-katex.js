@@ -285,26 +285,18 @@ function showdownKatex(userConfig) {
           // ignore anything in code and pre elements
           wrapper.querySelectorAll(':not(code):not(pre)').forEach(el => {
             // /** @type Text[] */
-            // const textNodes = [...el.childNodes].filter(
-            //   // skip "empty" text nodes
-            //   node => node.nodeName === '#text' && node.nodeValue.trim()
-            // );
+            const textNodes = Array.from(el.childNodes).filter(
+              // skip "empty" text nodes
+              node => node.nodeName === '#text' && node.nodeValue.trim()
+            );
 
-            // textNodes.forEach(node => {
-            //   const newText = mathDelimiters.reduce(
-            //     (acc, { test, replacer }) => acc.replace(test, replacer),
-            //     node.nodeValue
-            //   );
-            //   node.nodeValue = newText;
-            // });
-            const content = el.textContent
-            if (content.length > 0) {
+            textNodes.forEach(node => {
               const newText = mathDelimiters.reduce(
                 (acc, { test, replacer }) => acc.replace(test, replacer),
-                content
+                node.nodeValue
               );
-              el.textContent = newText;
-            }
+              node.nodeValue = newText;
+            });
           });
         }
 

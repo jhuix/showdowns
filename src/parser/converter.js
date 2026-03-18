@@ -107,6 +107,7 @@ showdown.ConverterExtObj = function (flavor, asyncExtensions) {
 
 showdown.Converter.prototype.initConvertExtObj = function (flavor, asyncExtensions) {
   this.extObj = new showdown.ConverterExtObj(flavor, asyncExtensions);
+  this.context = {};
 
   this.resetOptions = function (converterOptions) {
     converterOptions = converterOptions || {};
@@ -195,8 +196,10 @@ showdown.Converter.prototype.initConvertExtObj = function (flavor, asyncExtensio
    * @param {string} text
    * @returns {*}
    */
-  this.asyncMakeHtml = function (text, callback) {
-    const content = `<div class='showdowns'>${this.makeHtml(text)}</div>`;
+  this.asyncMakeHtml = function (text, id) {
+    this.context.id = id;
+    const showdownsId = id ? `id="showdowns-${id}" ` : '';
+    const content = `<div ${showdownsId}class='showdowns'>${this.makeHtml(text)}</div>`;
     const outputs = this.extObj.getAsyncExtensions();
     if (!outputs.length) {
       return Promise.resolve({ html: content });
@@ -204,8 +207,8 @@ showdown.Converter.prototype.initConvertExtObj = function (flavor, asyncExtensio
 
     var globals = {
       outputs: outputs,
+      id: id,
       converter: this,
-
     };
     const parser = new DOMParser();
     const doc = parser.parseFromString(content, 'text/html');
@@ -227,8 +230,24 @@ showdown.Converter.prototype.initConvertExtObj = function (flavor, asyncExtensio
     });
     return result.then(obj => {
       if (obj.symbols.length > 0) {
-        const globalSymbols = `<div id="global-showdowns-svgs" class="none hidden"><svg xmlns="http://www.w3.org/2000/svg">${obj.symbols.join('')}</svg></div>`;
-        obj.extras.unshift(globalSymbols);
+        let globalSvgs = document.querySelector('#showdowns-global-svgs')
+        if (!globalSvgs) {
+          globalSvgs = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+          globalSvgs.setAttributeNS("http://www.w3.org/2000/xmlns/", "xmlns", "http://www.w3.org/2000/svg");
+          globalSvgs.id = 'showdowns-global-svgs';
+          globalSvgs.classList.add('none', 'hidden');
+          globalSvgs.innerHTML = obj.symbols.join('');
+          document.body.insertBefore(globalSvgs, document.body.firstChild);
+        } else {
+          const symbols = document.createElement('svg');
+          symbols.innerHTML = obj.symbols.join('');
+          symbols.childNodes.forEach(node => {
+            if (!node.id || !globalSvgs.querySelector(`#${node.id}`)) {
+              globalSvgs.appendChild(node);
+            }
+          });
+          symbols.replaceChildren();
+        }
       }
       if (obj.inners.length > 0) {
         const div = document.createElement('div');
@@ -244,17 +263,8 @@ showdown.Converter.prototype.initConvertExtObj = function (flavor, asyncExtensio
           }
         });
       }
-      if (typeof callback === 'function' && callback) {
-        const promise = callback(obj);
-        if (promise instanceof Promise) {
-          return promise.then(obj => {
-            body.replaceChildren();
-            return { html: obj.wrapper, extras: obj.extras, scripts: obj.scripts, cssLinks: obj.cssLinks };
-          });
-        }
-      }
       body.replaceChildren();
-      return { html: obj.wrapper, extras: obj.extras, scripts: obj.scripts, cssLinks: obj.cssLinks };
+      return { html: obj.wrapper, extras: obj.extras, scripts: obj.scripts, cssLinks: obj.cssLinks, converter: obj.globals.converter };
     });
   };
 

@@ -35,6 +35,9 @@ if (typeof sequence === 'undefined' && typeof window !== 'undefined') {
 }
 
 function hasRaphael() {
+  if (!Raphael) {
+    Raphael = window.Raphael || undefined;
+  }
   return !!Raphael;
 }
 

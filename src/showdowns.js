@@ -34,15 +34,15 @@ import showdownSequence from './extensions/showdown-sequence.js';
 import showdownWavedrom from './extensions/showdown-wavedrom.js';
 import showdownFlowchart from './extensions/showdown-flowchart.js';
 import { showdownDirective, leafDirectiveEventName, textDirectiveEventName, embedDirectiveEventName } from './extensions/showdown-directive.js';
-import { showdownContentTabs, showdownAsyncContentTabs} from './extensions/showdown-content-tabs.js';
-import { showdownPageTabs, showdownAsyncPageTabs} from './extensions/showdown-page-tabs.js';
+import { showdownContentTabs, showdownAsyncContentTabs } from './extensions/showdown-content-tabs.js';
+import { showdownPageTabs, showdownAsyncPageTabs } from './extensions/showdown-page-tabs.js';
 import { showdownImage, showdownAsyncImage, imageResetEventName } from './extensions/showdown-image.js'
 import { showdownFootnotes, showdownAyncFootnotes } from './extensions/showdown-footnotes.js';
 
 import * as zlibcodec from './utils/zlib-codec.js';
 import cdnjs from './extensions/cdn';
 import format from './extensions/log';
-import { deepMerge } from './extensions/utils.js';
+import utils from './extensions/utils.js';
 import EventBus from './utils/event-bus.js';
 
 const events = {};
@@ -93,6 +93,7 @@ const getAsyncExtensions = (options, extensions = {}) => {
   const vegaOptions = options ? options.vega || {} : {};
   const shikiOptions = options ? options.shiki || {} : {};
   const gnuplotOptions = options ? options.gnuplot || {} : {};
+  const pagetabsOptions = options ? options.pagetabs || {} : {};
 
   const asyncExtensions = {
     'showdown-toc': getExtension('showdown-toc', showdownToc),
@@ -117,7 +118,7 @@ const getAsyncExtensions = (options, extensions = {}) => {
     'showdown-tex': showdownTex(texOptions),
     'showdown-gnuplot': showdownGnuplot(gnuplotOptions),
     'showdown-content-tabs': showdownAsyncContentTabs(),
-    'showdown-page-tabs': showdownAsyncPageTabs(),
+    'showdown-page-tabs': showdownAsyncPageTabs(pagetabsOptions),
     ...extensions,
     'showdown-shiki': showdownShiki(shikiOptions),
     'showdow-css': showdownCss(),
@@ -408,6 +409,7 @@ const showdowns = {
   markdownDecodeFilter: function (doc) {
     return '';
   },
+  onPreprocessHTML: null,
   initDefaultOptions: function () {
     if (!this.defaultOptions) {
       this.defaultOptions = {
@@ -428,23 +430,38 @@ const showdowns = {
       EventBus.on(events[event], callback);
     }
   },
-  setFlavor: function (name) {
+  setFlavor: function (name, converter) {
+    if (converter) {
+      converter.setFlavor(name);
+      return;
+    }
+
     this.showdown.setFlavor(name);
     if (this.converter) {
       this.converter.setFlavor(name);
     }
   },
-  getMetaData: function () {
-    if (!this.converter) {
+  getMetaData: function (converter) {
+    converter = converter || this.converter;
+    if (!converter) {
       return null;
     }
 
-    const meta = this.converter.getMetadata(false);
-    meta.raw = this.converter.getMetadata(true);
-    meta.format = this.converter.getMetadataFormat();
+    const meta = converter.getMetadata(false);
+    meta.raw = converter.getMetadata(true);
+    meta.format = converter.getMetadataFormat();
     return meta;
   },
-  addOptions: function (options) {
+  addOptions: function (options, converter) {
+    if (converter) {
+      for (const key in options) {
+        if (key !== 'flavor' && key !== 'mathEngine') {
+          converter.setOption(key, options[key]);
+        }
+      }
+      return;
+    }
+
     for (const key in options) {
       if (key !== 'flavor' && key !== 'mathEngine') {
         this.showdown.setOption(key, options[key]);
@@ -454,22 +471,28 @@ const showdowns = {
       }
     }
   },
-  addExtension: function (name, extension) {
-    this.removeExtension(name);
+  addExtension: function (name, extension, converter) {
+    const currConverter = converter || this.converter;
+    if (!converter) {
+      this.removeExtension(name);
+    }
     if (typeof name === 'string') {
       try {
-        showdown.extension(name, extension);
-        if (this.converter) {
-          this.converter.addExtension(name);
+        if (!converter) {
+          showdown.extension(name, extension);
+        }
+        if (currConverter) {
+          currConverter.addExtension(name);
         }
       } catch (err) {
         console.log(err);
       }
     }
   },
-  removeExtension: function (name) {
+  removeExtension: function (name, converter) {
     if (typeof name !== 'string') return;
-    if (this.converter) {
+    const currConverter = converter || this.converter;
+    if (currConverter) {
       let ext = null;
       try {
         ext = showdown.extension(name);
@@ -477,26 +500,34 @@ const showdowns = {
         console.log(err);
       }
       if (!ext) return;
-      this.converter.removeExtension(ext);
+      converter.removeExtension(ext);
     }
-    showdown.removeExtension(name);
+    if (!converter) {
+      showdown.removeExtension(name);
+    }
   },
-  addAsyncExtension: function (name, extension) {
-    this.removeAsyncExtension(name);
+  addAsyncExtension: function (name, extension, converter) {
+    const currConverter = converter || this.converter;
+    if (!converter) {
+      this.removeAsyncExtension(name);
+    }
     if (typeof name === 'string') {
       try {
-        showdown.asyncExtension(name, extension);
-        if (this.converter) {
-          this.converter.addAsyncExtension(name);
+        if (!converter) {
+          showdown.asyncExtension(name, extension);
+        }
+        if (currConverter) {
+          currConverter.addAsyncExtension(name);
         }
       } catch (err) {
         console.log(err);
       }
     }
   },
-  removeAsyncExtension: function (name) {
+  removeAsyncExtension: function (name, converter) {
     if (typeof name !== 'string') return;
-    if (this.converter) {
+    const currConverter = converter || this.converter;
+    if (currConverter) {
       let ext = null;
       try {
         ext = showdown.asyncExtension(name);
@@ -504,16 +535,23 @@ const showdowns = {
         console.log(err);
       }
       if (!ext) return;
-      this.converter.removeAsyncExtension(ext);
+      currConverter.removeAsyncExtension(ext);
     }
-    showdown.removeAsyncExtension(name);
+    if (!converter) {
+      showdown.removeAsyncExtension(name);
+    }
   },
   setCDN: function (cdnname, defScheme, distScheme, uriPath) {
     if (typeof cdnname === 'string' && cdnname) {
       cdnjs.setCDN(cdnname, defScheme, distScheme, uriPath);
     }
   },
-  setShowdownFlavor: function (name) {
+  setShowdownFlavor: function (name, converter) {
+    if (converter) {
+      this.setFlavor(name, converter);
+      return;
+    }
+
     this.initDefaultOptions();
     if (name) {
       if (showdownFlavors.indexOf(name) === -1) {
@@ -541,7 +579,15 @@ const showdowns = {
       this.setExtensionOptions('shiki', { theme: theme });
     }
   },
-  setShowdownOptions: function (options) {
+  setShowdownOptions: function (options, converter) {
+    if (converter) {
+      if (typeof options !== 'object' || !options) options = {};
+      options = Object.assign(this.defaultOptions.showdown || {}, options);
+      this.setShowdownFlavor(options.flavor, converter);
+      this.addOptions(options, converter);
+      return options;
+    }
+
     this.initDefaultOptions();
     if (typeof options !== 'object' || !options) options = {};
     this.defaultOptions.showdown = Object.assign(this.defaultOptions.showdown || {}, options);
@@ -571,7 +617,7 @@ const showdowns = {
     for (let i = 0; i < extensions.length; i++) {
       const extension = extensions[i];
       if (extension && extension.type === 'output' && extension.config) {
-        deepMerge(extension.config, options);
+        utils.deepMerge(extension.config, options);
         return true;
       }
     }
@@ -632,9 +678,14 @@ const showdowns = {
     }
     return this;
   },
-  makeHtml: function (doc, callback) {
+  preprocessHtml: function (preprocess) {
+    this.onPreprocessHTML = preprocess;
+    return this;
+  },
+  makeHtml: function (doc) {
     let content = '';
     let output = 'html';
+    let converter = this.converter;
     if (typeof doc === 'object') {
       if (typeof doc.content === 'string') {
         if (typeof doc.type === 'string') {
@@ -653,45 +704,62 @@ const showdowns = {
       if (doc.output === 'dom') {
         output = 'dom';
       }
+      if (doc.exclusive) {
+        // create new converter instance of showdown
+        const extensions = showdown.getAllExtensions();
+        const asyncExtensions = showdown.getAllAsyncExtensions();
+        converter = new showdown.Converter({
+          extensions: extensions,
+        }).initConvertExtObj(this.defaultOptions.showdown.flavor, asyncExtensions);
+        this.addOptions(this.defaultOptions.showdown, converter);
+      }
     } else {
       content = doc;
     }
 
-    if (!this.converter || !content) {
+    if (!converter || !content) {
       return Promise.reject(!content ? 'Content is empty.' : 'Converter is invaild.');
     }
 
-    return this.converter.asyncMakeHtml(content).then((obj) => {
-      if (typeof obj.html !== 'string') {
-        if (typeof document !== 'undefined' && output === 'dom') {
-          let doms = [obj.html];
-          if (obj.extras) {
-            let extraContent = '';
-            let extras = obj.extras;
-            if (!showdown.helper.isArray(extras)) {
-              extras = [extras];
-            }
-            for (let i = 0; i < extras.length; ++i) {
-              if (typeof extras[i] !== 'string') {
-                doms.push(extras[i]);
-                continue
-              };
-              extraContent += extras[i];
-            }
-            if (extraContent.length > 0) {
-              const div = document.createElement('div');
-              div.innerHTML = extraContent;
-              doms.push(...div.childNodes);
-              div.replaceChildren();
-            }
+    return converter.asyncMakeHtml(content, utils.hashString(content)).then((obj) => {
+      if (typeof document !== 'undefined' && output === 'dom') {
+        let doms = [obj.html];
+        if (obj.extras) {
+          let extraContent = '';
+          let extras = obj.extras;
+          if (!showdown.helper.isArray(extras)) {
+            extras = [extras];
           }
-          return { html: doms, scripts: obj.scripts, cssLinks: obj.cssLinks };
+          for (let i = 0; i < extras.length; ++i) {
+            if (typeof extras[i] !== 'string') {
+              doms.push(extras[i]);
+              continue
+            };
+            extraContent += extras[i];
+          }
+          if (extraContent.length > 0) {
+            const div = document.createElement('div');
+            div.innerHTML = extraContent;
+            doms.push(...div.childNodes);
+            div.replaceChildren();
+          }
         }
 
-        content = obj.html.outerHTML;
-      } else {
-        content = obj.html;
+        if (typeof this.onPreprocessHTML === 'function' && this.onPreprocessHTML) {
+          const promise = this.onPreprocessHTML(obj.converter, doms);
+          if (promise instanceof Promise) {
+            return promise.then(res => {
+              return { html: res, scripts: obj.scripts, cssLinks: obj.cssLinks, converter: obj.converter };
+            });
+          }
+
+          doms = promise;
+        }
+
+        return { html: doms, scripts: obj.scripts, cssLinks: obj.cssLinks, converter: obj.converter };
       }
+
+      content = obj.html.outerHTML;
       if (obj.extras) {
         let extras = obj.extras;
         if (!showdown.helper.isArray(extras)) {
@@ -704,9 +772,18 @@ const showdowns = {
           };
           content += extras[i];
         }
-
       }
-      return { html: content, scripts: obj.scripts, cssLinks: obj.cssLinks };
+      if (typeof this.onPreprocessHTML === 'function' && this.onPreprocessHTML) {
+        const promise = this.onPreprocessHTML(obj.converter, content);
+        if (promise instanceof Promise) {
+          return promise.then(res => {
+            return { html: res, scripts: obj.scripts, cssLinks: obj.cssLinks, converter: obj.converter };
+          });
+        }
+
+        content = promise;
+      }
+      return { html: content, scripts: obj.scripts, cssLinks: obj.cssLinks, converter: obj.converter };
     });
   },
   completedHtml: function (scripts, element) {

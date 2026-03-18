@@ -113,7 +113,7 @@ export function showdownAsyncContentTabs() {
         }
 
         const script = {
-          id: 'showdown-content-tabs',
+          id: 'showdowns-content-tabs',
           code: observerTabsClick
         };
         obj.scripts.push(script);

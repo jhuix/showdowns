@@ -33,6 +33,16 @@ let currFlavor = 'vanilla',
   _asyncExtensions = {};
 
 /**
+ * Get all async extensions
+ *
+ * @returns {[]}
+ */
+showdown.getAllAsyncExtensions = function() {
+  return _asyncExtensions;
+}
+
+
+/**
  * Gets or registers an async extension
  * @static
  * @param {string} name

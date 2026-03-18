@@ -260,7 +260,7 @@ function addExtra(obj, extra) {
   return obj;
 }
 
-function hashString(str) {
+export function hashString(str) {
   const seed = 31;
   let hash = 0;
   for (let i = 0; i < str.length; i++) {

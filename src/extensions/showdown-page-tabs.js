@@ -7,9 +7,6 @@
 
 import showdown from 'showdown';
 import i18n from './i18n';
-import utils from './utils';
-
-let hasTabs = false;
 
 /**
 <div class="page-navigation">
@@ -89,14 +86,15 @@ export function showdownPageTabs() {
                   })
                   desc = showdown.subParser('githubCodeBlocks')(lines.join('\n'), options, globals);
                   desc = showdown.subParser('blockGamut')(desc, options, globals);
-                  desc = `<div class="nav-desc">${desc}</div>`;
+                  desc = `<div class="page-desc">${desc}</div>`;
                 } else {
                   desc = '';
                 }
 
                 const navLinks = `<div class="nav-container"><ul class="nav-list">${links.join('')}</ul></div>`;
-                const code = `<div class="page-navigation"><div class="page-sidebar">${title}${navLinks}</div>${desc}<div class="page-content main-toc-row hidden"></div></div>`;
-                hasTabs = true;
+                const id = converter.context.id ? `id="page-${converter.context.id}" ` : '';
+                const code = `<div ${id}class="page-navigation"><div class="page-sidebar">${title}${navLinks}</div><div class="page-doc">${desc}</div></div>`;
+                converter.context.hasTabs = true;
                 return showdown.subParser('hashBlock')(code, options, globals);
               }
             }
@@ -112,50 +110,107 @@ export function showdownPageTabs() {
   ];
 }
 
+function renderLocalPage(pageId, pageRender) {
+  return () => {
+    pageRender(`page-${pageId}`);
+  };
+}
+
 function observeraPageTabsClick() {
+  let currNavItem = null;
   document.addEventListener('click', function (event) {
     const target = event.target;
     const navLink = target.closest('a.nav-link');
     if (navLink) {
-      const navItem = target.closest('.nav-item');
       const pageSidebar = target.closest('.page-sidebar');
       const navPage = target.closest('.page-navigation');
-      if (!navItem || !pageSidebar || !navPage) return;
+      if (!pageSidebar || !navPage) return;
+      const navContents = navPage.querySelectorAll('.page-content');
+      if (navContents.length > 1) {
+        event.stopImmediatePropagation();
+        event.preventDefault();
+
+        const navItem = target.closest('.nav-item');
+        if (navItem !== currNavItem) {
+          if (currNavItem) {
+            currNavItem.classList.remove('nav-item-active')
+          }
+          currNavItem = navItem;
+          if (navItem) {
+            navItem.classList.add('nav-item-active');
+          }
+        }
+        navContents.forEach((page) => {
+          if (page.id === `${navLink.id}-content`) {
+            page.classList.remove('hidden');
+          } else {
+            page.classList.add('hidden');
+          }
+        })
+        const navDesc = navPage.querySelector('.page-desc');
+        if (navDesc) {
+          if (navItem) {
+            navDesc.classList.add('hidden');
+          } else {
+            navDesc.classList.remove('hidden');
+          }
+        }
+        return;
+      }
+
+      const navItem = target.closest('.nav-item');
+      if (!navItem) return;
       event.stopImmediatePropagation();
       event.preventDefault();
-      const navItems = pageSidebar.querySelectorAll('.nav-item');
-      navItems.forEach((item) => {
-        item.classList.remove('nav-item-active');
-      });
-      navItem.classList.add('nav-item-active');
-      const navContent = navPage.querySelector('.page-content');
-      if (!navContent || !window.showdowns) return;
-      const nacDesc = navPage.querySelector('.nav-desc');
-      if (nacDesc && !nacDesc.classList.contains('hidden')) {
-        nacDesc.classList.add('hidden');
-      }
-      navContent.classList.remove('hidden');
-      const showdowns = window.showdowns;
-      window.fetch(navLink.href).then(response => {
-        if (response.ok) {
-          return response.text();
+      if (navItem !== currNavItem) {
+        if (currNavItem) {
+          currNavItem.classList.remove('nav-item-active')
         }
-      }).then(md => {
-        navContent.replaceChildren();
+        currNavItem = navItem;
+        navItem.classList.add('nav-item-active');
+      }
+
+      const navDesc = navPage.querySelector('.page-desc');
+      let navContent = navPage.querySelector('.page-content');
+      if (!navContent) {
+        navContent = document.createElement('div');
+        navContent.classList.add('page-content', 'hidden');
+        navDesc.parentNode.replaceChildren(navContent);
+      }
+
+      if (!window.showdowns) return;
+      const showdowns = window.showdowns;
+      const genHtml = (md) => {
         showdowns
-          .makeHtml({ content: md, output: 'dom' })
+          .makeHtml({ content: md, output: 'dom', exclusive: true })
           .then(res => {
             if (typeof res === 'string') {
               navContent.innerHTML = res;
             } else if (Array.isArray(res.html)) {
+              navContent.replaceChildren();
               res.html.forEach((e) => {
                 navContent.appendChild(e);
               })
               showdowns.completedHtml(res.scripts, '.page-content>.showdowns');
             }
+            if (!navContent.classList.contains('main-toc-row')) {
+              navContent.classList.add('main-toc-row');
+            }
+            if (navDesc && !navDesc.classList.contains('hidden')) {
+              navDesc.classList.add('hidden');
+            }
+            navContent.classList.remove('hidden');
           }).catch(err => {
             navContent.innerText = err;
           });
+      };
+
+      window.fetch(navLink.href).then(response => {
+        if (response.ok) {
+          return response.text();
+        }
+      }).then(md => {
+        genHtml(md);
       }).catch(error => {
         console.error('Failed to navigate to page:', error);
       });
@@ -163,21 +218,37 @@ function observeraPageTabsClick() {
   });
 }
 
-export function showdownAsyncPageTabs() {
+const getOptions = (config = {}) => ({
+  pageRender: null,
+  ...config
+});
+
+export function showdownAsyncPageTabs(options) {
+  const config = getOptions(options);
+
   return [
     {
       type: 'output',
+      config: config,
       filter: function (obj) {
         const wrapper = obj.wrapper;
-        if (!wrapper || !hasTabs) {
+        const converter = obj.globals.converter;
+        if (!wrapper || !converter.context.hasTabs) {
           return false;
         }
 
-        const script = {
-          id: 'showdown-page-tabs',
+        if (this.config.pageRender) {
+          obj.scripts.push({
+            id: `showdowns-get-page${converter.context.id}`,
+            code: renderLocalPage(converter.context.id, this.config.pageRender),
+            once: true
+          })
+        }
+        obj.scripts.push({
+          id: 'showdowns-page-tabs',
           code: observeraPageTabsClick
-        };
-        obj.scripts.push(script);
+        });
+        converter.context.hasTabs = false;
         return obj;
       }
     }
