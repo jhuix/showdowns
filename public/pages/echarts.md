@@ -52,7 +52,7 @@ More features of Apache ECharts can be found in the [feature document](https://e
 }
 ```
 
-```echarts {"align":"center", "width":640, "height":480, "type":"javascript"}
+```echarts {"align":"center", "width":640, "height":640, "type":"javascript"}
 const data = [];
 for (let i = 0; i <= 100; i++) {
   let theta = (i / 100) * 360;
