@@ -2,6 +2,16 @@
 
 # Echarts
 
+Apache ECharts is a free, powerful charting and visualization library offering easy ways to add intuitive, interactive, and highly customizable charts to your commercial products. It is written in pure JavaScript and based on [zrender](https://github.com/ecomfe/zrender), which is a whole new lightweight canvas library.
+
+:::important[Abundant Chart Types]
+ECharts supports [line series](https://echarts.apache.org/en/option.html#series-line), [bar series](https://echarts.apache.org/en/option.html#series-bar), [scatter series](https://echarts.apache.org/en/option.html#series-scatterhttps://echarts.apache.org/en/option.html#series-pie), [candle-stick series](https://echarts.apache.org/en/option.html#series-candlestick), [boxplot series](https://echarts.apache.org/en/option.html#series-boxplot) for statistics, [map series](https://echarts.apache.org/en/option.html#series-map), [heatmap series](https://echarts.apache.org/en/option.html#series-heatmap), [lines series](https://echarts.apache.org/en/option.html#series-lines) for directional information, [graph series](https://echarts.apache.org/en/option.html#series-graph) for relationships, [treemap series](https://echarts.apache.org/en/option.html#series-treemap), [sunburst series](https://echarts.apache.org/en/option.html#series-sunburst), [parallel series](https://echarts.apache.org/en/option.html#series-parallel) for multi-dimensional data, [funnel series](https://echarts.apache.org/en/option.html#series-funnel) and [gauge series](https://echarts.apache.org/en/option.html#series-gauge). It's easy to create combinations of these visualization types with ECharts.
+
+Besides the built-in chart types, ECharts also provides a [custom series](https://echarts.apache.org/en/option.html#series-custom) for users to create more specific chart types. To use it, just pass the renderItem callback function and return any graphic elements you wish to draw, according to the data. ECharts supports native interactivity and so there is no need for further configuration.
+:::
+
+More features of Apache ECharts can be found in the [feature document](https://echarts.apache.org/en/feature.html).
+
 ## Markdown Syntax
 
 ````
@@ -12,7 +22,7 @@
 
 ## Echarts example
 
-```echarts {"align":"center", "max-width":640, "max-height":480}
+```echarts {"align":"center", "width":640, "height":480}
 {
   "title": { "text": "最近 30 天" },
   "tooltip": { "trigger": "axis", "axisPointer": { "lineStyle": { "width": 0 } } },
@@ -42,7 +52,7 @@
 }
 ```
 
-```echarts {"align":"center", "max-width":640, "max-height":480, "type":"javascript"}
+```echarts {"align":"center", "width":640, "height":480, "type":"javascript"}
 const data = [];
 for (let i = 0; i <= 100; i++) {
   let theta = (i / 100) * 360;

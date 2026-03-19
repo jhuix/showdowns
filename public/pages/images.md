@@ -2,9 +2,7 @@
 
 # Inline Image
 
-Support inline image be defined, including the image path can be reset using a reset event.
-
-Its markdown syntax format Its grammatical format is the same as that of obsidian-style image links.
+Support inline image be defined, including the image path can be reset using a reset event. Its markdown syntax format Its grammatical format is the same as that of obsidian-style image links.
 
 ## Markdown Syntax
 

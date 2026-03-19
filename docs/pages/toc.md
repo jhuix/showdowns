@@ -6,7 +6,7 @@ It's implemented sub-TOC in showdown-toc.js.
 
 ## Markdown Syntax
 
-The syntax string is not case sensitive.
+he TOC syntax consists of one or more '#' (the quantity of which is the current TOC header level) add the following string, and the syntax string is not case sensitive.
 
 ```
 【TOC】
@@ -27,9 +27,22 @@ The syntax string is not case sensitive.
 
 ```
 
+The main toc head level is one, and so follow syntax:
+
+```
+# [[TOC]]
+
+```
+
+The sub head of two level is two, and so follow syntax:
+
+```
+## {{TOC}}
+```
+
 ## sub-TOC examples
 
-### {{TOC}}
+## {{TOC}}
 
 ### sub-TOC examples1
 
