@@ -560,7 +560,7 @@ Default options is described below:
   For more page tabs options:
 
       {
-        pageRender: (pageId: string) => void
+        pageRender: (pageSide: string | HTMLELement) => void
       }
 
 #### defaultExtensions

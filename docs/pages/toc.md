@@ -37,7 +37,7 @@ The main toc head level is one, and so follow syntax:
 The sub head of two level is two, and so follow syntax:
 
 ```
-## {{TOC}}
+## [[TOC]]
 ```
 
 ## sub-TOC examples

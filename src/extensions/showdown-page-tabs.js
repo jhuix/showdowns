@@ -93,7 +93,7 @@ export function showdownPageTabs() {
 
                 const navLinks = `<div class="nav-container"><ul class="nav-list">${links.join('')}</ul></div>`;
                 const id = converter.context.id ? `id="page-side${converter.context.id}" ` : '';
-                const code = `<div class="page-navigation"><div ${id}class="page-sidebar">${title}${navLinks}</div><div class="page-doc">${desc}</div></div>`;
+                const code = `<div class="page-navigation page-remote"><div ${id}class="page-sidebar">${title}${navLinks}</div><div class="page-doc">${desc}</div></div>`;
                 converter.context.hasTabs = true;
                 return showdown.subParser('hashBlock')(code, options, globals);
               }
@@ -112,7 +112,7 @@ export function showdownPageTabs() {
 
 function renderLocalPage(pageId, pageRender) {
   return () => {
-    pageRender(`page-side${pageId}`);
+    pageRender(`#page-side${pageId}`);
   };
 }
 
@@ -125,8 +125,7 @@ function observeraPageTabsClick() {
       const pageSidebar = target.closest('.page-sidebar');
       const navPage = target.closest('.page-navigation');
       if (!pageSidebar || !navPage) return;
-      const navContents = navPage.querySelectorAll('.page-content');
-      if (navContents.length > 1) {
+      if (!navPage.classList.contains('page-remote')) {
         event.stopImmediatePropagation();
         event.preventDefault();
 
@@ -140,6 +139,7 @@ function observeraPageTabsClick() {
             navItem.classList.add('nav-item-active');
           }
         }
+        const navContents = navPage.querySelectorAll('.page-content');
         navContents.forEach((page) => {
           if (page.id === `${navLink.id}-content`) {
             page.classList.remove('hidden');
